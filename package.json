@@ -1,0 +1,27 @@
+{
+  "name": "didact",
+  "version": "1.0.0",
+  "description": "didact",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel ./src -w --out-file ./build/index.js",
+    "start": "npm run build -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BetaSu/didact.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BetaSu/didact/issues"
+  },
+  "homepage": "https://github.com/BetaSu/didact#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-transform-react-jsx": "^7.7.7",
+    "@babel/preset-env": "^7.7.7"
+  }
+}
