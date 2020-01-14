@@ -1,5 +1,5 @@
 # Didact学习笔记
-Didact是实现了 Concurrent Mode, Fiber Tree , Reconciliation, Function Component, Hook (useState) 的简易版React。
+Didact是实现了 Concurrent Mode, Fiber Tree , Reconciliation, Function Component, Hook (useState) 的简易版React。当前仓库包括供运行的代码、注释。
 
 教程地址 https://pomb.us/build-your-own-react/
 
