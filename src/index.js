@@ -175,15 +175,14 @@ const updateFunctionComponent = fiber => {
   hookIndex = 0;
   wipFiber.hooks = [];
   const children = [fiber.type(fiber.props)];
-  reconciliationChildren(fiber, children);
+  reconcileChildren(fiber, children);
 }
 
 const updateHostComponent = fiber => {
   if (!fiber.dom) {
     fiber.dom = createDOM(fiber);
   }
-  const elements = fiber.props.children;
-  reconciliationChildren(fiber, elements);
+  reconcileChildren(fiber, fiber.props.children);
 }
 
 function useState(initial) {
@@ -219,7 +218,7 @@ function useState(initial) {
  * 2. 如果type不同，渲染新DOM
  * 3. 如果type不同同时存在旧fiber，需要删除旧node
 */
-const reconciliationChildren = (wipFiber, elements) => {
+const reconcileChildren = (wipFiber, elements) => {
   let index = 0;
   let prevSibling;
   let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
@@ -233,7 +232,7 @@ const reconciliationChildren = (wipFiber, elements) => {
     if (sameType) {
       newFiber = {
         type: oldFiber.type,
-        props: oldFiber.props,
+        props: element.props,
         dom: oldFiber.dom,
         parent: wipFiber,
         alternate: oldFiber,
@@ -294,9 +293,9 @@ const content = (
  * children来自于函数返回值而不是直接从props中取得
 */
 function Counter() {
-  const [state, setState] = Didact.useState(1)
+  const [state, setState] = Didact.useState(1);
+
   const onClick = () => {
-    console.log('click', state);
     setState(c => c + 1);
   }
   return (
