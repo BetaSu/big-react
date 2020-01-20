@@ -4,7 +4,6 @@
   "description": "didact",
   "main": "index.js",
   "scripts": {
-    "build": "babel ./src -w --out-file ./build/index.js",
     "start": "webpack-dev-server"
   },
   "repository": {
