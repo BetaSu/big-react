@@ -1,22 +1,23 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const outputPath = path.resolve(__dirname, "build");
-
-// 修改该变量进行不同版本编译
-const version = 'v2';
-
-console.log('\033[42;30m 当前版本 \033[40;32m ' + version + '\033[0m');
-console.warn('\033[43;30m 提示 \033[40;33m ' + '修改version变量进行不同版本编译' + '\033[0m');
-
+const packagesPath = path.resolve(__dirname, 'packages');
+console.log(path.resolve(packagesPath, 'react-reconciler'));
 module.exports = {
-  entry: path.resolve(__dirname, `./lib/${version}/demo`),
+  entry: path.resolve(__dirname, `./demo`),
   output: {
     path: outputPath,
     filename: "bundle.js"
   },
   resolve: {
     extensions: [".js", ".json", ".jsx"],
-    alias: {}
+    alias: {
+      react: path.resolve(packagesPath, 'react'),
+      reactDOM: path.resolve(packagesPath, 'react-dom'),
+      reactReconciler: path.resolve(packagesPath, 'react-reconciler'),
+      scheduler: path.resolve(packagesPath, 'scheduler'),
+      shared: path.resolve(packagesPath, 'shared')
+    }
   },
   module: {
     rules: [
@@ -27,7 +28,6 @@ module.exports = {
       }
     ]
   },
-  mode: "development",
   devServer: {
     contentBase: path.join(__dirname, "build"),
     compress: true,
@@ -37,8 +37,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'xxx',
-      template: path.resolve(__dirname, './index.html')
+      title: 'for dev',
+      template: path.resolve(__dirname, './demo/assets/index.html')
     })
   ]
 };

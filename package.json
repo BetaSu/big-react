@@ -1,22 +1,22 @@
 {
-  "name": "didact",
+  "name": "react-on-the-way",
   "version": "1.0.0",
-  "description": "didact",
-  "main": "index.js",
+  "description": "build your own React",
+  "main": "demo/init",
   "scripts": {
     "start": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BetaSu/didact.git"
+    "url": "git+https://github.com/BetaSu/react-on-the-way.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BetaSu/didact/issues"
+    "url": "https://github.com/BetaSu/react-on-the-way/issues"
   },
-  "homepage": "https://github.com/BetaSu/didact#readme",
+  "homepage": "https://github.com/BetaSu/react-on-the-way#readme",
   "devDependencies": {
     "@babel/cli": "^7.7.7",
     "@babel/core": "^7.7.7",
