@@ -1,6 +1,15 @@
 import {NoEffect} from 'shared/ReactSideEffectTags';
 import { NoWork } from './ReactFiberExpirationTime';
+import {
+  IndeterminateComponent,
+  ClassComponent
+} from 'shared/ReactWorkTags';
 
+// 判断是否是 ClassComponent
+function shouldConstruct(Component) {
+  const prototype = Component.prototype;
+  return !!(prototype && prototype.isReactComponent);
+}
 export class FiberNode {
   constructor(tag, pendingProps, key, mode) {
     // 1 ClassComponent
@@ -13,10 +22,10 @@ export class FiberNode {
     // 未使用
     this.mode = mode;
 
+    // type字段由React.createElement注入
     // 对于FunctionComponent，指向 fn
     // 对于ClassComponent，指向 class
     // 对于HostComponent，为对应DOM节点的字符串
-    // type
 
     // 指向父Fiber
     this.return = null;
@@ -74,4 +83,30 @@ export function createWorkInProgress(current, pendingProps) {
   workInProgress.memoizedState = current.memoizedState;
 
   return workInProgress;
+}
+
+// type定义见FiberNode class
+export function createFiberFromTypeAndProps(type, key, pendingProps) {
+  let fiberTag = IndeterminateComponent;
+  // FunctionComponent ClassComponent 类型都是 function
+  if (typeof type === 'function') {
+    if (shouldConstruct(type)) {
+      fiberTag = ClassComponent;
+    }
+  }
+  const fiber = new FiberNode(fiberTag, pendingProps, key);
+  fiber.type = type;
+  return fiber;
+}
+
+export function createFiberFromElement(element) {
+  const type = element.type;
+  const key = element.key;
+  const pendingProps = element.props;
+  const fiber = createFiberFromTypeAndProps(
+    type,
+    key,
+    pendingProps
+  );
+  return fiber;
 }

@@ -23,6 +23,7 @@ export default class ReactRoot {
     const expirationTime = DOMRenderer.requestCurrentTimeForUpdate();
     // var expirationTime = computeExpirationForFiber(currentTime, current$$1);
     const update = createUpdate(expirationTime);
+    // fiber.tag为HostRoot类型，payload为对应要渲染的ReactComponents
     update.payload = {element};
     enqueueUpdate(current, update);
     return DOMRenderer.scheduleUpdateOnFiber(current, expirationTime);

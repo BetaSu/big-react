@@ -9,15 +9,40 @@ import {
   HostComponent,
   HostText
 } from 'shared/ReactWorkTags';
+import {cloneUpdateQueue} from './ReactUpdateQueue';
+import {reconcileChildFibers} from './ReactChildFiber';
 
 
 let didReceiveUpdate = false;
 
-function updateHostRoot(current, workInProgress) {
-  const updateQueue = workInProgress.updateQueue;
 
+function reconcileChildren(current, workInProgress, nextChildren) {
+  workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
 }
 
+// 更新HostRoot，
+// 遍历update链表，更新state，协调子节点，返回child
+function updateHostRoot(current, workInProgress) {
+  const updateQueue = workInProgress.updateQueue;
+  const nextProps = workInProgress.pendingProps;
+  const prevState = current.memoizedState;
+  const prevChildren = prevState ? prevState.element : null;
+
+  cloneUpdateQueue(current, workInProgress);
+  processUpdateQueue(workInProgress, nextProps);
+
+  const nextState = workInProgress.memoizedState;
+  const nextChildren = nextState.element;
+
+  if (prevChildren === nextChildren) {
+    return console.log('prevChildren === nextChildren it is a bailout');
+  }
+  reconcileChildren(current, workInProgress, nextChildren);
+  return workInProgress.child;
+}
+
+// render阶段开始处理fiber的入口
+// 总体来说该函数会计算新state，返回child
 export default function beginWork(workInProgress) {
   const current = workInProgress.alternate;
 
