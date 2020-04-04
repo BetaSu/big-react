@@ -2,7 +2,7 @@
 import {createFiberFromElement} from './ReactFiber';
 import {Placement} from 'shared/ReactSideEffectTags';
 
-// 当前fiber需要在commit阶段插入DOM
+// 标志当前fiber需要在commit阶段插入DOM
 function placeSingleChild(fiber) {
   // alternate存在表示该fiber已经插入到DOM
   if (!fiber.alternate) {

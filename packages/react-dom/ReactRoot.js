@@ -7,7 +7,7 @@ import {createUpdate, initializeUpdateQueue, enqueueUpdate} from 'reactReconcile
 */
 export default class ReactRoot {
   constructor(container) {
-    // 指向RootFiber
+    // RootFiber tag === 3
     this.current = new FiberNode(3);
     // 初始化rootFiber的updateQueue
     initializeUpdateQueue(this.current);

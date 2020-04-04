@@ -11,17 +11,23 @@ import {
 } from 'shared/ReactWorkTags';
 import {cloneUpdateQueue} from './ReactUpdateQueue';
 import {reconcileChildFibers} from './ReactChildFiber';
-
+import {shouldSetTextContent} from 'reactDOM/ReactDOMHostConfig';
 
 let didReceiveUpdate = false;
 
+// 应该存在于 ReactFiberHooks.js
+function renderWithHooks(current, workInProgress, Component, props) {
+  
+}
 
 function reconcileChildren(current, workInProgress, nextChildren) {
   workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
 }
 
 // 更新HostRoot，
-// 遍历update链表，更新state，协调子节点，返回child
+// 遍历update链表，更新state
+// 生成child fiber
+// 返回child fiber
 function updateHostRoot(current, workInProgress) {
   const updateQueue = workInProgress.updateQueue;
   const nextProps = workInProgress.pendingProps;
@@ -29,6 +35,7 @@ function updateHostRoot(current, workInProgress) {
   const prevChildren = prevState ? prevState.element : null;
 
   cloneUpdateQueue(current, workInProgress);
+  // 根据update链表更新state的操作只在HostRoot上有，存疑？
   processUpdateQueue(workInProgress, nextProps);
 
   const nextState = workInProgress.memoizedState;
@@ -38,6 +45,41 @@ function updateHostRoot(current, workInProgress) {
     return console.log('prevChildren === nextChildren it is a bailout');
   }
   reconcileChildren(current, workInProgress, nextChildren);
+  return workInProgress.child;
+}
+
+function updateFunctionComponent(current, workInProgress, Component, nextProps) {
+  let nextChildren = renderWithHooks(current, workInProgress, Component, nextProps);
+
+  if (current && !didReceiveUpdate) {
+    // 需要返回    
+  }
+  reconcileChildren(current, workInProgress, nextChildren);
+  return workInProgress.child;
+}
+
+// 生成 child fiber
+// 返回 child fiber
+function updateHostComponent(current, workInProgress) {
+  // DOM节点名
+  const type = workInProgress.type;
+  const prevProps = current ? current.memoizedProps : null;
+  const nextProps = workInProgress.pendingProps;
+  const nextChildren = nextProps.children;
+
+  const isDirectTextChild = shouldSetTextContent(type, nextProps);
+  if (isDirectTextChild) {
+    // 当前fiber对应的DOM节点只有唯一一个文本子节点
+    // 这种情况我们可以直接将其子节点一起处理了，省去了再生成一个HostText Fiber并遍历下去的过程
+    nextChildren = null;
+  }
+  // 省去 之前isDirectTextChild 现在不是情况的 diff
+
+  reconcileChildren(
+    current,
+    workInProgress,
+    nextChildren
+  )
   return workInProgress.child;
 }
 
@@ -56,6 +98,16 @@ export default function beginWork(workInProgress) {
   switch (workInProgress.tag) {
     case HostRoot:  
       return updateHostRoot(current, workInProgress);
+    case FunctionComponent:
+      const Component = workInProgress.type;
+      return updateFunctionComponent(
+        current,
+        workInProgress,
+        Component,
+        workInProgress.pendingProps
+      );
+    case HostComponent:
+      return updateHostComponent(current, workInProgress);
     default:
       break;
   }
