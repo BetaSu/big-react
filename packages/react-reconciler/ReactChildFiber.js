@@ -1,6 +1,7 @@
 // 协调子fiber的过程
 import {createFiberFromElement} from './ReactFiber';
 import {Placement} from 'shared/ReactSideEffectTags';
+import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
 
 // 标志当前fiber需要在commit阶段插入DOM
 function placeSingleChild(fiber) {
@@ -20,13 +21,25 @@ function reconcileSingleElement(returnFiber, currentFirstChild, element) {
 }
 
 export function reconcileChildFibers(returnFiber, currentFirstChild, newChild) {
+  // React.createElement类型 或者 子节点是String、Number对应的Array类型
   const isObject = typeof newChild === 'object' && newChild !== null;
   if (isObject) {
-    return placeSingleChild(reconcileSingleElement(
-      returnFiber,
-      currentFirstChild,
-      newChild
-    ))
+    switch (newChild.$$typeof) {
+      case REACT_ELEMENT_TYPE:
+        return placeSingleChild(reconcileSingleElement(
+          returnFiber,
+          currentFirstChild,
+          newChild
+        ))
+    }
+    // 在 beginWork update各类Component时并未处理HostText，这里处理单个HostText
+    if (typeof newChild === 'number' || typeof newChild === 'string') {
+
+    }
+    // 在 beginWork update各类Component时并未处理HostText，这里处理多个HostText
+    if (Array.isArray(newChild)) {
+
+    }
   }
   console.log('未实现的协调分支逻辑');
 }
