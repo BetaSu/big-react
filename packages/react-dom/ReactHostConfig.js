@@ -16,6 +16,10 @@ export function createInstance(type, props) {
   return domElement;
 }
 
+export function appendInitialChild(parent, child) {
+  parent.appendChild(child);
+}
+
 // 创建DOM节点
 // TODO 根据 根节点的namespace创建DOM节点，不一定 创建在当前document里
 export function createElement(type, props) {

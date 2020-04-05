@@ -19,7 +19,7 @@ import {
 } from './ReactFiber';
 import {
   createInstance
-} from 'reactDOM/ReactDOMHostConfig';
+} from 'reactDOM/ReactHostConfig';
 import beginWork from './ReactFiberBeginWork';
 import Scheduler from 'scheduler';
 

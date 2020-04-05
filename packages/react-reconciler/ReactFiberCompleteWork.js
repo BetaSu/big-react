@@ -1,7 +1,38 @@
+import {
+  HostComponent,
+  HostText
+} from 'shared/ReactWorkTags';
+import {
+  appendInitialChild,
+  createInstance
+} from 'reactDOM/ReactHostConfig';
 
-// 已经为children创建对应fiber，递归子节点为HostFiber创建对应DOM节点
+
+// 执行到当前函数之前已经为每个element创建对应的fiber，并且为每个host fiber创建对应的DOM节点
+// 该函数会将fiber的所有子节点（chid,child.sibling...）append到fiber对应的DOM节点上（fiber.stateNode）
+// 对于每一级HostComponent，该过程会递归上去，这样就能将分散在各自fiber中的DOM节点形成对应的DOM树
 export function appendAllChildren(parent, workInProgress) {
-  
+  let node = workInProgress.child;
+  while (node) {
+    if (node.tag === HostComponent || node.tag === HostText) {
+      appendInitialChild(parent, node.stateNode);
+    } else if (node.child) {
+      node.child.return = node;
+      node = node.child;
+      continue;
+    }
+    if (node === workInProgress) {
+      return;
+    }
+    while (!node.sibling) {
+      if (!node.return || node.return === workInProgress) {
+        return;
+      }
+      node = node.return;
+    }
+    node.sibling.return = node.return;
+    node = node.sibling;
+  }
 }
 
 export function completeWork(current, workInProgress) {
@@ -22,6 +53,7 @@ export function completeWork(current, workInProgress) {
       }
       // 创建对应DOM节点
       let instance = createInstance(type, newProps);
+      // 将子DOM节点append到创建的DOM节点上
       appendAllChildren(instance, workInProgress);
     default:
       break;

@@ -11,7 +11,7 @@ import {
 } from 'shared/ReactWorkTags';
 import {cloneUpdateQueue} from './ReactUpdateQueue';
 import {reconcileChildFibers} from './ReactChildFiber';
-import {shouldSetTextContent} from 'reactDOM/ReactDOMHostConfig';
+import {shouldSetTextContent} from 'reactDOM/ReactHostConfig';
 
 let didReceiveUpdate = false;
 
@@ -56,6 +56,10 @@ function updateFunctionComponent(current, workInProgress, Component, nextProps) 
   }
   reconcileChildren(current, workInProgress, nextChildren);
   return workInProgress.child;
+}
+
+function updateHostText(current, workInProgress) {
+  
 }
 
 // 生成 child fiber
@@ -108,6 +112,8 @@ export default function beginWork(workInProgress) {
       );
     case HostComponent:
       return updateHostComponent(current, workInProgress);
+    case HostText:
+        return updateHostText(current, workInProgress);
     default:
       break;
   }
