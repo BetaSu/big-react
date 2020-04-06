@@ -9,7 +9,7 @@ import {
   HostComponent,
   HostText
 } from 'shared/ReactWorkTags';
-import {cloneUpdateQueue} from './ReactUpdateQueue';
+import {cloneUpdateQueue, processUpdateQueue} from './ReactUpdateQueue';
 import {reconcileChildFibers} from './ReactChildFiber';
 import {shouldSetTextContent} from 'reactDOM/ReactHostConfig';
 

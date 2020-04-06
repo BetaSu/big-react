@@ -4,7 +4,8 @@ import {
 } from 'shared/ReactWorkTags';
 import {
   appendInitialChild,
-  createInstance
+  createInstance,
+  createTextInstance
 } from 'reactDOM/ReactHostConfig';
 
 
@@ -35,6 +36,7 @@ export function appendAllChildren(parent, workInProgress) {
   }
 }
 
+// 为 beginWork阶段生成的fiber生成对应DOM，并产生DOM树
 export function completeWork(current, workInProgress) {
   const newProps = workInProgress.pendingProps;
   switch (workInProgress.tag) {
@@ -55,6 +57,15 @@ export function completeWork(current, workInProgress) {
       let instance = createInstance(type, newProps);
       // 将子DOM节点append到创建的DOM节点上
       appendAllChildren(instance, workInProgress);
+      workInProgress.stateNode = instance;
+      // TODO 初始化事件？
+
+      return null;
+    case HostText:
+      // TODO 更新流程
+      const newText = newProps;
+      workInProgress.stateNode = createTextInstance(newText);
+      return null;
     default:
       break;
   }

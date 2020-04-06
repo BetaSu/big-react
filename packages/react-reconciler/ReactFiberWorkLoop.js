@@ -10,7 +10,7 @@ import {
 import {
   HostRoot,
   HostComponent
-} from 'shared/ReactWorkTag';
+} from 'shared/ReactWorkTags';
 import {
   Incomplete
 } from 'shared/ReactSideEffectTags';
@@ -20,6 +20,10 @@ import {
 import {
   createInstance
 } from 'reactDOM/ReactHostConfig';
+import {
+  commitMutationEffects,
+  commitBeforeMutationEffects
+} from './ReactFiberCommitWork';
 import beginWork from './ReactFiberBeginWork';
 import Scheduler from 'scheduler';
 
@@ -58,7 +62,7 @@ export function computeExpirationForFiber(currentTime, fiber) {
 export function scheduleUpdateOnFiber(fiber, expirationTime) {
   const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime);
   prepareFreshStack(root, expirationTime);
-  performSyncWorkOnRoot();
+  performSyncWorkOnRoot(root);
 }
 
 function prepareFreshStack(root, expirationTime) {
@@ -74,7 +78,7 @@ function prepareFreshStack(root, expirationTime) {
     // }
   }
   workInProgress = createWorkInProgress(root.current, null);
-  renderExpirationTime = expirationTime;
+  // renderExpirationTime = expirationTime;
 }
 
 export function unbatchedUpdates(fn, a) {
@@ -92,20 +96,109 @@ function completeUnitOfWork(unitOfWork) {
   do {
     const current = unitOfWork.alternate;
     const returnFiber = unitOfWork.return;
-    if (!(unitOfWork.effectTag & Incomplete)) {
-      // 该fiber还未处理完
+    // if (!(unitOfWork.effectTag & Incomplete)) {
+    if (true) {
+      // 该fiber未抛出错误
 
       let next = completeWork(current, unitOfWork);
 
       if (next) {
-        // 
         return next;
       }
+
+      if (returnFiber) {
+      // if (returnFiber && !(returnFiber.effectTag & Incomplete)) {
+        // 将完成的fiber的 effect list append到父级fiber上
+        // 这样一级级递归上去后，根节点会有一条本次update所有有effect的fiber的list
+        // 在执行DOM操作时只需要遍历这条链表而不需要再递归一遍整个fiber树就能执行effect对应DOM操作
+        if (!returnFiber.firstEffect) {
+          returnFiber.firstEffect = workInProgress.firstEffect;
+        }
+        if (workInProgress.lastEffect) {
+          if (returnFiber.lastEffect) {
+            returnFiber.lastEffect.nextEffect = workInProgress.firstEffect;
+          }
+          returnFiber.lastEffect = workInProgress.lastEffect;
+        }
+        const effectTag = workInProgress.effectTag;
+        if (effectTag) {
+          // 如果当前fiber上存在effect，把他附在父fiber effect list的最后
+          if (returnFiber.lastEffect) {
+            // 父fiber list 已有effect
+            returnFiber.lastEffect.nextEffect = workInProgress;
+          } else {
+            returnFiber.firstEffect = workInProgress;
+          }
+          returnFiber.lastEffect = workInProgress;
+        }
+      }
+
+      const sibling = workInProgress.sibling;
+      if (sibling) {
+        // 当前父fiber下处理完workInProgress，再去处理他的兄弟节点
+        return sibling;
+      }
+      // 兄弟节点也处理完后，向上一级继续处理
+      workInProgress = returnFiber;
     }
   } while(true)
+
+  return null;
 }
 
 
+
+// commit阶段的入口，包括子阶段：
+// before mutation阶段：遍历effect list，执行 DOM操作前触发的钩子
+// mutation阶段：遍历effect list，执行effect
+function commitRoot(root) {
+  // TODO 根据scheduler优先级执行
+  const finishedWork = root.finishedWork;
+  if (!finishedWork) {
+    return null;
+  }
+  root.finishedWork = null;
+
+  let firstEffect;
+  if (root.effectTag) {
+    // 由于根节点的effect list不含有自身的effect，所以当根节点本身存在effect时需要将其append 入 effect list
+    if (finishedWork.lastEffect) {
+      finishedWork.lastEffect.nextEffect = finishedWork;
+      firstEffect = finishedWork.firstEffect;
+    } else {
+      firstEffect = finishedWork;
+    }
+  } else {
+    // 根节点本身没有effect
+    firstEffect = finishedWork.firstEffect;
+  }
+
+  let nextEffect;
+
+  if (firstEffect) {
+    // before mutation阶段
+    nextEffect = firstEffect;    
+    do {
+      try {
+        commitBeforeMutationEffects(nextEffect);
+      } catch(e) {
+        console.warn('commit before error', e);
+        nextEffect = nextEffect.nextEffect;
+      }
+    } while(nextEffect)
+
+    // mutation阶段
+    nextEffect = firstEffect;
+    do {
+      try {
+        commitMutationEffects(root, nextEffect);
+      } catch(e) {
+        console.warn('commit mutaion error', e);
+        nextEffect = nextEffect.nextEffect;
+      }
+    } while(nextEffect)
+  }
+}
 
 function performUnitOfWork(unitOfWork) {
   // beginWork会返回fiber.child，不存在next意味着深度优先遍历已经遍历到某个子树的最深层叶子节点
@@ -117,7 +210,7 @@ function performUnitOfWork(unitOfWork) {
 }
 
 // 这是不通过scheduler的同步任务的入口
-function  performSyncWorkOnRoot() {
+function  performSyncWorkOnRoot(root) {
   if (workInProgress) {
     do {
       try {
@@ -128,6 +221,10 @@ function  performSyncWorkOnRoot() {
       }
     } while (true)
   }
+  root.finishedWork = root.current.alternate;
+  // render阶段结束，进入commit阶段
+  commitRoot(root);
+  return null;
 }
 
 // 当前只实现了从fiber向上直到root

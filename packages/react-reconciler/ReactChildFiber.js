@@ -91,10 +91,10 @@ export function reconcileChildFibers(returnFiber, currentFirstChild, newChild) {
     // 在 beginWork update各类Component时并未处理HostText，这里处理多个HostText
     if (Array.isArray(newChild)) {
       return reconcileChildrenArray(
-        returnFiber,
-        currentFirstChild,
-        newChild
-        )
+      returnFiber,
+      currentFirstChild,
+      newChild
+      )
     }
   }
   console.log('未实现的协调分支逻辑');
