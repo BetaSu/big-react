@@ -83,8 +83,8 @@ export function getStateFromUpdate(workInProgress, queue, update, prevState, nex
 export function processUpdateQueue(workInProgress, nextProps) {
   const queue = workInProgress.updateQueue;
   // base update 为 单向非环链表
-  const firstBaseUpdate = queue.firstBaseUpdate;
-  const lastBaseUpdate = queue.lastBaseUpdate;
+  let firstBaseUpdate = queue.firstBaseUpdate;
+  let lastBaseUpdate = queue.lastBaseUpdate;
 
   // 如果有 pendingUpdate，需要将 pendingUpdate单向环状链表剪开并拼在baseUpdate单向链表后面
   let pendingQueue = queue.shared.pending;
@@ -123,7 +123,7 @@ export function processUpdateQueue(workInProgress, nextProps) {
     // 存在update时遍历链表，计算出update后的值
 
     let newState = queue.baseState;
-    let udpate = firstBaseUpdate;
+    let update = firstBaseUpdate;
     do {
       // 需要考虑优先级，还未处理
       newState = getStateFromUpdate(workInProgress, queue, update, newState, nextProps);

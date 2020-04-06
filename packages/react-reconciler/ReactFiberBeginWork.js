@@ -89,14 +89,14 @@ function updateHostComponent(current, workInProgress) {
 
 // render阶段开始处理fiber的入口
 // 总体来说该函数会计算新state，返回child
-export default function beginWork(workInProgress) {
-  const current = workInProgress.alternate;
-
-  const oldProps = current.memoizedProps;
-  const newProps = workInProgress.pendingProps;
-
-  if (oldProps !== newProps) {
-    didReceiveUpdate = true;
+export default function beginWork(current, workInProgress) {
+  if (current) {
+    const oldProps = current.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+  
+    if (oldProps !== newProps) {
+      didReceiveUpdate = true;
+    }
   }
 
   switch (workInProgress.tag) {

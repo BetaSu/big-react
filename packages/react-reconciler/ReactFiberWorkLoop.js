@@ -213,12 +213,14 @@ function performUnitOfWork(unitOfWork) {
 function  performSyncWorkOnRoot(root) {
   if (workInProgress) {
     do {
-      try {
-        workLoopSync();
-        break;
-      } catch(e) {
-        console.log('work loop sync err:', e);
-      }
+      workLoopSync();
+      break;
+      // try {
+      //   workLoopSync();
+      //   break;
+      // } catch(e) {
+      //   console.log('work loop sync err:', e);
+      // }
     } while (true)
   }
   root.finishedWork = root.current.alternate;
