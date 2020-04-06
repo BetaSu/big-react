@@ -91,16 +91,15 @@ export function unbatchedUpdates(fn, a) {
 
 // 传入的fiber是某个子树的叶子节点
 function completeUnitOfWork(unitOfWork) {
-  // 感觉不需要的样子
-  // workInProgress = unitOfWork;
+  workInProgress = unitOfWork;
   do {
-    const current = unitOfWork.alternate;
-    const returnFiber = unitOfWork.return;
-    // if (!(unitOfWork.effectTag & Incomplete)) {
+    const current = workInProgress.alternate;
+    const returnFiber = workInProgress.return;
+    // if (!(workInProgress.effectTag & Incomplete)) {
     if (true) {
       // 该fiber未抛出错误
 
-      let next = completeWork(current, unitOfWork);
+      let next = completeWork(current, workInProgress);
 
       if (next) {
         return next;
@@ -201,8 +200,9 @@ function commitRoot(root) {
 }
 
 function performUnitOfWork(unitOfWork) {
+  const current = unitOfWork.alternate;
   // beginWork会返回fiber.child，不存在next意味着深度优先遍历已经遍历到某个子树的最深层叶子节点
-  let next = beginWork(unitOfWork);
+  let next = beginWork(current, unitOfWork);
   if (!next) {
     next = completeUnitOfWork(unitOfWork);
   }
