@@ -140,7 +140,7 @@ function completeUnitOfWork(unitOfWork) {
       // 兄弟节点也处理完后，向上一级继续处理
       workInProgress = returnFiber;
     }
-  } while(true)
+  } while(workInProgress)
 
   return null;
 }
@@ -173,13 +173,12 @@ function commitRoot(root) {
   }
 
   let nextEffect;
-
   if (firstEffect) {
     // before mutation阶段
     nextEffect = firstEffect;    
     do {
       try {
-        commitBeforeMutationEffects(nextEffect);
+        nextEffect = commitBeforeMutationEffects(nextEffect);
       } catch(e) {
         console.warn('commit before error', e);
         nextEffect = nextEffect.nextEffect;
@@ -190,7 +189,7 @@ function commitRoot(root) {
     nextEffect = firstEffect;
     do {
       try {
-        commitMutationEffects(root, nextEffect);
+        nextEffect = commitMutationEffects(root, nextEffect);
       } catch(e) {
         console.warn('commit mutaion error', e);
         nextEffect = nextEffect.nextEffect;

@@ -1,5 +1,6 @@
 import {
   HostComponent,
+  HostRoot,
   HostText
 } from 'shared/ReactWorkTags';
 import {

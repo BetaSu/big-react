@@ -28,6 +28,7 @@ function isHostParent(parent) {
 
 function getHostSibling(fiber) {
   let node = fiber;
+  // sutodo
   sibling: while(true) {
     
   }
@@ -79,5 +80,6 @@ export function commitMutationEffects(root, nextEffect) {
       case PlacementAndUpdate:
         break;
     }
+    return null;
   }
 }
