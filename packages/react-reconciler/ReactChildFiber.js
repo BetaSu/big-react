@@ -1,5 +1,8 @@
 // 协调子fiber的过程
-import {createFiberFromElement} from './ReactFiber';
+import {
+  createFiberFromElement,
+  createFiberFromText
+} from './ReactFiber';
 import {Placement} from 'shared/ReactSideEffectTags';
 import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
 
@@ -12,12 +15,57 @@ function placeSingleChild(fiber) {
   return fiber;
 }
 
-// 协调子fiber 
+function createChild(returnFiber, newChild) {
+  if (typeof newChild === 'number' || typeof newChild === 'string') {
+    const created = createFiberFromText(newChild);
+    created.return = returnFiber;
+    return created;
+  }
+  if (typeof newChild === 'object' && newChild !== null) {
+    if (newChild.$$typeof === REACT_ELEMENT_TYPE) {
+      const created = createFiberFromElement(newChild);
+      created.return = returnFiber;
+      return created;
+    }
+  }
+  return null;
+}
+
+// 协调子fiber 创建fiber
 function reconcileSingleElement(returnFiber, currentFirstChild, element) {
   // key diff 算法待补充
   const created = createFiberFromElement(element);
   created.return = returnFiber;
   return created;
+}
+
+function reconcileSingleTextNode(returnFiber, currentFirstChild, textContent) {
+  // 省略更新过程
+  const created = createFiberFromText(textContent);
+  created.return = returnFiber;
+  return created;
+}
+
+function reconcileChildrenArray(returnFiber, currentFirstChild, newChild) {
+  // TODO array diff
+  let prev;
+  let first;
+  for (let i = 0; i < newChild.length; i++) {
+    const child = newChild[i];
+    const newFiber = createChild(returnFiber, child);
+    if (!newFiber) {
+      continue;
+    }
+    placeSingleChild(newFiber);
+    if (prev) {
+      prev.sibling = newFiber;
+    }
+    if (!first) {
+      first = newFiber;
+    }
+    prev = newFiber;
+  }
+  return first;
 }
 
 export function reconcileChildFibers(returnFiber, currentFirstChild, newChild) {
@@ -34,11 +82,19 @@ export function reconcileChildFibers(returnFiber, currentFirstChild, newChild) {
     }
     // 在 beginWork update各类Component时并未处理HostText，这里处理单个HostText
     if (typeof newChild === 'number' || typeof newChild === 'string') {
-
+      return placeSingleChild(reconcileSingleTextNode(
+        returnFiber,
+        currentFirstChild,
+        newChild
+      ))
     }
     // 在 beginWork update各类Component时并未处理HostText，这里处理多个HostText
     if (Array.isArray(newChild)) {
-
+      return reconcileChildrenArray(
+        returnFiber,
+        currentFirstChild,
+        newChild
+        )
     }
   }
   console.log('未实现的协调分支逻辑');

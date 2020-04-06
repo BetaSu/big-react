@@ -2,6 +2,7 @@ import {NoEffect} from 'shared/ReactSideEffectTags';
 import { NoWork } from './ReactFiberExpirationTime';
 import {
   IndeterminateComponent,
+  HostText,
   ClassComponent
 } from 'shared/ReactWorkTags';
 
@@ -108,5 +109,10 @@ export function createFiberFromElement(element) {
     key,
     pendingProps
   );
+  return fiber;
+}
+
+export function createFiberFromText(textContent) {
+  const fiber = new FiberNode(HostText, textContent);
   return fiber;
 }
