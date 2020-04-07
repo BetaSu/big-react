@@ -75,7 +75,7 @@ function updateHostComponent(current, workInProgress) {
   const type = workInProgress.type;
   const prevProps = current ? current.memoizedProps : null;
   const nextProps = workInProgress.pendingProps;
-  const nextChildren = nextProps.children;
+  let nextChildren = nextProps.children;
 
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
   if (isDirectTextChild) {

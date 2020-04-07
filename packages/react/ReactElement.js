@@ -14,6 +14,7 @@ function ReactElement(type, key, props) {
  * @description React.createElement
 */
 export function createElement(type, config, children) {
+  console.log('in cre');
   const props = {};
   if (config) {
     for (propName in config) {
@@ -21,17 +22,19 @@ export function createElement(type, config, children) {
         props[propName] = config[propName];
       }
     }
-    const childrenLength = arguments.length - 2;
-    // 多个children使用数组的形式
-    if (childrenLength === 1) {
-      props.children = children;
-    } else if (childrenLength > 1) {
-      const childArray = Array(childrenLength);
-      for (let i = 0; i < childrenLength; i++) {
-        childArray[i] = arguments[2 + i];
-      }
-      props.children = childArray;
-    }
   }
+
+  const childrenLength = arguments.length - 2;
+  // 多个children使用数组的形式
+  if (childrenLength === 1) {
+    props.children = children;
+  } else if (childrenLength > 1) {
+    const childArray = Array(childrenLength);
+    for (let i = 0; i < childrenLength; i++) {
+      childArray[i] = arguments[2 + i];
+    }
+    props.children = childArray;
+  }
+  
   return ReactElement(type, null, props);
 }

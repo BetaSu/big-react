@@ -1,5 +1,5 @@
 import {React, ReactDOM} from '../packages';
 
-const Block = <div>i am block</div>
-
+const Block = <div>Hello world!!!</div>
+console.log(Block);
 ReactDOM.render(Block, document.querySelector('#app'));

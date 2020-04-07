@@ -6,7 +6,8 @@ import {
 import {
   appendInitialChild,
   createInstance,
-  createTextInstance
+  createTextInstance,
+  finalizeInitialChildren
 } from 'reactDOM/ReactHostConfig';
 
 

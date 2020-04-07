@@ -3,6 +3,7 @@ import { NoWork } from './ReactFiberExpirationTime';
 import {
   IndeterminateComponent,
   HostText,
+  HostComponent,
   ClassComponent
 } from 'shared/ReactWorkTags';
 
@@ -89,11 +90,14 @@ export function createWorkInProgress(current, pendingProps) {
 // type定义见FiberNode class
 export function createFiberFromTypeAndProps(type, key, pendingProps) {
   let fiberTag = IndeterminateComponent;
+
   // FunctionComponent ClassComponent 类型都是 function
   if (typeof type === 'function') {
     if (shouldConstruct(type)) {
       fiberTag = ClassComponent;
     }
+  } else if (typeof type === 'string') {
+    fiberTag = HostComponent;
   }
   const fiber = new FiberNode(fiberTag, pendingProps, key);
   fiber.type = type;

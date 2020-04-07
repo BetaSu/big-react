@@ -150,7 +150,7 @@ function completeUnitOfWork(unitOfWork) {
 
 
 
-// commit阶段的入口，包括子阶段：
+// commit阶段的入口，包括如下子阶段：
 // before mutation阶段：遍历effect list，执行 DOM操作前触发的钩子
 // mutation阶段：遍历effect list，执行effect
 function commitRoot(root) {

@@ -26,7 +26,7 @@ export function shouldSetTextContent(type, props) {
   return (
     type === 'noscript' ||
     type === 'textarea' ||
-    tyep === 'option' ||
+    type === 'option' ||
     typeof children === 'string' ||
     typeof children === 'number'
   )
@@ -83,4 +83,20 @@ function setInitialDOMProperties(domElement, tag, nextProps) {
 // TODO HostComponent attribute、事件初始化
 export function finalizeInitialChildren(domElement, type, props) {
   setInitialDOMProperties(domElement, type, props);
+}
+
+export function insertInContainerBefore(container, child, beforeChild) {
+  if (container.nodeType === COMMENT_NODE) {
+    container.parentNode.insertBefore(child, beforeChild);
+  } else {
+    container.insertBefore(child, beforeChild);
+  }
+}
+
+export function appendChildToContainer(container, child) {
+  if (container.nodeType === COMMENT_NODE) {
+    container.parentNode.insertBefore(child, container);
+  } else {
+    container.appendChild(child);
+  }
 }
