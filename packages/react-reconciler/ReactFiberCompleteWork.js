@@ -62,8 +62,8 @@ export function completeWork(current, workInProgress) {
       // 这样当completeWork递归上去时DOM树其实是从底到顶一层层构建好的，commit阶段只需要把顶层root append到container即可
       appendAllChildren(instance, workInProgress);
       workInProgress.stateNode = instance;
-      // TODO 初始化事件？
-
+      // 初始化props
+      finalizeInitialChildren(instance, type, newProps);
       return null;
     case HostText:
       // TODO 更新流程

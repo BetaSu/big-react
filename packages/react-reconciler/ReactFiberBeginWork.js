@@ -22,10 +22,11 @@ function renderWithHooks(current, workInProgress, Component, props) {
 
 function reconcileChildren(current, workInProgress, nextChildren) {
   // 首次渲染时只有root节点存在current，所以只有root会进入reconcile产生effectTag
+  // 其他节点会appendAllChildren形成DOM树
   if (current) {
     workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
   } else {
-    workInProgress.child = reconcileChildFibers(workInProgress, null, nextChildren);
+    workInProgress.child = mountChildFibers(workInProgress, null, nextChildren);
   }
 }
 
@@ -78,8 +79,9 @@ function updateHostComponent(current, workInProgress) {
 
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
   if (isDirectTextChild) {
-    // 当前fiber对应的DOM节点只有唯一一个文本子节点
-    // 这种情况我们可以直接将其子节点一起处理了，省去了再生成一个HostText Fiber并遍历下去的过程
+    // 当前fiber对应的DOM节点只有唯一一个文本子节点，这种情况比较常见，故针对其单独优化
+    // 标记其nextChildren为空，省去了再生成一个HostText Fiber并遍历下去的过程
+    // 该节点的child的处理在compleWork finalizeInitialChildren中
     nextChildren = null;
   }
   // 省去 之前isDirectTextChild 现在不是情况的 diff

@@ -1,5 +1,26 @@
 // 涉及DOM的相关配置
 
+const CHILDREN = 'children';
+
+const ELEMENT_NODE = 1;
+const TEXT_NODE = 3;
+const COMMENT_NODE = 8;
+const DOCUMENT_NODE = 9;
+const DOCUMENT_FRAGMENT_NODE = 11;
+
+function setTextContent(node, text) {
+  let firstChild = node.firstChild;
+  if (
+    firstChild &&
+    firstChild === node.lastChild &&
+    firstChild.nodeType === TEXT_NODE
+  ) {
+    firstChild.nodeValue = text;
+  } else {
+    node.textContent = text;
+  }
+}
+
 export function shouldSetTextContent(type, props) {
   const children = props.children;
   return (
@@ -37,4 +58,29 @@ export function createElement(type, props) {
     domElement = document.createElement(type);
   }
   return domElement;
+}
+
+function setInitialDOMProperties(domElement, tag, nextProps) {
+  for (const propKey in nextProps) {
+    if (!nextProps.hasOwnProperty(propKey)) {
+      continue;
+    }
+    const nextProp = nextProps[propKey];
+
+    if (propKey === CHILDREN) {
+      if (typeof nextProp === 'string' && nextProp) {
+        setTextContent(domElement, nextProp);
+      } else if (typeof nextProp === 'number') {
+        setTextContent(domElement, '' + nextProp);
+      }
+    } else if (nextProp !== null) {
+      // setValueForProperty
+    }
+  }
+}
+
+// 初始化DOM属性
+// TODO HostComponent attribute、事件初始化
+export function finalizeInitialChildren(domElement, type, props) {
+  setInitialDOMProperties(domElement, type, props);
 }
