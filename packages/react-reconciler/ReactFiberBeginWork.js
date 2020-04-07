@@ -10,7 +10,7 @@ import {
   HostText
 } from 'shared/ReactWorkTags';
 import {cloneUpdateQueue, processUpdateQueue} from './ReactUpdateQueue';
-import {reconcileChildFibers} from './ReactChildFiber';
+import {reconcileChildFibers, mountChildFibers} from './ReactChildFiber';
 import {shouldSetTextContent} from 'reactDOM/ReactHostConfig';
 
 let didReceiveUpdate = false;
@@ -21,7 +21,12 @@ function renderWithHooks(current, workInProgress, Component, props) {
 }
 
 function reconcileChildren(current, workInProgress, nextChildren) {
-  workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
+  // 首次渲染时只有root节点存在current，所以只有root会进入reconcile产生effectTag
+  if (current) {
+    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
+  } else {
+    workInProgress.child = reconcileChildFibers(workInProgress, null, nextChildren);
+  }
 }
 
 // 更新HostRoot，

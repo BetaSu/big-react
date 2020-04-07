@@ -89,7 +89,9 @@ export function unbatchedUpdates(fn, a) {
   }
 }
 
-// 传入的fiber是某个子树的叶子节点
+// 由于一定是beginWork返回null才会执行completeUnitOfWork，而beginWork始终创建并返回fiber.child
+// 所以传入的fiber一定是某个子树的叶子节点
+// 返回节点的兄弟节点（如果存在），不存在兄弟节点时递归上一级
 function completeUnitOfWork(unitOfWork) {
   workInProgress = unitOfWork;
   do {
@@ -99,6 +101,7 @@ function completeUnitOfWork(unitOfWork) {
     if (true) {
       // 该fiber未抛出错误
 
+      // 当前总会返回null
       let next = completeWork(current, workInProgress);
 
       if (next) {

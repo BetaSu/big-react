@@ -56,7 +56,10 @@ export function completeWork(current, workInProgress) {
       }
       // 创建对应DOM节点
       let instance = createInstance(type, newProps);
-      // 将子DOM节点append到创建的DOM节点上
+      // 因为current不存在，走到这里表示是首次渲染，不需要记录每一层的effect，层层更新
+      // 只需要一次性把fiber树渲染到页面上
+      // appendAllChildren用于将子DOM节点append到创建的DOM节点上（instance）
+      // 这样当completeWork递归上去时DOM树其实是从底到顶一层层构建好的，commit阶段只需要把顶层root append到container即可
       appendAllChildren(instance, workInProgress);
       workInProgress.stateNode = instance;
       // TODO 初始化事件？
