@@ -14,10 +14,9 @@ function ReactElement(type, key, props) {
  * @description React.createElement
 */
 export function createElement(type, config, children) {
-  console.log('in cre');
   const props = {};
   if (config) {
-    for (propName in config) {
+    for (const propName in config) {
       if (hasOwnProperty.call(config, propName)) {
         props[propName] = config[propName];
       }

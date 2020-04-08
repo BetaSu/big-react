@@ -5,20 +5,17 @@
 import {
   FunctionComponent,
   ClassComponent,
+  IndeterminateComponent,
   HostRoot,
   HostComponent,
   HostText
 } from 'shared/ReactWorkTags';
 import {cloneUpdateQueue, processUpdateQueue} from './ReactUpdateQueue';
 import {reconcileChildFibers, mountChildFibers} from './ReactChildFiber';
+import {renderWithHooks} from './ReactFiberHooks';
 import {shouldSetTextContent} from 'reactDOM/ReactHostConfig';
 
 let didReceiveUpdate = false;
-
-// 应该存在于 ReactFiberHooks.js
-function renderWithHooks(current, workInProgress, Component, props) {
-  
-}
 
 function reconcileChildren(current, workInProgress, nextChildren) {
   // 首次渲染时只有root节点存在current，所以只有root会进入reconcile产生effectTag
@@ -68,6 +65,20 @@ function updateHostText(current, workInProgress) {
   
 }
 
+// 可能是Class/Function Component，需要先mount后才能知道具体类型
+function mountIndeterminateComponent(current, workInProgress, Component) {
+  if (current) {
+    // TODO
+  }
+  const props = workInProgress.pendingProps;
+  const value = renderWithHooks(null, workInProgress, Component, props);
+  // TODO ClassComponent
+  // 当前只处理了 FunctionComponent
+  workInProgress.tag = FunctionComponent;
+  reconcileChildren(null, workInProgress, value);
+  return workInProgress.child;
+}
+
 // 生成 child fiber
 // 返回 child fiber
 function updateHostComponent(current, workInProgress) {
@@ -107,6 +118,8 @@ export default function beginWork(current, workInProgress) {
   }
 
   switch (workInProgress.tag) {
+    case IndeterminateComponent:
+      return mountIndeterminateComponent(current, workInProgress, workInProgress.type);
     case HostRoot:  
       return updateHostRoot(current, workInProgress);
     case FunctionComponent:

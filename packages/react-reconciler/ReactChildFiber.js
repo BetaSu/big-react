@@ -74,6 +74,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     return first;
   }
   
+  // 协调子节点，分为 mount 和 reconcile 2类
+  // mount用于首次渲染，child没有对应fiber，直接生成fiber，mount不会改变fiber的effectTag，原因见 appendAllChildren
+  // reconcile用于更新
   function reconcileChildFibers(returnFiber, currentFirstChild, newChild) {
     // React.createElement类型 或者 子节点是String、Number对应的Array类型
     const isObject = typeof newChild === 'object' && newChild !== null;

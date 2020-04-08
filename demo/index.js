@@ -1,5 +1,8 @@
 import {React, ReactDOM} from '../packages';
 
-const Block = <div>Hello world!!!</div>
-console.log(Block);
-ReactDOM.render(Block, document.querySelector('#app'));
+function App({name}) {
+  return (
+    <div>my name is {name}</div>
+  )
+}
+ReactDOM.render(<App name="UZI" />, document.querySelector('#app'));
