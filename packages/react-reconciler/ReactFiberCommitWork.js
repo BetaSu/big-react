@@ -90,7 +90,6 @@ function commitPlacement(finishedWork) {
 
   if (isContainer) {
     insertOrAppendPlacementNodeIntoContainer(finishedWork, before, parent);
-    console.log('里程碑！！~');
   } else {
     // TODO
   }
