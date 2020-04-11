@@ -217,7 +217,7 @@ function mountWorkInProgressHook() {
 const HooksDispatcherOnMount = {
   useState(initialState) {
     // 这部分代码在React中对应于mountState函数
-
+    
     // 生成新hook并插入WorkInProgress memoizedState最后
     // 同一个FunctionComponent内多个useState就会多次调用，生成 hook list
     const hook = mountWorkInProgressHook();

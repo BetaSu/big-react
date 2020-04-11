@@ -11,11 +11,12 @@ import {
   HostText
 } from 'shared/ReactWorkTags';
 import {cloneUpdateQueue, processUpdateQueue} from './ReactUpdateQueue';
-import {reconcileChildFibers, mountChildFibers} from './ReactChildFiber';
+import {reconcileChildFibers, mountChildFibers, cloneChildFibers} from './ReactChildFiber';
 import {renderWithHooks} from './ReactFiberHooks';
 import {shouldSetTextContent} from 'reactDOM/ReactHostConfig';
 
 let didReceiveUpdate = false;
+
 
 function reconcileChildren(current, workInProgress, nextChildren) {
   // 首次渲染时只有root节点存在current，所以只有root会进入reconcile产生effectTag
@@ -25,6 +26,11 @@ function reconcileChildren(current, workInProgress, nextChildren) {
   } else {
     workInProgress.child = mountChildFibers(workInProgress, null, nextChildren);
   }
+}
+
+function bailoutOnAlreadyFinishedWork(current, workInProgress) {
+  cloneChildFibers(current, workInProgress);
+  return workInProgress.child;
 }
 
 // 更新HostRoot，
@@ -45,7 +51,8 @@ function updateHostRoot(current, workInProgress) {
   const nextChildren = nextState.element;
 
   if (prevChildren === nextChildren) {
-    return console.log('prevChildren === nextChildren it is a bailout');
+    // 当前root state未变化，走优化路径，不需要协调子节点
+    return bailoutOnAlreadyFinishedWork(current, workInProgress);
   }
   reconcileChildren(current, workInProgress, nextChildren);
   return workInProgress.child;
@@ -109,17 +116,19 @@ function updateHostComponent(current, workInProgress) {
 // 总体来说该函数会计算新state，返回child
 export default function beginWork(current, workInProgress) {
   if (current) {
+    // 非首次渲染
+    // 对于FiberRoot，首次渲染也存在current，React是通过expirationTime区分是否走优化路径
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
-  
+
     if (oldProps !== newProps) {
       didReceiveUpdate = true;
+    } else {
+      // TODO props未改变，同时updateExpirationTime < renderExpirationTime（本次不需渲染）的优化路径
+      // didReceiveUpdate = false;
+      // return bailoutOnAlreadyFinishedWork(current, workInProgress);
     }
   }
-
-  // 此处有个优化路径
-  // 根据根据任务优先级判断如果当前fiber没有pending任务，则调用bailoutOnAlreadyFinishedWork
-  // 这个方法会为当前fiber没有alternate的children生成workInProgress copy，省去了reconcile过程
 
   switch (workInProgress.tag) {
     case IndeterminateComponent:

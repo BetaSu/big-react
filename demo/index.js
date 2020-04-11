@@ -2,14 +2,14 @@ import {React, ReactDOM} from '../packages';
 
 const {useState} = React;
 
-function App({age}) {
+function App({name}) {
   const [num, updateNum] = useState(0);
   setTimeout(() => {
     updateNum(num + 1);
   }, 2000);
   return (
     <div>
-      <p>{age}:{num}</p>
+      <p>{name}:{num}</p>
     </div>
   )
 }

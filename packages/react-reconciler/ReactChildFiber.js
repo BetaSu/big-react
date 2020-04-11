@@ -1,10 +1,25 @@
 // 协调子fiber的过程
 import {
   createFiberFromElement,
-  createFiberFromText
+  createFiberFromText,
+  createWorkInProgress
 } from './ReactFiber';
 import {Placement} from 'shared/ReactSideEffectTags';
 import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
+
+export function cloneChildFibers(current, workInProgress) {
+  if (!workInProgress.child) return;
+  const currentChild = workInProgress.child;
+  let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
+  workInProgress.child = newChild;
+
+  while (currentChild.sibling) {
+    currentChild = currentChild.sibling;
+    newChild = newChild.sibling = createWorkInProgress(currentChild, currentChild.pendingProps);
+    newChild.return = workInProgress;
+  }
+  newChild.sibling = null;
+}
 
 // 为了在2个方法中复用一批共用方法
 // shouldTrackSideEffects标示是否标记fiber的effectTag

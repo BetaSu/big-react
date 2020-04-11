@@ -56,9 +56,9 @@ export function computeExpirationForFiber(currentTime, fiber) {
   
 }
 
-// 将fiber的ept一直同步到root
-// 检查是否中断
-// 区分当前任务使同步还是异步
+// 从当前fiber递归上去到root，再从root开始work
+// TODO 检查是否中断
+// TODO 区分当前任务使同步还是异步
 export function scheduleUpdateOnFiber(fiber, expirationTime) {
   const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime);
   prepareFreshStack(root, expirationTime);
@@ -77,6 +77,7 @@ function prepareFreshStack(root, expirationTime) {
     //   interruptedWork = interruptedWork.return;
     // }
   }
+  
   workInProgress = createWorkInProgress(root.current, null);
   // renderExpirationTime = expirationTime;
 }
@@ -198,6 +199,10 @@ function commitRoot(root) {
         nextEffect = nextEffect.nextEffect;
       }
     } while(nextEffect)
+
+    // workInProgress tree 现在完成副作用的渲染变成current tree
+    // 之所以在 mutation阶段后设置是为了componentWillUnmount触发时 current 仍然指向之前那棵树
+    root.current = finishedWork;
   }
 }
 

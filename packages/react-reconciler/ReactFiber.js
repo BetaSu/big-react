@@ -18,7 +18,6 @@ export class FiberNode {
     // 3 HostRoot
     // 5 HostComponent
     this.tag = tag;
-    this.pendingProps = pendingProps;
     // prop key
     this.key = key;
     // 未使用
@@ -37,6 +36,12 @@ export class FiberNode {
     this.sibling = null;
 
     this.ref = null;
+
+    this.pendingProps = pendingProps;
+    this.memoizedProps = null;
+    // 存放update链表
+    this.updateQueue = null;
+    this.memoizedState = null;
 
     // 对于FunctionComponent，指向 fn()
     // 对于ClassComponent，指向 实例
