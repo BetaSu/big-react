@@ -3,12 +3,14 @@ import {React, ReactDOM} from '../packages';
 const {useState} = React;
 
 function App({age}) {
-  const [name, updateName] = useState('UZI');
+  const [num, updateNum] = useState(0);
+  setTimeout(() => {
+    updateNum(num + 1);
+  }, 2000);
   return (
     <div>
-      <p>My name is {name}</p>
-      <p>I am {age} years old.</p>
+      <p>{age}:{num}</p>
     </div>
   )
 }
-ReactDOM.render(<App age={18}/>, document.querySelector('#app'));
+ReactDOM.render(<App name='状态更新demo'/>, document.querySelector('#app'));

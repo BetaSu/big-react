@@ -71,11 +71,11 @@ function mountIndeterminateComponent(current, workInProgress, Component) {
     // TODO
   }
   const props = workInProgress.pendingProps;
-  const value = renderWithHooks(null, workInProgress, Component, props);
+  const children = renderWithHooks(null, workInProgress, Component, props);
   // TODO ClassComponent
   // 当前只处理了 FunctionComponent
   workInProgress.tag = FunctionComponent;
-  reconcileChildren(null, workInProgress, value);
+  reconcileChildren(null, workInProgress, children);
   return workInProgress.child;
 }
 
@@ -117,8 +117,15 @@ export default function beginWork(current, workInProgress) {
     }
   }
 
+  // 此处有个优化路径
+  // 根据根据任务优先级判断如果当前fiber没有pending任务，则调用bailoutOnAlreadyFinishedWork
+  // 这个方法会为当前fiber没有alternate的children生成workInProgress copy，省去了reconcile过程
+
   switch (workInProgress.tag) {
     case IndeterminateComponent:
+      // 首次渲染的Class/Function Component会进入该逻辑，
+      // 在函数内部会区分具体类型
+      // 如果是FunctionCompoennt，下次渲染就会走 updateFunctionComponent
       return mountIndeterminateComponent(current, workInProgress, workInProgress.type);
     case HostRoot:  
       return updateHostRoot(current, workInProgress);
