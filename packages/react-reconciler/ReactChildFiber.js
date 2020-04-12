@@ -4,8 +4,18 @@ import {
   createFiberFromText,
   createWorkInProgress
 } from './ReactFiber';
-import {Placement} from 'shared/ReactSideEffectTags';
+import {
+  Placement,
+  Deletion
+} from 'shared/ReactSideEffectTags';
 import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
+
+// 对于协调单一节点过程中，创建的workInProgress需要去掉他的sibling指向
+function useFiber(fiber, pendingProps) {
+  const clone = createWorkInProgress(fiber, pendingProps);
+  clone.sibling = null;
+  return clone;
+}
 
 export function cloneChildFibers(current, workInProgress) {
   if (!workInProgress.child) return;
@@ -42,10 +52,58 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
     return null;
   }
+
+  function deleteChild(returnFiber, childToDelete) {
+    if (!shouldTrackSideEffects) {
+      return;
+    }
+    // Deletion插入在末尾 ？
+    const last = returnFiber.lastEffect;
+    if (last) {
+      last.nextEffect = childToDelete;
+      returnFiber.lastEffect = childToDelete;
+    } else {
+      returnFiber.firstEffect = returnFiber.lastEffect = childToDelete;
+    }
+    childToDelete.nextEffect = null;
+    childToDelete.effectTag = Deletion;
+  }
+
+  // 将children置为删除
+  function deleteRemainingChildren(returnFiber, currentFirstChild) {
+    if (!shouldTrackSideEffects) {
+      return;
+    }
+    let childToDelete = currentFirstChild;
+    while (childToDelete) {
+      deleteChild(returnFiber, childToDelete);
+      childToDelete = childToDelete.sibling;
+    }
+    return null;
+  }
   
-  // 协调子fiber 创建fiber
+  // 协调单一节点的子fiber 创建fiber
   function reconcileSingleElement(returnFiber, currentFirstChild, element) {
-    // key diff 算法待补充
+    let child = currentFirstChild;
+    while (child) {
+      // 非首次渲染
+      // TODO key diff
+      if (child.type === element.type) {
+        // child type未改变，当前节点需要保留
+        // 父级下应该只有这一个子节点，将该子节点的兄弟节点删除
+        deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
+        // 创建child的workInProgress
+        const existing = useFiber(child, element.props);
+        existing.return = returnFiber;
+        return existing;
+      } else {
+        // 节点的type改变，同时是单一节点，需要将父fiber下所有child标记为删除
+        // 重新走创建新workInProgress的流程
+        deleteRemainingChildren(returnFiber, child);
+        break;
+      }
+      child = child.sibling;
+    }
     const created = createFiberFromElement(element);
     created.return = returnFiber;
     return created;

@@ -27,6 +27,10 @@ export class FiberNode {
     // 对于FunctionComponent，指向 fn
     // 对于ClassComponent，指向 class
     // 对于HostComponent，为对应DOM节点的字符串
+    this.type = null;
+    // 与type同步
+    this.elementType = null;
+    
 
     // 指向父Fiber
     this.return = null;
@@ -72,6 +76,7 @@ export function createWorkInProgress(current, pendingProps) {
     );
     workInProgress.stateNode = current.stateNode;
     workInProgress.type = current.type;
+    workInProgress.elementType = current.elementType;
     current.alternate = workInProgress;
     workInProgress.alternate = current;
   } else {
@@ -88,6 +93,9 @@ export function createWorkInProgress(current, pendingProps) {
   workInProgress.child = current.child;
   workInProgress.memoizedProps = current.memoizedProps;
   workInProgress.memoizedState = current.memoizedState;
+
+  // 父级协调的过程中会被覆写
+  workInProgress.sibling = current.sibling;
 
   return workInProgress;
 }
@@ -106,6 +114,7 @@ export function createFiberFromTypeAndProps(type, key, pendingProps) {
   }
   const fiber = new FiberNode(fiberTag, pendingProps, key);
   fiber.type = type;
+  fiber.elementType = type;
   return fiber;
 }
 
