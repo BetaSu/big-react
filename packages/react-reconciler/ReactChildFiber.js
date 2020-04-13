@@ -179,7 +179,8 @@ function ChildReconciler(shouldTrackSideEffects) {
         )
       }
     }
-    console.log('未实现的协调分支逻辑');
+    // 兜底删除
+    return deleteRemainingChildren(returnFiber, currentFirstChild);
   }
   return reconcileChildFibers;
 }

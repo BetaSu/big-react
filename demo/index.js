@@ -9,8 +9,8 @@ function App({name}) {
   }, 2000);
   return (
     <div>
-      <p>{name}:{num}</p>
+      <p>{num}</p>
     </div>
   )
 }
-ReactDOM.render(<App name='状态更新demo'/>, document.querySelector('#app'));
+ReactDOM.render(<App/>, document.querySelector('#app'));

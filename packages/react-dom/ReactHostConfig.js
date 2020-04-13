@@ -100,3 +100,47 @@ export function appendChildToContainer(container, child) {
     container.appendChild(child);
   }
 }
+
+// diff oldProps 与 newProps 更新HostComponent
+// TODO 除了children以外其他props的更新
+export function diffProperties(domElement, type, oldProps, newProps) {
+  let propKey;
+  let updatePayload;
+  // TODO oldProps不存在的情况
+  // 这种情况下 children 的处理我们在协调时已经做了
+
+  // newProp存在的情况
+  for (propKey in newProps) {
+    const newProp = newProps[propKey];
+    const oldProp = oldProps ? oldProps[propKey] : undefined;
+    if (
+      !newProps.hasOwnProperty(propKey) ||
+      oldProp === newProp ||
+      (!oldProp && !newProp)
+    ) {
+      continue;
+    }
+    if (propKey === CHILDREN) {
+      if (typeof newProp === 'number' || typeof newProp === 'string') {
+        (updatePayload = updatePayload || []).push(propKey, '' + newProp);
+      }
+    }
+  }
+  return updatePayload;
+}
+
+// 当前处理了 children textNode
+function updateDOMProperties(domElement, updatePayload) {
+  for (let i = 0; i < updatePayload.length; i += 2) {
+    const propKey = updatePayload[i];
+    const propValue = updatePayload[i + 1];
+    if (propKey === CHILDREN) {
+      setTextContent(domElement, propValue);
+    }
+  }
+}
+
+export function commitUpdate(domElement, updatePayload) {
+  // TODO 调用updateProperties，内部再调用updateDOMProperties
+  updateDOMProperties(domElement, updatePayload);
+}

@@ -7,9 +7,33 @@ import {
   appendInitialChild,
   createInstance,
   createTextInstance,
-  finalizeInitialChildren
+  finalizeInitialChildren,
+  diffProperties
 } from 'reactDOM/ReactHostConfig';
+import {
+  Update
+} from 'shared/ReactSideEffectTags';
 
+function markUpdate(workInProgress) {
+  workInProgress.effectTag |= Update;
+}
+
+function updateHostComponent(current, workInProgress, type, newProps) {
+  const oldProps = current.memoizedProps;
+
+  if (oldProps === newProps) {
+    return;
+  }
+  const instance = workInProgress.stateNode;
+  // HostComponent单一文本节点会在这里加入updateQueue
+  const updatePayload = diffProperties(instance, type, oldProps, newProps);
+  // updateQueue的处理会在commitWork中进行
+  workInProgress.updateQueue = updatePayload;
+
+  if (updatePayload) {
+    markUpdate(workInProgress);
+  }
+}
 
 // 执行到当前函数之前已经为每个element创建对应的fiber，并且为每个host fiber创建对应的DOM节点
 // 该函数会将fiber的所有子节点（chid,child.sibling...）append到fiber对应的DOM节点上（fiber.stateNode）
@@ -49,8 +73,10 @@ export function completeWork(current, workInProgress) {
     case HostComponent:
       const type = workInProgress.type;
       if (current && workInProgress.stateNode) {
-        // current存在代表不是首次render的fiber
-      }
+        // 非首次渲染，已经存在对应current 和 stateNode
+        updateHostComponent(current, workInProgress, type, newProps);
+        return null;
+      } 
       if (!newProps) {
         console.warn('error happen');
         return null;

@@ -62,7 +62,7 @@ function updateFunctionComponent(current, workInProgress, Component, nextProps) 
   let nextChildren = renderWithHooks(current, workInProgress, Component, nextProps);
 
   if (current && !didReceiveUpdate) {
-    // 需要返回    
+    // TODO 优化路径
   }
   reconcileChildren(current, workInProgress, nextChildren);
   return workInProgress.child;
@@ -99,7 +99,8 @@ function updateHostComponent(current, workInProgress) {
   if (isDirectTextChild) {
     // 当前fiber对应的DOM节点只有唯一一个文本子节点，这种情况比较常见，故针对其单独优化
     // 标记其nextChildren为空，省去了再生成一个HostText Fiber并遍历下去的过程
-    // 该节点的child的处理在compleWork finalizeInitialChildren中
+    // 首次渲染该节点的child的处理在completeWork finalizeInitialChildren中
+    // 非首次渲染该节点会在completeWork中设置updateQueue并在commitWork中处理
     nextChildren = null;
   }
   // 省去 之前isDirectTextChild 现在不是情况的 diff
@@ -115,7 +116,6 @@ function updateHostComponent(current, workInProgress) {
 // render阶段开始处理fiber的入口
 // 总体来说该函数会计算新state，返回child
 export default function beginWork(current, workInProgress) {
-  console.log('beginWork', workInProgress);
   if (current) {
     // 非首次渲染
     // 对于FiberRoot，首次渲染也存在current，React是通过expirationTime区分是否走优化路径

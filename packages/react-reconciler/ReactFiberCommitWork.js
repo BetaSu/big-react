@@ -11,7 +11,8 @@ import {
 } from 'shared/ReactWorkTags';
 import {
   insertInContainerBefore,
-  appendChildToContainer
+  appendChildToContainer,
+  commitUpdate
 } from 'reactDOM/ReactHostConfig';
 
 function getHostParentFiber(fiber) {
@@ -95,6 +96,22 @@ function commitPlacement(finishedWork) {
   }
 }
 
+function commitWork(current, finishedWork) {
+  switch (finishedWork.tag) {
+    case HostComponent:
+      // 处理组件completeWork产生的updateQueue
+      const instance = finishedWork.stateNode;
+      if (instance) {
+        const updatePayload = finishedWork.updateQueue;
+        finishedWork.updatePayload = null;
+        if (updatePayload) {
+          commitUpdate(instance, updatePayload);
+        }
+      }
+      return;
+  }
+}
+
 function insertOrAppendPlacementNodeIntoContainer(fiber, before, parent) {
   const {tag} = fiber;
   if (tag === HostComponent || tag === HostText) {
@@ -132,6 +149,7 @@ export function commitBeforeMutationEffects(nextEffect) {
 
 // 处理DOM增删查改
 export function commitMutationEffects(root, nextEffect) {
+  console.log('commitMutationEffects');
   while (nextEffect) {
     const effectTag = nextEffect.effectTag;
     // 处理 Placement / Update / Deletion，排除其他effectTag干扰
@@ -143,6 +161,8 @@ export function commitMutationEffects(root, nextEffect) {
         nextEffect.effectTag &= ~Placement;
         break;
       case Update:
+        const current = nextEffect.alternate;
+        commitWork(current, nextEffect);
         break;
       case Deletion:
         break;
