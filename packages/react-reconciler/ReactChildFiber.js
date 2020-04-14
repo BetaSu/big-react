@@ -18,10 +18,11 @@ function useFiber(fiber, pendingProps) {
 }
 
 export function cloneChildFibers(current, workInProgress) {
-  if (!workInProgress.child) return;
   const currentChild = workInProgress.child;
+  if (!currentChild) return;
   let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
   workInProgress.child = newChild;
+  newChild.return = workInProgress;
 
   while (currentChild.sibling) {
     currentChild = currentChild.sibling;
