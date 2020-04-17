@@ -45,6 +45,10 @@ export function createTextInstance(text) {
   return document.createTextNode(text);
 }
 
+export function removeChild(parentInstance, child) {
+  parentInstance.removeChild(child);
+}
+
 // 创建DOM节点
 // TODO 根据 根节点的namespace创建DOM节点，不一定 创建在当前document里
 export function createElement(type, props) {
@@ -85,20 +89,12 @@ export function finalizeInitialChildren(domElement, type, props) {
   setInitialDOMProperties(domElement, type, props);
 }
 
-export function insertInContainerBefore(container, child, beforeChild) {
-  if (container.nodeType === COMMENT_NODE) {
-    container.parentNode.insertBefore(child, beforeChild);
-  } else {
-    container.insertBefore(child, beforeChild);
-  }
+export function insertBefore(container, child, beforeChild) {
+  container.insertBefore(child, beforeChild);
 }
 
-export function appendChildToContainer(container, child) {
-  if (container.nodeType === COMMENT_NODE) {
-    container.parentNode.insertBefore(child, container);
-  } else {
-    container.appendChild(child);
-  }
+export function appendChild(container, child) {
+  container.appendChild(child);
 }
 
 // diff oldProps 与 newProps 更新HostComponent

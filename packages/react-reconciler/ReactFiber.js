@@ -96,6 +96,9 @@ export function createWorkInProgress(current, pendingProps) {
 
   // 父级协调的过程中会被覆写
   workInProgress.sibling = current.sibling;
+  // index同级多个节点，当前节点的索引
+  // [null, a] [b, a] 2种情况 a的index都是1
+  workInProgress.index = current.index;
 
   return workInProgress;
 }
