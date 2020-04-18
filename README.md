@@ -4,9 +4,17 @@
 ## 历史版本预览
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
 
-### 当前版本v3
+### 当前版本v4
+之前只能协调单一节点，这次实现了大名鼎鼎的React Diff算法，可以协调多个子节点了😄，新增功能如下：
+- [x] 节点支持`key`prop
+- [x] commit流程支持`Deletion effectTag`处理
+- [x] `reconcileChildrenArray`支持非首次渲染的diff算法
+
+
+### v3
 终于实现状态更新啦，撒花🎉，新增功能如下：
 - [x] `useState hook`对单一`HostComponent`的状态更新
+
 ps：之所以只支持单一`HostComponent`，是因为还没有实现`key`以及`diff`算法
 
 ### v2
