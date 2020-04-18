@@ -90,22 +90,26 @@ function ChildReconciler(shouldTrackSideEffects) {
   // 协调单一节点的子fiber 创建fiber
   function reconcileSingleElement(returnFiber, currentFirstChild, element) {
     let child = currentFirstChild;
+    const key = element.key;
     while (child) {
       // 非首次渲染
-      // TODO key diff
-      if (child.type === element.type) {
-        // child type未改变，当前节点需要保留
-        // 父级下应该只有这一个子节点，将该子节点的兄弟节点删除
-        deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
-        // 创建child的workInProgress
-        const existing = useFiber(child, element.props);
-        existing.return = returnFiber;
-        return existing;
+      if (child.key === key) {
+        if (child.type === element.type) {
+          // child type未改变，当前节点需要保留
+          // 父级下应该只有这一个子节点，将该子节点的兄弟节点删除
+          deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
+          // 创建child的workInProgress
+          const existing = useFiber(child, element.props);
+          existing.return = returnFiber;
+          return existing;
+        } else {
+          // 节点的type改变，同时是单一节点，需要将父fiber下所有child标记为删除
+          // 重新走创建新workInProgress的流程
+          deleteRemainingChildren(returnFiber, child);
+          break;
+        }
       } else {
-        // 节点的type改变，同时是单一节点，需要将父fiber下所有child标记为删除
-        // 重新走创建新workInProgress的流程
-        deleteRemainingChildren(returnFiber, child);
-        break;
+        deleteChild(returnFiber, child);
       }
       child = child.sibling;
     }
