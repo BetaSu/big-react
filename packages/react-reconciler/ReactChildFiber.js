@@ -190,7 +190,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
   /** 
    * newFiber 更新的fiber
-   * lastPlacedIndex 最后一个插入的节点索引？
+   * lastPlacedIndex 当前的新fiber数组中已经遍历过的fiber中在上一次更新时的index中最大的那个
    * newIndex 该fiber在新数组中的index
   */
   function placeChild(newFiber, lastPlacedIndex, newIndex) {
@@ -200,9 +200,16 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
     const current = newFiber.alternate;
     if (current) {
-      
+      // 节点上次的index
       const oldIndex = current.index;
       if (oldIndex < lastPlacedIndex) {
+        // lastPlacedIndex对应的fiber在本次更新中已经遍历过了
+        // 所以lastPlacedIndex对应的fiber在本次更新中是newFiber左边的兄弟节点
+        // 所以我们要看看lastPlacedIndex对应的fiber在上次更新中和newFiber对应上次更新的位置关系
+        // oldIndex < lastPlacedIndex 代表newFiber上次的位置是在lastPlacedIndex对应的fiber左边
+        // 但是本次他在其右边
+        // 所以需要标记他Placement
+
         // 移动新fiber
         newFiber.effectTag = Placement;
         return lastPlacedIndex;
@@ -251,6 +258,10 @@ function ChildReconciler(shouldTrackSideEffects) {
   }
 
   // diff算法会进行4轮遍历，可能中间有中断，时间复杂度O(n)
+  // 可复用节点的几种情况：
+  // 1. 相同key（index可以不同）相同type
+  // 2. 没有key，相同index，相同type
+  // diff算法会标记3种effectTag
   function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren) {
     console.log('reconcileChildrenArray');
     // 由于fiber没有保存before引用，所以无法通过头尾双指针的方式优化diff算法
@@ -258,10 +269,10 @@ function ChildReconciler(shouldTrackSideEffects) {
     // diff完成后新的第一个child
     let resultingFirstChild = null;
     let previousNewFiber = null;
-    // 最后一个插入的newChild的索引
+    // 可复用节点的位置可能和上次不同（需要标记Placement代表移动） ex： abcd => badc
+    // 所以判断完是否可复用后还需要比较index，具体逻辑见 placeChild
     let lastPlacedIndex = 0;
-    // 遍历newChildren的索引
-    // 虽然都和lastPlacedIndex一样从0开始，但是中间有null节点会造成 newIdx > lastPlacedIndex
+    // 遍历到的newChild 索引
     let newIdx = 0;
     // 遍历过程中用于比较的老fiber
     let oldFiber = currentFirstChild;
