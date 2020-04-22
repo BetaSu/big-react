@@ -203,12 +203,13 @@ function ChildReconciler(shouldTrackSideEffects) {
       // 节点上次的index
       const oldIndex = current.index;
       if (oldIndex < lastPlacedIndex) {
-        // lastPlacedIndex对应的fiber在本次更新中已经遍历过了
-        // 所以lastPlacedIndex对应的fiber在本次更新中是newFiber左边的兄弟节点
-        // 所以我们要看看lastPlacedIndex对应的fiber在上次更新中和newFiber对应上次更新的位置关系
+        // lastPlacedIndex对应的oldFiber对应的newFiber在本次更新中已经遍历过了
+        // 所以lastPlacedIndex对应的newFiber在本次更新中是当前要插入的newFiber左边的兄弟节点
+        // 所以我们要看看lastPlacedIndex对应的newFiber在上次更新中和newFiber对应上次更新的位置关系
         // oldIndex < lastPlacedIndex 代表newFiber上次的位置是在lastPlacedIndex对应的fiber左边
-        // 但是本次他在其右边
+        // 但是本次更新他在其右边
         // 所以需要标记他Placement
+        // 这个移动算法类似插入排序的理念：将要排序的部分分为已排序区和未排序区，每次遍历都将未排序区的一个元素与已排序区元素比较
 
         // 移动新fiber
         newFiber.effectTag = Placement;
@@ -261,9 +262,7 @@ function ChildReconciler(shouldTrackSideEffects) {
   // 可复用节点的几种情况：
   // 1. 相同key（index可以不同）相同type
   // 2. 没有key，相同index，相同type
-  // diff算法会标记3种effectTag
   function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren) {
-    console.log('reconcileChildrenArray');
     // 由于fiber没有保存before引用，所以无法通过头尾双指针的方式优化diff算法
 
     // diff完成后新的第一个child
@@ -298,7 +297,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       //   更新包括 复用fiber或者创建新fiber
       // key不同则返回null，代表该节点不能复用
 
-      // 设想如果没有key，那么对应
+      // 尝试复用节点
       const newFiber = updateSlot(
         returnFiber,
         oldFiber,
