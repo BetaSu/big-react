@@ -2,7 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const outputPath = path.resolve(__dirname, "build");
 const packagesPath = path.resolve(__dirname, 'packages');
-console.log(path.resolve(packagesPath, 'react-reconciler'));
+
 module.exports = {
   entry: path.resolve(__dirname, `./demo`),
   output: {

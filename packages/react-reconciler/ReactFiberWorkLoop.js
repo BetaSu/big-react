@@ -22,7 +22,9 @@ import {
 } from 'reactDOM/ReactHostConfig';
 import {
   commitMutationEffects,
-  commitBeforeMutationEffects
+  commitBeforeMutationEffects,
+  flushPassiveEffects,
+  globalVariables as ReactFiberCommitWorkGlobalVariables
 } from './ReactFiberCommitWork';
 import beginWork from './ReactFiberBeginWork';
 import Scheduler from 'scheduler';
@@ -203,6 +205,22 @@ function commitRoot(root) {
     // workInProgress tree 现在完成副作用的渲染变成current tree
     // 之所以在 mutation阶段后设置是为了componentWillUnmount触发时 current 仍然指向之前那棵树
     root.current = finishedWork;
+    const rootDidHavePassiveEffects = ReactFiberCommitWorkGlobalVariables.rootDoesHavePassiveEffects;
+    
+    if (ReactFiberCommitWorkGlobalVariables.rootDoesHavePassiveEffects) {
+      // 本次commit含有passiveEffect
+      ReactFiberCommitWorkGlobalVariables.rootDoesHavePassiveEffects = false;
+      ReactFiberCommitWorkGlobalVariables.rootWithPendingPassiveEffects = root;
+    } else {
+      // effectList已处理完，GC
+      nextEffect = firstEffect;
+      while (nextEffect) {
+        const nextNextEffect = nextEffect.next;
+        nextEffect.next = null;
+        nextEffect = nextNextEffect;
+      }
+    }
+
   }
 }
 

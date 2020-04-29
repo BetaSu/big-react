@@ -7,7 +7,8 @@ import {
 import {
   HostRoot,
   HostText,
-  HostComponent
+  HostComponent,
+  FunctionComponent
 } from 'shared/ReactWorkTags';
 import {
   insertBefore,
@@ -15,6 +16,23 @@ import {
   commitUpdate,
   removeChild
 } from 'reactDOM/ReactHostConfig';
+import {
+  Passive
+} from 'shared/ReactSideEffectTags';
+import {
+  NoEffect
+} from 'shared/ReactSideEffectTags';
+import {
+  HasEffect as HookHasEffect,
+  Passive as HookPassive
+} from 'shared/ReactHookEffectTags';
+
+// 在React中commitWork中大部分逻辑是杂糅在workloop中的，我将他们抽离到commitWork
+// 为了在workLoop和当前模块间公用全局变量
+export const globalVariables = {
+  rootWithPendingPassiveEffects: null,
+  rootDoesHavePassiveEffects: false
+};
 
 function getHostParentFiber(fiber) {
   let parent = fiber.return;
@@ -93,6 +111,12 @@ function commitPlacement(finishedWork) {
 
 function commitWork(current, finishedWork) {
   switch (finishedWork.tag) {
+    case FunctionComponent:
+      // TODO layoutEffect 在 mutation阶段执行destroy
+      // 由于 layoutEffect 的 create是在commitRoot尾部执行，所以任何fiber的任何layoutEffect destroy会先于任何fiber的任何layoutEffect create执行
+      // 这避免了兄弟fiber互相影响
+      // ex：在同一个commit阶段，一个FunctionComponent的destroy不应该复写掉另一个FunctionComponent在create中设置的ref
+      return;
     case HostComponent:
       // 处理组件completeWork产生的updateQueue
       const instance = finishedWork.stateNode;
@@ -227,23 +251,65 @@ function insertOrAppendPlacementNode(fiber, before, parent) {
   }
 }
 
+// 遍历effectList执行 passive effect
+export function flushPassiveEffects() {
+  // TODO priority
+  // 该变量在commitRoot DOM渲染完成后被赋值
+  if (!globalVariables.rootWithPendingPassiveEffects) {
+    return false;
+  }
+  const root = globalVariables.rootWithPendingPassiveEffects;
+  globalVariables.rootWithPendingPassiveEffects = null;
+  
+  let effect = root.current.firstEffect;
+  while (effect) {
+    try {
+      commitPassiveHookEffects(effect);
+    } catch(e) {
+      // TODO captureCommitPhaseError
+      console.warn(e);
+    }
+
+    const nextNextEffect = effect.nextEffect;
+    effect.nextEffect = null;
+    effect = nextNextEffect;
+  }
+}
+
 // commit阶段的第一项工作（before mutation）
 // 调用ClassComponent getSnapshotBeforeUpdate生命周期钩子
+// 执行 前一次useEffect的destroy和下一次的mount
+// 由于 commitHookEffectListUnmount 调用后会马上调用 commitHookEffectListMount，
+// 所以前一次同一个useEffect的destroy和下一次的mount是依次同步调用的
 export function commitBeforeMutationEffects(nextEffect) {
-  while(nextEffect) {
+  if (nextEffect) {
     // TODO getSnapshotBeforeUpdate生命周期钩子
-    // 假装已经处理完
-    return nextEffect = null;
+    const effectTag = nextEffect.effectTag;
+    if ((effectTag & Passive) !== NoEffect) {
+      // 与 componentDidMount 或 componentDidUpdate 不同，useEffect是在DOM更新后异步调用的
+      // 所以不会阻塞页面渲染，见下文
+      // https://zh-hans.reactjs.org/docs/hooks-effect.html#detailed-explanation
+      // TODO 使用scheduler异步调用
+      if (!globalVariables.rootDoesHavePassiveEffects) {
+        // 标记rootDoesHavePassiveEffects为true，在commitRoot中渲染完DOM后会为rootWithPendingPassiveEffects赋值
+        globalVariables.rootDoesHavePassiveEffects = true;
+        setTimeout(() => {
+          flushPassiveEffects();
+        });
+      }
+    }
+    nextEffect = nextEffect.nextEffect;
   }
+  return nextEffect;
 }
 
 // 处理DOM增删查改
 export function commitMutationEffects(root, nextEffect) {
-  console.log('commitMutationEffects');
   while (nextEffect) {
     const effectTag = nextEffect.effectTag;
     // 处理 Placement / Update / Deletion，排除其他effectTag干扰
     const primaryEffectTag = effectTag & (Placement | Deletion | Update);
+    let current;
     switch (primaryEffectTag) {
       case Placement:
         commitPlacement(nextEffect);
@@ -251,16 +317,73 @@ export function commitMutationEffects(root, nextEffect) {
         nextEffect.effectTag &= ~Placement;
         break;
       case Update:
-        const current = nextEffect.alternate;
+        current = nextEffect.alternate;
         commitWork(current, nextEffect);
         break;
       case Deletion:
         commitDeletion(root, nextEffect);
         break;
       case PlacementAndUpdate:
+        // Placement
+        commitPlacement(nextEffect);
+        nextEffect.effectTag &= ~Placement;
+        // Update
+        current = nextEffect.alternate;
+        commitWork(current, nextEffect);
         break;
     }
     nextEffect = nextEffect.nextEffect;
   }
   return null;
+}
+
+function commitHookEffectListUnmount(tag, finishedWork) {
+  const updateQueue = finishedWork.updateQueue;
+  let lastEffect = updateQueue ? updateQueue.lastEffect : null;
+  if (lastEffect) {
+    const firstEffect = lastEffect.next;
+    let effect = firstEffect;
+    do {
+      if ((effect.tag & tag) === tag) {
+        // unmount
+        const destroy = effect.destroy;
+        effect.destroy = undefined;
+        if (destroy) {
+          destroy();
+        }
+      }
+      effect = effect.next;
+    } while (effect !== firstEffect)
+  }
+}
+
+function commitHookEffectListMount(tag, finishedWork) {
+  const updateQueue = finishedWork.updateQueue;
+  let lastEffect = updateQueue ? updateQueue.lastEffect : null;
+  if (lastEffect) {
+    const firstEffect = lastEffect.next;
+    let effect = firstEffect;
+    do {
+      if ((effect.tag & tag) === tag) {
+        // mount
+        const create = effect.create;
+        effect.destroy = create();
+      }
+      effect = effect.next;
+    } while (effect !== firstEffect)
+  }
+}
+
+function commitPassiveHookEffects(finishedWork) {
+  if ((finishedWork.effectTag & Passive) !== NoEffect) {
+    switch (finishedWork.tag) {
+      case FunctionComponent:
+        // 遍历updateQueue执行 useEffect unmount函数
+        commitHookEffectListUnmount(HookPassive | HookHasEffect, finishedWork);
+        commitHookEffectListMount(HookPassive | HookHasEffect, finishedWork);
+        break;
+      default:
+        break;
+    }
+  }
 }

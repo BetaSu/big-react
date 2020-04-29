@@ -1,16 +1,23 @@
 import {React, ReactDOM} from '../packages';
 
-const {useState} = React;
-
+const {useState, useEffect} = React;
+let stop = Date.now() + 1000 * 30;
 function App({name}) {
-  const [num, updateNum] = useState(1);
+  const [even, updateEven] = useState(0);
+  
+  useEffect(() => {
+    document.title = even;
+  }, [even])
+
   setTimeout(() => {
-    updateNum(num + 1);
+    if (Date.now() - stop > 0) {
+      return;
+    }
+    updateEven(even + 2);
   }, 2000);
   return (
     <ul>
-      <li key={0}>0</li>
-      {num % 2 ? <li key={1}>1</li> : null}
+      <li key={0}>{even}</li>
     </ul>
   )
 }

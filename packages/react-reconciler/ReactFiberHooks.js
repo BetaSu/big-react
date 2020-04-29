@@ -1,5 +1,15 @@
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import * as DOMRenderer from 'reactReconciler';
+import {
+  Update as UpdateEffect, 
+  Passive as PassiveEffect
+} from 'shared/ReactSideEffectTags';
+import {
+  NoEffect as NoHookEffect,
+  HasEffect as HookHasEffect,
+  Layout as HookLayout,
+  Passive as HookPassive
+} from 'shared/ReactHookEffectTags';
 
 const {ReactCurrentDispatcher} = ReactSharedInternals;
 
@@ -19,6 +29,36 @@ function basicStateReducer(state, action) {
 // useState是一种特殊的useReducer
 function updateState(initialState) {
   return updateReducer(basicStateReducer, initialState);
+}
+
+function createFunctionComponentUpdateQueue() {
+  return {
+    lastEffect: null
+  };
+}
+
+// effect对象保存在fiber.updateQueue.lastEffect 链表
+function pushEffect(tag, create, destroy, deps) {
+  const effect = {
+    tag,
+    create,
+    destroy,
+    deps,
+    // 环
+    next : null
+  };
+  let componentUpdateQueue = currentlyRenderingFiber.updateQueue;
+  if (!componentUpdateQueue) {
+    componentUpdateQueue = createFunctionComponentUpdateQueue();
+    currentlyRenderingFiber.updateQueue = componentUpdateQueue;
+    componentUpdateQueue.lastEffect = effect.next = effect;
+  } else {
+    const firstEffect = lastEffect.next;
+    lastEffect.next = effect;
+    effect.next = firstEffect;
+    componentUpdateQueue.lastEffect = effect;
+  }
+  return effect;
 }
 
 // 获取当前hook的状态信息
@@ -117,7 +157,11 @@ function updateWorkInProgressHook() {
     nextWorkInProgressHook = nextWorkInProgressHook.next;
     currentHook = nextCurrentHook;
   } else {
+    if (!nextCurrentHook) {
+      console.error('比上一次render调用了更多的hook');
+    }
     // 从 current hook复制来
+    // 即使是同一个FunctionComponent中多个useState，也是进入这个逻辑，workInProgressHook由currentHook复制而来
     currentHook = nextCurrentHook;
 
     const newHook = {
@@ -164,6 +208,7 @@ function dispatchAction(fiber, queue, action) {
   }
   queue.pending = update;
   
+  // 对于首次渲染完后触发的dispatch，fiber还不存在alternate
   const alternate = fiber.alternate;
 
   if (fiber === currentlyRenderingFiber || (alternate && alternate === currentlyRenderingFiber)) {
@@ -185,6 +230,9 @@ function dispatchAction(fiber, queue, action) {
     //     }
     //   }
     // }
+
+    // 注意fiber参数是mount时bind的currentlyRenderingFiber，即首次渲染时的workInProgress fiber
+    // 一般调用当前方法时首屏渲染已经完成，fiber已经从workInProgress变为current
     DOMRenderer.scheduleUpdateOnFiber(fiber);
   }
 }
@@ -214,6 +262,71 @@ function mountWorkInProgressHook() {
   return workInProgressHook;
 }
 
+function mountEffect(create, deps) {
+  return mountEffectImpl(UpdateEffect | PassiveEffect, HookPassive, create, deps);
+}
+
+function updateEffect(create, deps) {
+  return updateEffectImpl(UpdateEffect | PassiveEffect, HookPassive, create, deps);
+}
+
+function mountEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
+  const hook = mountWorkInProgressHook();
+  const nextDeps = deps === undefined ? null : deps;
+  currentlyRenderingFiber.effectTag |= fiberEffectTag;
+  // 指向effect对象
+  hook.memoizedState = pushEffect(
+    HookHasEffect | hookEffectTag,
+    create,
+    undefined,
+    nextDeps
+  );
+}
+
+function areHookInputsEqual(nextDeps, prevDeps) {
+  if (prevDeps === null) {
+    return false;
+  }
+  if (nextDeps.length !== prevDeps.length) {
+    console.error('前后deps长度不一致');
+  }
+  for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+    if (Object.is(nextDeps[i], prevDeps[i])) {
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
+
+function updateEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
+  const hook = updateWorkInProgressHook();
+  const nextDeps = deps === undefined ? null : deps;
+  let destroy = undefined;
+
+  if (currentHook) {
+    const prevEffect = currentHook.memoizedState;
+    destroy = prevEffect.destroy;
+    if (nextDeps !== null) {
+      const prevDeps = prevEffect.deps;
+      if (areHookInputsEqual(nextDeps, prevDeps)) {
+        // deps相同，不需要为fiber增加effectTag
+        pushEffect(hookEffectTag, create, destroy, nextDeps);
+        return;
+      }
+    }
+  }
+
+  // 前后deps不同，增加effectTag
+  currentlyRenderingFiber.effectTag |= fiberEffectTag;
+  hook.memoizedState = pushEffect(
+    HookHasEffect | hookEffectTag,
+    create,
+    destroy,
+    nextDeps
+  );
+}
+
 const HooksDispatcherOnMount = {
   useState(initialState) {
     // 这部分代码在React中对应于mountState函数
@@ -235,16 +348,19 @@ const HooksDispatcherOnMount = {
     }
     const dispatch = queue.dispatch = dispatchAction.bind(null, currentlyRenderingFiber, queue);
     return [hook.memoizedState, dispatch];
-  }
+  },
+  useEffect: mountEffect
 }
 
 const HooksDispatcherOnUpdate = {
-  useState: updateState
+  useState: updateState,
+  useEffect: updateEffect
 }
 
 export function renderWithHooks(current, workInProgress, Component, props) {
   currentlyRenderingFiber = workInProgress;
   // 重置
+  // workInProgress.memoizedState会在updateWorkInProgressHook中赋值
   workInProgress.memoizedState = null;
   workInProgress.updateQueue = null;
 

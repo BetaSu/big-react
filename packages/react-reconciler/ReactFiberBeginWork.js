@@ -59,6 +59,7 @@ function updateHostRoot(current, workInProgress) {
 }
 
 function updateFunctionComponent(current, workInProgress, Component, nextProps) {
+  console.log('renderWithHooks');
   let nextChildren = renderWithHooks(current, workInProgress, Component, nextProps);
 
   if (current && !didReceiveUpdate) {
@@ -116,6 +117,7 @@ function updateHostComponent(current, workInProgress) {
 // render阶段开始处理fiber的入口
 // 总体来说该函数会计算新state，返回child
 export default function beginWork(current, workInProgress) {
+  console.log('beginWork');
   if (current) {
     // 非首次渲染
     // 对于FiberRoot，首次渲染也存在current，React是通过expirationTime区分是否走优化路径
