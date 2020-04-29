@@ -1,4 +1,4 @@
-<p align="center"><img src="https://p5.ssl.qhimg.com/t01d24827719d254d97.png" alt="React-On-The-Way"></p>
+<p align="center"><img src="https://p3.ssl.qhimg.com/t0154d29702a432306d.png" alt="React-On-The-Way"></p>
 
 # React-On-The-Way
 基于React`V16.13.1`架构，从零实现React，相关配套文章
