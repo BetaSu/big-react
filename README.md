@@ -1,3 +1,5 @@
+<img src="https://p5.ssl.qhimg.com/t01d24827719d254d97.png" alt="React-On-The-Way" width="100%">
+
 # React-On-The-Way
 基于React`V16.13.1`架构，从零实现React，相关配套文章
 
