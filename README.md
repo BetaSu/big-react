@@ -9,7 +9,14 @@
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
 
 ### 当前版本v5
-实现了`useEffect hook`，新增功能如下：
+在v3中我们实现了状态更新，直接在`FunctionComponent`函数体内触发更新会造成死循环，所以我们用计时器来触发。在业务中，我们一般是通过：
+
+1. 回调函数（ex：onClick）
+2. `useEffect hook`
+3. `ClassComponent`生命周期钩子
+
+来触发。既然我们已经实现了`useState hook`，这一版我们就实现`useEffect hook`，新增功能如下：
+
 - [x] `useEffect hook`首屏及再次渲染的完整逻辑
 
 ### v4
