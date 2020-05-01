@@ -41,6 +41,37 @@ ps：支持`Deletion effectTag`处理是为了应对：
 
 ps：之所以只支持单一`HostComponent`，是因为还没有实现`key`以及`diff`算法，所以无法支持多个兄弟组件的更新
 
+🐛当一个组件中使用多个`useState hook`且他们的更新函数同时触发，如示例中：
+
+```javascript
+// 会造成页面逐渐卡顿并最终崩溃的例子
+function App({name}) {
+  const [even, updateEven] = useState(0);
+  const [odd, updateOdd] = useState(1);
+
+  setTimeout(() => {
+    updateEven(even + 2);
+    updateOdd(odd + 2);  
+  }, 2000);
+  
+  return (
+    <ul>
+      <li key={0}>{even}</li>
+      <li key={1}>{odd}</li>
+    </ul>
+  )
+}
+
+```
+react-on-the-way会造成页面逐渐卡顿并最终崩溃。原因是`updateEven`和`updateOdd`方法会分别开始一次新的更新流程。
+
+在其中每次更新流程执行到`updateFunctionComponent`时会调用`App`函数，在函数内部会调用计时器并在2000ms后又调用这2个更新函数，从而又开启新的更新流程。更新流程的数量会指数增加并最终崩溃。
+
+造成这个问题的原因是我们还没有实现React的任务优先级机制与任务的批处理。在React中，
+
+- 同步模式下同一个事件函数内的同步更新会被批处理，只产生一次更新流程
+- 异步模式下所有更新都会经过优先级调度
+
 ### v2
 为了实现React的页面更新逻辑，需要改变状态（state），我们有2条路可选：
 
