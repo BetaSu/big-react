@@ -68,7 +68,6 @@ export function completeWork(current, workInProgress) {
   switch (workInProgress.tag) {
     case HostRoot:
       const fiberRoot = workInProgress.stateNode;
-      console.log('complete host root');
       return null;
     case HostComponent:
       const type = workInProgress.type;

@@ -194,9 +194,9 @@ function unmountHostComponents(finishedRoot, current) {
     if (node.tag === HostComponent || node.tag === HostText) {
       // 我们需要遍历下去每个节点，直到叶子节点，从叶子节点触发 componentWillUnmount，再一直往上到当前节点
       commitNestedUnmounts(finishedRoot, node);
-      
-      // 子节点已经遍历完，可以安全的删除当前节点了
+
       removeChild(currentParent, node.stateNode);
+
     } else {
       // 同commitNestedUnmounts一样的深度优先遍历
       commitUnmount(finishedRoot, node);
@@ -206,18 +206,18 @@ function unmountHostComponents(finishedRoot, current) {
         node = node.child;
         continue;
       }
-      if (node === current) {
+    }
+    if (node === current) {
+      return;
+    }
+    while (!node.sibling) {
+      if (!node.return || node.return === current) {
         return;
       }
-      while (!node.sibling) {
-        if (!node.return || node.return === current) {
-          return;
-        }
-        node = node.return;
-      }
-      node.sibling.return = node.return;
-      node = node.sibling;
+      node = node.return;
     }
+    node.sibling.return = node.return;
+    node = node.sibling;
   }
 
 }
@@ -278,7 +278,7 @@ export function flushPassiveEffects() {
 
 // commit阶段的第一项工作（before mutation）
 // 调用ClassComponent getSnapshotBeforeUpdate生命周期钩子
-// 执行 前一次useEffect的destroy和下一次的mount
+// 异步调用 前一次useEffect的destroy和下一次的mount
 // 由于 commitHookEffectListUnmount 调用后会马上调用 commitHookEffectListMount，
 // 所以前一次同一个useEffect的destroy和下一次的mount是依次同步调用的
 export function commitBeforeMutationEffects(nextEffect) {

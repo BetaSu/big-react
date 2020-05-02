@@ -258,7 +258,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     return null;
   }
 
-  // diff算法会进行4轮遍历，可能中间有中断，时间复杂度O(n)
+  // diff算法会进行两轮遍历，可能中间有中断，时间复杂度O(n)
   // 可复用节点的几种情况：
   // 1. 相同key（index可以不同）相同type
   // 2. 没有key，相同index，相同type
@@ -333,14 +333,14 @@ function ChildReconciler(shouldTrackSideEffects) {
       oldFiber = nextOldFiber;
     }
 
-    // 第二轮遍历
+    // 第二轮遍历情况1 newChildren遍历完时
     if (newIdx === newChildren.length) {
       // 当newChildren遍历完时，代表第一轮所有新节点都可复用，
       // 只需要删除剩下的oldFiber，因为这部分oldFiber在新的数组里已经不存在了
       deleteRemainingChildren(returnFiber, oldFiber);
       return resultingFirstChild;
     }
-    // 第三轮遍历
+    // 第二轮遍历情况2 oldFiber遍历完时
     if (!oldFiber) {
       // 当oldFiber遍历完时，代表所有oldFiber已经复用完或者这是首次渲染没有oldFiber
       // 再遍历newChildren，把新节点append到后面，这部分在oldFiber中不存在的节点是新加入的
@@ -360,7 +360,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       return resultingFirstChild;
     }
 
-    // 第四轮遍历
+    // 第二轮遍历情况3 newChildren，oldFiber都未遍历完
     // 将可复用的节点移动位置
     // 将所有未遍历的oldFiber存入map，这样在接下来的遍历中能O(1)的复杂度就能通过key找到对应的oldFiber
     const existingChildren = mapRemainingChildren(returnFiber, oldFiber);
