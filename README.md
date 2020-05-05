@@ -9,7 +9,7 @@
 
 1. 《xx行代码带你实现迷你React》，《xx行代码实现React hook》这样短小精干的文章。如果你只是想花一点点时间了解下React的工作原理，我向你推荐 <a href="https://pomb.us/build-your-own-react/">这篇文章</a>，非常精彩。同时，这个仓库可能不适合你，因为他会花掉你很多时间。
 
-2. 《React Fiber原理》，《React expirationTime原理》这样摘录React源码讲解的文章。如果你想学习React源码，很遗憾，这样的文章也不太适合。当你都不知道`Fiber`是什么，不知道`expirationTime`对于React的意义时，这样的文章会给人“你讲解的代码我看懂了，但这些代码的作用是什么”的感觉。
+2. 《React Fiber原理》，《React expirationTime原理》这样摘录React源码讲解的文章。如果你想学习React源码，当你都不知道`Fiber`是什么，不知道`expirationTime`对于React的意义时，这样的文章会给人“你讲解的代码我看懂了，但这些代码的作用是什么”的感觉。
 
 这个仓库的存在就是为了解决这个问题。
 
