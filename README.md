@@ -27,7 +27,8 @@
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
 
 ### 当前版本v5
-<a href="https://github.com/BetaSu/react-on-the-way/compare/v5...BetaSu:v4">v5 diff v4</a>
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v4...BetaSu:v5" target="_blank">v5 diff v4</a>
+
 在v3中我们实现了状态更新，直接在`FunctionComponent`函数体内触发更新会造成死循环，所以我们用计时器来触发。在业务中，我们一般是通过：
 
 1. 回调函数（ex：onClick）
@@ -39,7 +40,8 @@
 - [x] `useEffect hook`首屏及再次渲染的完整逻辑
 
 ### v4
-<a href="https://github.com/BetaSu/react-on-the-way/compare/v4...BetaSu:v3">v4 diff v3</a>
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v3...BetaSu:v4" target="_blank">v4 diff v3</a>
+
 之前只能更新单一节点，这次实现了大名鼎鼎的React Diff算法，可以更新多个兄弟子节点了😄，新增功能如下：
 - [x] 节点支持`key`prop
 - [x] `commit`流程支持`Deletion effectTag`处理
@@ -56,7 +58,8 @@ ps：支持`Deletion effectTag`处理是为了应对：
 在这种情况下b fiber被标记为`Deletion effectTag`，对应的DOM节点需要删除
 
 ### v3
-<a href="https://github.com/BetaSu/react-on-the-way/compare/v3...BetaSu:v2">v3 diff v2</a>
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v2...BetaSu:v3" target="_blank">v3 diff v2</a>
+
 之前的版本只实现了首屏渲染的逻辑，即使在v2中实现了`useState`也只实现了`useState(initialValue)`带来的首屏渲染，在v3中我们终于实现状态更新啦，撒花🎉，新增功能如下：
 - [x] `useState hook`对单一`HostComponent`的状态更新
 
@@ -94,7 +97,8 @@ react-on-the-way会造成页面逐渐卡顿并最终崩溃。原因是`updateEve
 - 异步模式下所有更新都会经过优先级调度
 
 ### v2
-<a href="https://github.com/BetaSu/react-on-the-way/compare/v2...BetaSu:v1">v2 diff v1</a>
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v1...BetaSu:v2" target="_blank">v2 diff v1</a>
+
 为了实现React的页面更新逻辑，需要改变状态（state），我们有2条路可选：
 
 1. 实现`ClassComopnent setState`
