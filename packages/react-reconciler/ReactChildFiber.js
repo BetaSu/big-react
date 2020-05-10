@@ -42,15 +42,15 @@ export function cloneChildFibers(current, workInProgress) {
 // 对于单次更新，需要标记更新fiber的effectTag
 function ChildReconciler(shouldTrackSideEffects) {
 
-  function createChild(returnFiber, newChild) {
+  function createChild(returnFiber, newChild, expirationTime) {
     if (typeof newChild === 'number' || typeof newChild === 'string') {
-      const created = createFiberFromText(newChild);
+      const created = createFiberFromText(newChild, expirationTime);
       created.return = returnFiber;
       return created;
     }
     if (typeof newChild === 'object' && newChild !== null) {
       if (newChild.$$typeof === REACT_ELEMENT_TYPE) {
-        const created = createFiberFromElement(newChild);
+        const created = createFiberFromElement(newChild, expirationTime);
         created.return = returnFiber;
         return created;
       }
@@ -88,7 +88,7 @@ function ChildReconciler(shouldTrackSideEffects) {
   }
   
   // 协调单一节点的子fiber 创建fiber
-  function reconcileSingleElement(returnFiber, currentFirstChild, element) {
+  function reconcileSingleElement(returnFiber, currentFirstChild, element, expirationTime) {
     let child = currentFirstChild;
     const key = element.key;
     while (child) {
@@ -113,7 +113,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
       child = child.sibling;
     }
-    const created = createFiberFromElement(element);
+    const created = createFiberFromElement(element, expirationTime);
     created.return = returnFiber;
     return created;
   }
@@ -134,7 +134,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     return fiber;
   }
 
-  function updateTextNode(returnFiber, current, textContent) {
+  function updateTextNode(returnFiber, current, textContent, expirationTime) {
     if (!current || current.tag !== HostText) {
       // 插入
       const created = createFiberFromText(textContent);
@@ -147,7 +147,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     return existing;
   }
 
-  function updateElement(returnFiber, current, element) {
+  function updateElement(returnFiber, current, element, expirationTime) {
     if (current) {
       // 更新
       if (current.elementType === element.type) {
@@ -157,12 +157,12 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
     // 插入
-    const created = createFiberFromElement(element);
+    const created = createFiberFromElement(element, expirationTime);
     created.return = returnFiber;
     return created;
   }
 
-  function updateSlot(returnFiber, oldFiber, newChild) {
+  function updateSlot(returnFiber, oldFiber, newChild, expirationTime) {
     // 如果key相同则更新fiber，否则返回null
     const key = oldFiber ? oldFiber.key : null;
 
@@ -171,14 +171,14 @@ function ChildReconciler(shouldTrackSideEffects) {
       if (key !== null) {
         return null;
       }
-      return updateTextNode(returnFiber, oldFiber, '' + newChild);
+      return updateTextNode(returnFiber, oldFiber, '' + newChild, expirationTime);
     }
 
     if (typeof newChild === 'object' && newChild !== null) {
       if (newChild.$$typeof === REACT_ELEMENT_TYPE) {
         if (newChild.key === key) {
           // key相同，如果type不同会创建新fiber，不复用
-          return updateElement(returnFiber, oldFiber, newChild);
+          return updateElement(returnFiber, oldFiber, newChild, expirationTime);
         } else {
           // key不同的Component不复用
           return null;
@@ -241,17 +241,17 @@ function ChildReconciler(shouldTrackSideEffects) {
   }
 
   // 通过map中保存的oldFiber和newChild比较，判断是否更新oldFiber或创建新节点
-  function updateFromMap(existingChildren, returnFiber, newIdx, newChild) {
+  function updateFromMap(existingChildren, returnFiber, newIdx, newChild, expirationTime) {
     if (typeof newChild === 'string' || typeof newChild === 'number') {
       // 文本节点没有key，只需要比较他们是否都是文本节点
       const matchedFiber = existingChildren.get(newIdx) || null;
-      return updateTextNode(returnFiber, matchedFiber, '' + newChild);
+      return updateTextNode(returnFiber, matchedFiber, '' + newChild, expirationTime);
     }
 
     if (typeof newChild === 'object' && newChild !== null) {
       if (newChild.$$typeof === REACT_ELEMENT_TYPE) {
         const matchedFiber = existingChildren.get(newChild.key === null ? newIdx : newChild.key) || null;
-        return updateElement(returnFiber, matchedFiber, newChild);
+        return updateElement(returnFiber, matchedFiber, newChild, expirationTime);
       }
     }
 
@@ -262,7 +262,7 @@ function ChildReconciler(shouldTrackSideEffects) {
   // 可复用节点的几种情况：
   // 1. 相同key（index可以不同）相同type
   // 2. 没有key，相同index，相同type
-  function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren) {
+  function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, expirationTime) {
     // 由于fiber没有保存before引用，所以无法通过头尾双指针的方式优化diff算法
 
     // diff完成后新的第一个child
@@ -301,7 +301,8 @@ function ChildReconciler(shouldTrackSideEffects) {
       const newFiber = updateSlot(
         returnFiber,
         oldFiber,
-        newChildren[newIdx]
+        newChildren[newIdx],
+        expirationTime
       )
       if (newFiber === null) {
         // 该索引对应位置的新节点是 null
@@ -345,7 +346,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       // 当oldFiber遍历完时，代表所有oldFiber已经复用完或者这是首次渲染没有oldFiber
       // 再遍历newChildren，把新节点append到后面，这部分在oldFiber中不存在的节点是新加入的
       for (; newIdx < newChildren.length; newIdx++) {
-        const newFiber = createChild(returnFiber, newChildren[newIdx]);
+        const newFiber = createChild(returnFiber, newChildren[newIdx], expirationTime);
         if (!newFiber) {
           continue;
         }
@@ -370,7 +371,8 @@ function ChildReconciler(shouldTrackSideEffects) {
         existingChildren,
         returnFiber,
         newIdx,
-        newChildren[newIdx]
+        newChildren[newIdx],
+        expirationTime
       );
       if (newFiber) {
         if (shouldTrackSideEffects) {
@@ -400,7 +402,7 @@ function ChildReconciler(shouldTrackSideEffects) {
   // 协调子节点，分为 mount 和 reconcile 2类
   // mount用于首次渲染，child没有对应fiber，直接生成fiber，mount不会改变fiber的effectTag，原因见 appendAllChildren
   // reconcile用于更新
-  function reconcileChildFibers(returnFiber, currentFirstChild, newChild) {
+  function reconcileChildFibers(returnFiber, currentFirstChild, newChild, expirationTime) {
     // React.createElement类型 或者 子节点是String、Number对应的Array类型
     const isObject = typeof newChild === 'object' && newChild !== null;
     if (isObject) {
@@ -409,7 +411,8 @@ function ChildReconciler(shouldTrackSideEffects) {
           return placeSingleChild(reconcileSingleElement(
             returnFiber,
             currentFirstChild,
-            newChild
+            newChild,
+            expirationTime
           ))
       }
       // 在 beginWork update各类Component时并未处理HostText，这里处理单个HostText
@@ -417,7 +420,8 @@ function ChildReconciler(shouldTrackSideEffects) {
         return placeSingleChild(reconcileSingleTextNode(
           returnFiber,
           currentFirstChild,
-          newChild
+          newChild,
+          expirationTime
         ))
       }
       // 在 beginWork update各类Component时并未处理HostText，这里处理多个HostText
@@ -425,7 +429,8 @@ function ChildReconciler(shouldTrackSideEffects) {
         return reconcileChildrenArray(
           returnFiber,
           currentFirstChild,
-          newChild
+          newChild,
+          expirationTime
         )
       }
     }

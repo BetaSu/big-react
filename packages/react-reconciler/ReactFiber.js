@@ -20,8 +20,12 @@ export class FiberNode {
     this.tag = tag;
     // prop key
     this.key = key;
-    // 未使用
-    this.mode = mode;
+    // mode 标记当前fiber的模式 Sync/Blocking/Concurrent
+    // Sync为旧的同步模式
+    // Blocking为方便开发者从Sync过渡到Concurrent的非全功能异步模式
+    // Concurrent为异步模式
+    // 由于未来Concurrent会成为默认选项，我们只实现Concurrent，所以不需要这个参数
+    // this.mode = mode;
 
     // type字段由React.createElement注入
     // 对于FunctionComponent，指向 fn
@@ -53,7 +57,10 @@ export class FiberNode {
     this.stateNode = null;
     this.effectTag = NoEffect;
     // fiber的过期时间
-    this.expirationTime = null;
+    this.expirationTime = NoWork;
+    // 该fiber的子孙fiber中优先级最高的expirationTime
+    // 有了这个变量就不用遍历当前fiber的子孙就能找到下一个任务的expirationTime
+    this.childExpirationTime = NoWork;
     // 指向前一次render的fiber
     this.alternate = null;
 
@@ -88,7 +95,9 @@ export function createWorkInProgress(current, pendingProps) {
     workInProgress.lastEffect = null;
     workInProgress.nextEffect = null;
   }
+
   workInProgress.expirationTime = current.expirationTime;
+  workInProgress.childExpirationTime = current.childExpirationTime;
   workInProgress.updateQueue = current.updateQueue;
   workInProgress.child = current.child;
   workInProgress.memoizedProps = current.memoizedProps;
@@ -104,7 +113,7 @@ export function createWorkInProgress(current, pendingProps) {
 }
 
 // type定义见FiberNode class
-export function createFiberFromTypeAndProps(type, key, pendingProps) {
+export function createFiberFromTypeAndProps(type, key, pendingProps, expirationTime) {
   let fiberTag = IndeterminateComponent;
 
   // FunctionComponent ClassComponent 类型都是 function
@@ -118,22 +127,25 @@ export function createFiberFromTypeAndProps(type, key, pendingProps) {
   const fiber = new FiberNode(fiberTag, pendingProps, key);
   fiber.type = type;
   fiber.elementType = type;
+  fiber.expirationTime = expirationTime;
   return fiber;
 }
 
-export function createFiberFromElement(element) {
+export function createFiberFromElement(element, expirationTime) {
   const type = element.type;
   const key = element.key;
   const pendingProps = element.props;
   const fiber = createFiberFromTypeAndProps(
     type,
     key,
-    pendingProps
+    pendingProps,
+    expirationTime
   );
   return fiber;
 }
 
-export function createFiberFromText(textContent) {
+export function createFiberFromText(textContent, expirationTime) {
   const fiber = new FiberNode(HostText, textContent);
+  fiber.expirationTime = expirationTime;
   return fiber;
 }

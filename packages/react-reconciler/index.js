@@ -1,8 +1,13 @@
-import {unbatchedUpdates} from './ReactFiberWorkLoop';
-import {requestCurrentTimeForUpdate, scheduleUpdateOnFiber} from './ReactFiberWorkLoop';
+import {
+  unbatchedUpdates,
+  requestCurrentTimeForUpdate,
+  scheduleUpdateOnFiber,
+  computeExpirationForFiber
+} from './ReactFiberWorkLoop';
 
 export {
   unbatchedUpdates,
   scheduleUpdateOnFiber,
-  requestCurrentTimeForUpdate
+  requestCurrentTimeForUpdate,
+  computeExpirationForFiber
 }

@@ -1,3 +1,5 @@
+import { NoWork, Sync } from "./ReactFiberExpirationTime";
+
 export const UpdateState = 0;
 export const ReplaceState = 1;
 export const ForceUpdate = 2;
@@ -67,20 +69,18 @@ export function enqueueUpdate(fiber, update) {
 }
 
 //
-export function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps) {
+export function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps, instance) {
   switch (update.tag) {
     case UpdateState:
       const payload = update.payload;
       if (!payload) return prevState;
       return Object.assign({}, prevState, payload);
-
-    default:
-      break;
   }
+  return prevState;
 }
 
 // 通过遍历update链表，根据fiber.tag不同，通过不同的路径计算新的state
-export function processUpdateQueue(workInProgress, nextProps) {
+export function processUpdateQueue(workInProgress, nextProps, instance, renderExpirationTime) {
   const queue = workInProgress.updateQueue;
   // base update 为 单向非环链表
   let firstBaseUpdate = queue.firstBaseUpdate;
@@ -123,19 +123,76 @@ export function processUpdateQueue(workInProgress, nextProps) {
     // 存在update时遍历链表，计算出update后的值
 
     let newState = queue.baseState;
+    let newExpirationTime = NoWork;
+
+    let newBaseState = null;
+    let newFirstBaseState = null;
+    let newLastBaseState = null;
+
     let update = firstBaseUpdate;
     do {
-      // 需要考虑优先级，还未处理
-      newState = getStateFromUpdate(workInProgress, queue, update, newState, nextProps);
+      const updateExpirationTime = update.expirationTime;
+      if (updateExpirationTime < renderExpirationTime) {
+        // 该update优先级不够，跳过
+        // 新的state是基于baseUpdate计算得出
+        // 如果这是第一个跳过的update，则之前的update/state就是新的 base update/state
+        const clone = {
+          expirationTime: update.expirationTime,
+          tag: update.tag,
+          payload: update.payload,
+          next: null
+        }
+        if (newLastBaseState === null) {
+          newFirstBaseState = newLastBaseState = clone;
+          newBaseState = newState;
+        } else {
+          newLastBaseState = newLastBaseState.next = clone;
+        }
+        if (updateExpirationTime > newExpirationTime) {
+          newExpirationTime = updateExpirationTime;
+        }
+      } else {
+        // 该update有足够的优先级，基于该update计算newState
+        if (newLastBaseState) {
+          // 同时将该update加入baseUpdate
+          // 对于 !newLastBaseState 的情况在下面 newBaseState = newState; 处处理
+          const clone = {
+            expirationTime: Sync,
+            tag: update.tag,
+            payload: update.payload,
+            next: null
+          };
+          newLastBaseState = newLastBaseState.next = clone;
+        }
+
+        newState = getStateFromUpdate(workInProgress, queue, update, newState, nextProps, instance);
+      }
       update = update.next;
       if (!update) {
-        console.log('update to state 过程中可能产生新pendingUpdate，还未处理', queue.shared.pending)
-        break;
+        pendingQueue = queue.shared.pending;
+        if (!pendingQueue) {
+          break;
+        } else {
+          // 在reducer内部又产生了新的update，则继续计算他
+          const lastPendingUpdate = pendingQueue;
+          const firstPendingUpdate = lastPendingUpdate.next;
+          lastPendingUpdate.next = null;
+          update = firstPendingUpdate;
+          queue.lastBaseUpdate = lastPendingUpdate;
+          queue.shared.pending = null;
+        }
       }
     } while(true)
-    queue.baseState = newState;
-    queue.firstBaseUpdate = null;
-    queue.lastBaseUpdate = null;
+
+    if (!newLastBaseState) {
+      newBaseState = newState;
+    }
+    
+    queue.baseState = newBaseState;
+    queue.firstBaseUpdate = newFirstBaseState;
+    queue.lastBaseUpdate = newLastBaseState;
+
+    workInProgress.expirationTime = newExpirationTime;
     workInProgress.memoizedState = newState;
   }
 }

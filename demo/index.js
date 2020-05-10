@@ -2,22 +2,16 @@ import {React, ReactDOM} from '../packages';
 
 const {useState, useEffect} = React;
 
-let stop = Date.now() + 1000 * 20;
-let callTime = 0;
-
 function App({name}) {
   const [even, updateEven] = useState(0);
   const [odd, updateOdd] = useState(1);
-  callTime++;
-  // useEffect(() => {
-  //   document.title = `${name} ${even}`;
-  // }, [even])
+
+  useEffect(() => {
+    document.title = `${name} ${even}`;
+  }, [even])
 
   setTimeout(() => {
-    if (stop - Date.now() < 0) {
-      return;
-    }
-    debugger
+    console.log('set~')
     updateEven(even + 2);
     updateOdd(odd + 2);  
 

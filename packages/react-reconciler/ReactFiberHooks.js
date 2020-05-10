@@ -10,8 +10,16 @@ import {
   Layout as HookLayout,
   Passive as HookPassive
 } from 'shared/ReactHookEffectTags';
-
+import {
+  requestCurrentTimeForUpdate,
+  computeExpirationForFiber
+} from './ReactFiberWorkLoop';
+import {
+  markWorkInProgressReceivedUpdate
+} from './ReactFiberBeginWork';
+import { NoWork } from './ReactFiberExpirationTime';
 const {ReactCurrentDispatcher} = ReactSharedInternals;
+
 
 // hook以单向链表的形式存储在fiber.memoizedState中
 // currentHook属于current fiber
@@ -20,6 +28,8 @@ let currentHook;
 let workInProgressHook;
 // 指向workInProgress
 let currentlyRenderingFiber;
+
+let renderExpirationTime = NoWork;
 
 // 传给useState的第二个参数，可以接受 值 或 回调函数 作为参数
 function basicStateReducer(state, action) {
@@ -111,6 +121,10 @@ function updateReducer(reducer, initialArg) {
       update = update.next;
     } while(update && update !== first)
 
+    if (!Object.is(newState, hook.memoizedState)) {
+      markWorkInProgressReceivedUpdate();
+    }
+
     hook.memoizedState = newState;
     hook.baseState = newState;
     hook.baseQueue = null;
@@ -185,10 +199,14 @@ function updateWorkInProgressHook() {
 // 第三个参数之所以叫action，是借鉴了redux中的概念
 // 事实上useState就是useReducer的特殊情况
 function dispatchAction(fiber, queue, action) {
+  const currentTime = requestCurrentTimeForUpdate();
+  var expirationTime = computeExpirationForFiber(currentTime, fiber);
+
   // 这个update和fiber.update是有区别的，可以理解为这是针对fiber的hook的update，相较于fiber update粒度更细
   // 他存在的原因是因为一个fiber代表一个FunctionComponent，而一个FunctionComponent上是可以有多个hook的
   const update = {
     action,
+    expirationTime,
     // 用于特殊情况的优化
     // eagerReducer: null,
     // eagerState: null,
@@ -233,7 +251,7 @@ function dispatchAction(fiber, queue, action) {
 
     // 注意fiber参数是mount时bind的currentlyRenderingFiber，即首次渲染时的workInProgress fiber
     // 一般调用当前方法时首屏渲染已经完成，fiber已经从workInProgress变为current
-    DOMRenderer.scheduleUpdateOnFiber(fiber);
+    DOMRenderer.scheduleUpdateOnFiber(fiber, expirationTime);
   }
 }
 
@@ -357,7 +375,8 @@ const HooksDispatcherOnUpdate = {
   useEffect: updateEffect
 }
 
-export function renderWithHooks(current, workInProgress, Component, props) {
+export function renderWithHooks(current, workInProgress, Component, props, nextRenderExpirationTime) {
+  renderExpirationTime = nextRenderExpirationTime;
   currentlyRenderingFiber = workInProgress;
   // 重置
   // workInProgress.memoizedState会在updateWorkInProgressHook中赋值
@@ -379,4 +398,14 @@ export function renderWithHooks(current, workInProgress, Component, props) {
   currentHook = null;
 
   return children;
+}
+
+export function bailoutHooks(current, workInProgress, expirationTime) {
+  workInProgress.updateQueue = current.updateQueue;
+  // 对于没有任务需要处理的fiber，去掉effect
+  workInProgress.effectTag &= ~(PassiveEffect | UpdateEffect);
+
+  if (current.expirationTime <= expirationTime) {
+    current.expirationTime = NoWork;
+  }
 }

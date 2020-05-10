@@ -26,12 +26,27 @@ import {
   HasEffect as HookHasEffect,
   Passive as HookPassive
 } from 'shared/ReactHookEffectTags';
+import * as Scheduler from 'scheduler';
+import { NoWork } from './ReactFiberExpirationTime';
+import { 
+  NoPriority, 
+  NormalPriority, 
+  runWithPriority,
+  flushSyncCallbackQueue
+} from 'scheduler';
+import { 
+  getCurrentExecutionContext,
+  setCurrentExecutionContext,
+  CommitContext
+} from './ReactFiberWorkLoop';
 
 // 在React中commitWork中大部分逻辑是杂糅在workloop中的，我将他们抽离到commitWork
 // 为了在workLoop和当前模块间公用全局变量
 export const globalVariables = {
   rootWithPendingPassiveEffects: null,
-  rootDoesHavePassiveEffects: false
+  rootDoesHavePassiveEffects: false,
+  pendingPassiveEffectsExpirationTime: NoWork,
+  pendingPassiveEffectsRenderPriority: NoPriority
 };
 
 function getHostParentFiber(fiber) {
@@ -251,16 +266,29 @@ function insertOrAppendPlacementNode(fiber, before, parent) {
   }
 }
 
-// 遍历effectList执行 passive effect
 export function flushPassiveEffects() {
-  // TODO priority
+  if (globalVariables.pendingPassiveEffectsRenderPriority !== NoPriority) {
+    // passiveEffects 的优先级按 <= NormalPriority
+    const prioriyLevel = globalVariables.pendingPassiveEffectsRenderPriority > NormalPriority ? NormalPriority : globalVariables.pendingPassiveEffectsRenderPriority;
+    globalVariables.pendingPassiveEffectsRenderPriority = NoPriority;
+    return runWithPriority(prioriyLevel, flushPassiveEffectsImpl);
+  }
+}
+
+// 遍历effectList执行 passive effect
+function flushPassiveEffectsImpl() {
   // 该变量在commitRoot DOM渲染完成后被赋值
   if (!globalVariables.rootWithPendingPassiveEffects) {
     return false;
   }
   const root = globalVariables.rootWithPendingPassiveEffects;
   globalVariables.rootWithPendingPassiveEffects = null;
-  
+  const expirationTime = globalVariables.pendingPassiveEffectsExpirationTime;
+  globalVariables.pendingPassiveEffectsExpirationTime = NoWork;
+
+  const prevExecutionContext = getCurrentExecutionContext();
+  setCurrentExecutionContext(CommitContext);
+
   let effect = root.current.firstEffect;
   while (effect) {
     try {
@@ -274,6 +302,9 @@ export function flushPassiveEffects() {
     effect.nextEffect = null;
     effect = nextNextEffect;
   }
+  setCurrentExecutionContext(prevExecutionContext);
+  flushSyncCallbackQueue();
+  return true;
 }
 
 // commit阶段的第一项工作（before mutation）
@@ -289,12 +320,12 @@ export function commitBeforeMutationEffects(nextEffect) {
       // 与 componentDidMount 或 componentDidUpdate 不同，useEffect是在DOM更新后异步调用的
       // 所以不会阻塞页面渲染，见下文
       // https://zh-hans.reactjs.org/docs/hooks-effect.html#detailed-explanation
-      // TODO 使用scheduler异步调用
       if (!globalVariables.rootDoesHavePassiveEffects) {
         // 标记rootDoesHavePassiveEffects为true，在commitRoot中渲染完DOM后会为rootWithPendingPassiveEffects赋值
         globalVariables.rootDoesHavePassiveEffects = true;
-        setTimeout(() => {
+        Scheduler.scheduleCallback(Scheduler.NormalPriority ,() => {
           flushPassiveEffects();
+          return null;
         });
       }
     }
