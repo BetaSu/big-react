@@ -1,7 +1,25 @@
 <p align="center"><img src="https://p3.ssl.qhimg.com/t0154d29702a432306d.png" alt="React-On-The-Way"></p>
 
 # React-On-The-Way
-基于React`V16.13.1`架构，从零实现React，相关配套文章
+基于React`V16.13.1`架构，从零实现React 🎉🎉🎉
+
+## 为什么会有这个仓库？
+
+我假设React是你日常开发的框架，在日复一日的开发中，你萌生了学习React源码的念头，在网上搜各种源码解析后，你发现这些教程可以分为2类：
+
+1. 《xx行代码带你实现迷你React》，《xx行代码实现React hook》这样短小精干的文章。如果你只是想花一点点时间了解下React的工作原理，我向你推荐 <a href="https://pomb.us/build-your-own-react/">这篇文章</a>，非常精彩。同时，这个仓库可能不适合你，因为他会花掉你很多时间。
+
+2. 《React Fiber原理》，《React expirationTime原理》这样摘录React源码讲解的文章。如果你想学习React源码，当你都不知道`Fiber`是什么，不知道`expirationTime`对于React的意义时，这样的文章会给人“你讲解的代码我看懂了，但这些代码的作用是什么”的感觉。
+
+这个仓库的存在就是为了解决这个问题。
+
+简单来说，这个仓库有对应的一系列文章，文章会讲解React为什么要这么做，以及大体怎么做，但不会有大段的代码告诉你怎么做。
+
+当你看完文章知道我们要做什么后，再来看仓库中具体的代码实现。
+
+同时为了防止堆砌过多功能后，代码量太大影响你理解某个功能的实现，我为每个功能的实现打上一个`git tag`。
+
+## 配套文章
 
 - <a href="https://juejin.im/post/5e9abf06e51d454702460bf6">🔥从0实现React 📖PART1 React的架构设计</a>
 
@@ -9,6 +27,8 @@
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
 
 ### 当前版本v5
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v4...BetaSu:v5" target="_blank">v5 diff v4</a>
+
 在v3中我们实现了状态更新，直接在`FunctionComponent`函数体内触发更新会造成死循环，所以我们用计时器来触发。在业务中，我们一般是通过：
 
 1. 回调函数（ex：onClick）
@@ -20,6 +40,8 @@
 - [x] `useEffect hook`首屏及再次渲染的完整逻辑
 
 ### v4
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v3...BetaSu:v4" target="_blank">v4 diff v3</a>
+
 之前只能更新单一节点，这次实现了大名鼎鼎的React Diff算法，可以更新多个兄弟子节点了😄，新增功能如下：
 - [x] 节点支持`key`prop
 - [x] `commit`流程支持`Deletion effectTag`处理
@@ -36,6 +58,8 @@ ps：支持`Deletion effectTag`处理是为了应对：
 在这种情况下b fiber被标记为`Deletion effectTag`，对应的DOM节点需要删除
 
 ### v3
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v2...BetaSu:v3" target="_blank">v3 diff v2</a>
+
 之前的版本只实现了首屏渲染的逻辑，即使在v2中实现了`useState`也只实现了`useState(initialValue)`带来的首屏渲染，在v3中我们终于实现状态更新啦，撒花🎉，新增功能如下：
 - [x] `useState hook`对单一`HostComponent`的状态更新
 
@@ -73,6 +97,8 @@ react-on-the-way会造成页面逐渐卡顿并最终崩溃。原因是`updateEve
 - 异步模式下所有更新都会经过优先级调度
 
 ### v2
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v1...BetaSu:v2" target="_blank">v2 diff v1</a>
+
 为了实现React的页面更新逻辑，需要改变状态（state），我们有2条路可选：
 
 1. 实现`ClassComopnent setState`
@@ -87,3 +113,9 @@ react-on-the-way会造成页面逐渐卡顿并最终崩溃。原因是`updateEve
 我们的首要目标是实现React的页面更新逻辑，基于这个目标，我们首先实现了`HostComponent`的首屏渲染，新增功能如下：
 - [x] Render-Commit整体架构体系
 - [x] `HostComponent`的首屏渲染
+
+🙋‍♂️小讲堂：`HostComponent`是指原生DOM组件对应的JSX，在React执行时产生的组件
+```jsx
+// 比如这样
+<div>Hello</div>
+```
