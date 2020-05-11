@@ -288,8 +288,8 @@ function prepareFreshStack(root, expirationTime) {
   root.finishedWork = null;
   root.finishedExpirationTime = NoWork;
 
-  // 有未完成的任务时需要中断
   if (workInProgress !== null) {
+    // TODO 有未完成的任务时需要中断，主要是处理context
     // let interruptedWork = workInProgress.return;
     // while (interruptedWork !== null) {
     //   unwindInterruptedWork(interruptedWork);
