@@ -21,12 +21,27 @@
 
 ## 配套文章
 
-- <a href="https://juejin.im/post/5e9abf06e51d454702460bf6">🔥从0实现React 📖PART1 React的架构设计</a>
+- <a href="https://juejin.im/post/5e9abf06e51d454702460bf6">从0实现React 📖架构设计与首屏渲染</a>
 
 ## 历史版本预览
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
 
-### 当前版本v5
+### 当前版本v6
+<a href="https://github.com/BetaSu/react-on-the-way/compare/v5...BetaSu:v6" target="_blank">v6 diff v5</a>
+
+v6实现了React的异步调度器`Scheduler`（也就是说我们实现了`requestIdleCallback` polyfill），并使用`Scheduler`实现了异步render，也就是<a href="https://zh-hans.reactjs.org/docs/concurrent-mode-intro.html">React ConcurrentMode</a>。
+
+之前的版本中，我们都是同步执行render流程。在v6中，我们会为产生的`update`赋予一个优先级，高优先级的`update`会优先进入render流程。甚至当低优先级的`update`在render过程中我们触发了高优先级`update`，这时会搁置低优先级render转而处理高优先级render，这很酷，不是么😄
+
+相对应的，v6相对v5增加了大量代码和一些全局变量。不过没关系，我会在之后的文章介绍这一切是如何做到的。新增功能如下：
+
+1. Scheduler模块
+2. fiber的优先级冒泡机制
+3. ConcurrentMode
+
+这真是React内部最复杂的机制了，让人头秃👨‍🦲
+
+### v5
 <a href="https://github.com/BetaSu/react-on-the-way/compare/v4...BetaSu:v5" target="_blank">v5 diff v4</a>
 
 在v3中我们实现了状态更新，直接在`FunctionComponent`函数体内触发更新会造成死循环，所以我们用计时器来触发。在业务中，我们一般是通过：
