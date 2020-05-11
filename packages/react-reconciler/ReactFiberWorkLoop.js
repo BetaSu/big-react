@@ -537,7 +537,7 @@ function markRootExpiredAtTime(root, expirationTime) {
 function performUnitOfWork(unitOfWork) {
   const current = unitOfWork.alternate;
   // beginWork会返回fiber.child，不存在next意味着深度优先遍历已经遍历到某个子树的最深层叶子节点
-  let next = beginWork(current, unitOfWork);
+  let next = beginWork(current, unitOfWork, renderExpirationTime);
   // beginWork完成 props的diff已经完成，可以更新momoizedProps
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (!next) {

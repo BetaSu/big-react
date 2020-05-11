@@ -11,14 +11,8 @@ function App({name}) {
   }, [even])
 
   setTimeout(() => {
-    console.log('set~')
     updateEven(even + 2);
     updateOdd(odd + 2);  
-
-    // setTimeout(() => {
-    //   updateOdd(odd + 2);  
-    // }, 1000);
-
   }, 2000);
   
   return (

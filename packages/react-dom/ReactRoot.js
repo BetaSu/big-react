@@ -10,7 +10,7 @@ import { NoWork } from 'reactReconciler/ReactFiberExpirationTime';
 export default class ReactRoot {
   constructor(container) {
     // RootFiber tag === 3
-    this.current = new FiberNode(3);
+    this.current = new FiberNode(3, null, null);
     // 初始化rootFiber的updateQueue
     initializeUpdateQueue(this.current);
     // RootFiber指向FiberRoot

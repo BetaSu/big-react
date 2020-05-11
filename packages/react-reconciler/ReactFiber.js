@@ -13,7 +13,7 @@ function shouldConstruct(Component) {
   return !!(prototype && prototype.isReactComponent);
 }
 export class FiberNode {
-  constructor(tag, pendingProps, key, mode) {
+  constructor(tag, pendingProps, key) {
     // 1 ClassComponent
     // 3 HostRoot
     // 5 HostComponent
@@ -78,8 +78,7 @@ export function createWorkInProgress(current, pendingProps) {
     workInProgress = new FiberNode(
       current.tag,
       pendingProps,
-      current.key,
-      current.mode
+      current.key
     );
     workInProgress.stateNode = current.stateNode;
     workInProgress.type = current.type;
@@ -145,7 +144,7 @@ export function createFiberFromElement(element, expirationTime) {
 }
 
 export function createFiberFromText(textContent, expirationTime) {
-  const fiber = new FiberNode(HostText, textContent);
+  const fiber = new FiberNode(HostText, textContent, null);
   fiber.expirationTime = expirationTime;
   return fiber;
 }

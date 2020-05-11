@@ -164,7 +164,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
   function updateSlot(returnFiber, oldFiber, newChild, expirationTime) {
     // 如果key相同则更新fiber，否则返回null
-    const key = oldFiber ? oldFiber.key : null;
+    const key = oldFiber !== null ? oldFiber.key : null;
 
     if (typeof newChild === 'string' || typeof newChild === 'number') {
       // 文本节点没有key，如果之前的节点有key，代表之前不是文本节点而当前是，可以直接返回
