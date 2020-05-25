@@ -21,8 +21,9 @@
 
 ## 配套文章
 
-- <a href="https://juejin.im/post/5e9abf06e51d454702460bf6">从0实现React 📖1 架构设计与首屏渲染</a>
-- <a href="https://juejin.im/post/5eb9030b6fb9a043333c6071">从0实现React 📖2 组件更新</a>
+- <a href="https://juejin.im/post/5e9abf06e51d454702460bf6">React源码揭秘 📖1 架构设计与首屏渲染</a>
+- <a href="https://juejin.im/post/5eb9030b6fb9a043333c6071">React源码揭秘 📖2 组件更新</a>
+- <a href="https://juejin.im/post/5ec507146fb9a047f47cb805">React源码揭秘 📖3 Diff算法详解</a>
 
 ## 历史版本预览
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
