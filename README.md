@@ -3,6 +3,11 @@
 # React-On-The-Way
 基于React`V16.13.1`架构，从零实现React 🎉🎉🎉
 
+# 配套教程
+<a href="https://betasu.github.io/just-react/">React技术揭秘</a>
+
+👋👋👋 文章有任何问题，欢迎给我提PR
+
 ## 为什么会有这个仓库？
 
 我假设React是你日常开发的框架，在日复一日的开发中，你萌生了学习React源码的念头，在网上搜各种源码解析后，你发现这些教程可以分为2类：
@@ -18,12 +23,6 @@
 当你看完文章知道我们要做什么后，再来看仓库中具体的代码实现。
 
 同时为了防止堆砌过多功能后，代码量太大影响你理解某个功能的实现，我为每个功能的实现打上一个`git tag`。
-
-## 配套文章
-
-- <a href="https://juejin.im/post/5e9abf06e51d454702460bf6">React源码揭秘 📖1 架构设计与首屏渲染</a>
-- <a href="https://juejin.im/post/5eb9030b6fb9a043333c6071">React源码揭秘 📖2 组件更新</a>
-- <a href="https://juejin.im/post/5ec507146fb9a047f47cb805">React源码揭秘 📖3 Diff算法详解</a>
 
 ## 历史版本预览
 通过切换`git tag`浏览不同完成度的项目，执行`npm start`启动该版本下的Demo
