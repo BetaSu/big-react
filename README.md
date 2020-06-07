@@ -4,9 +4,9 @@
 基于React`V16.13.1`架构，从零实现React 🎉🎉🎉
 
 # 配套教程
-<a href="https://betasu.github.io/just-react/">React技术揭秘</a>
+<a href="https://kasong.gitee.io/just-react">React技术揭秘</a>
 
-👋👋👋 文章有任何问题，欢迎给我提PR
+👋👋👋 文章有任何不清楚的地方，欢迎给我提PR
 
 ## 为什么会有这个仓库？
 
