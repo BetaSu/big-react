@@ -4,7 +4,7 @@
 基于React`V16.13.1`架构，从零实现React 🎉🎉🎉
 
 # 配套教程
-<a href="https://kasong.gitee.io/just-react">React技术揭秘</a>
+<a href="https://react.iamkasong.com/">React技术揭秘</a>
 
 👋👋👋 文章有任何不清楚的地方，欢迎给我提PR
 
