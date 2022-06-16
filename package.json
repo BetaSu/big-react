@@ -1,31 +1,19 @@
 {
-  "name": "react-on-the-way",
-  "version": "1.0.0",
-  "description": "build your own React",
-  "main": "demo/init",
-  "scripts": {
-    "start": "webpack-dev-server"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BetaSu/react-on-the-way.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/BetaSu/react-on-the-way/issues"
-  },
-  "homepage": "https://github.com/BetaSu/react-on-the-way#readme",
+  "name": "big-react",
+  "private": true,
+  "version": "0.0.0",
+  "repository": "git@github.com:BetaSu/big-react.git",
+  "author": "kasong <313439271@qq.com>",
+  "license": "MIT",
+  "scripts": {},
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/plugin-transform-react-jsx": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "babel-loader": "^8.0.6",
-    "html-webpack-plugin": "^3.2.0",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.1"
+    "typescript": "^4.5.4",
+    "rollup": "^2.75.6"
+  },
+  "dependencies": {
+    
+  },
+  "script": {
+    "build": "rollup --config rollup.config.js"
   }
 }
