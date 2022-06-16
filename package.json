@@ -1,19 +1,17 @@
 {
   "name": "big-react",
-  "private": true,
   "version": "0.0.0",
   "repository": "git@github.com:BetaSu/big-react.git",
   "author": "kasong <313439271@qq.com>",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "rollup --config scripts/rollup/packages.config.js",
+    "preview": "rollup --config scripts/rollup/examples.config.js"
+  },
   "devDependencies": {
-    "typescript": "^4.5.4",
-    "rollup": "^2.75.6"
-  },
-  "dependencies": {
-    
-  },
-  "script": {
-    "build": "rollup --config rollup.config.js"
+    "rollup": "^2.75.6",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.3"
   }
 }
