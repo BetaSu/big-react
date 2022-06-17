@@ -6,9 +6,16 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup --config scripts/rollup/packages.config.js",
+    "lint:packages": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
     "preview": "rollup --config scripts/rollup/examples.config.js"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.7.1",
     "rollup": "^2.75.6",
     "rollup-plugin-typescript2": "^0.32.1",
     "tslib": "^2.4.0",

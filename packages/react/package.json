@@ -1,12 +1,9 @@
 {
   "name": "react",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.0",
+  "description": "React主模块",
   "module": "index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "shared": "workspace:*"
+  }
 }

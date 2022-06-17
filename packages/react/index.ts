@@ -1,5 +1,3 @@
-const num: number = 1;
-
+const num = 1;
 
 export default num;
-
