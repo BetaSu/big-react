@@ -1,29 +1,32 @@
 {
-  "name": "big-react",
-  "version": "0.0.0",
-  "repository": "git@github.com:BetaSu/big-react.git",
-  "author": "kasong <313439271@qq.com>",
-  "license": "MIT",
-  "scripts": {
-    "build": "rollup --config scripts/rollup/packages.config.js",
-    "lint:packages": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
-    "preview": "rollup --config scripts/rollup/examples.config.js"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^17.0.2",
-    "@commitlint/config-conventional": "^17.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.28.0",
-    "@typescript-eslint/parser": "^5.28.0",
-    "commitlint": "^17.0.2",
-    "eslint": "^8.17.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.2",
-    "prettier": "^2.7.1",
-    "rollup": "^2.75.6",
-    "rollup-plugin-typescript2": "^0.32.1",
-    "tslib": "^2.4.0",
-    "typescript": "^4.7.3"
-  }
+	"name": "big-react",
+	"version": "0.0.0",
+	"repository": "git@github.com:BetaSu/big-react.git",
+	"author": "kasong <313439271@qq.com>",
+	"license": "MIT",
+	"scripts": {
+		"build:pkg": "rollup --config scripts/rollup/prod.config.js",
+		"lint:packages": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.18.5",
+		"@babel/plugin-transform-react-jsx": "^7.17.12",
+		"@commitlint/cli": "^17.0.2",
+		"@commitlint/config-conventional": "^17.0.2",
+		"@rollup/plugin-babel": "^5.3.1",
+		"@rollup/plugin-node-resolve": "^13.3.0",
+		"@typescript-eslint/eslint-plugin": "^5.28.0",
+		"@typescript-eslint/parser": "^5.28.0",
+		"commitlint": "^17.0.2",
+		"eslint": "^8.17.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"husky": "^8.0.1",
+		"lint-staged": "^13.0.2",
+		"prettier": "^2.7.1",
+		"rollup": "^2.75.6",
+		"rollup-plugin-typescript2": "^0.32.1",
+		"tslib": "^2.4.0",
+		"typescript": "^4.7.3"
+	}
 }
