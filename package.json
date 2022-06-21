@@ -5,8 +5,9 @@
 	"author": "kasong <313439271@qq.com>",
 	"license": "MIT",
 	"scripts": {
-		"build:pkg": "rollup --config scripts/rollup/prod.config.js",
-		"lint:packages": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages"
+		"build:dev": "rm -rf dist && rollup --config scripts/rollup/dev.config.js",
+		"build:prod": "rollup --config scripts/rollup/prod.config.js",
+		"lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.18.5",
@@ -25,8 +26,12 @@
 		"lint-staged": "^13.0.2",
 		"prettier": "^2.7.1",
 		"rollup": "^2.75.6",
+		"rollup-plugin-generate-package-json": "^3.2.0",
 		"rollup-plugin-typescript2": "^0.32.1",
 		"tslib": "^2.4.0",
 		"typescript": "^4.7.3"
+	},
+	"dependencies": {
+		"react": "^0.0.0"
 	}
 }

@@ -9,10 +9,11 @@ const ReactElement = function (
 ): ReactElement {
 	const element: ReactElement = {
 		$$typeof: REACT_ELEMENT_TYPE,
-		type,
+		type: type,
 		key,
 		ref,
-		props
+		props,
+		__mark: 'KaSong'
 	};
 
 	return element;
@@ -26,12 +27,12 @@ function hasValidRef(config: any) {
 	return config.ref !== undefined;
 }
 
-export const jsx = (type: ElementType, config: any) => {
+const jsx = (type: ElementType, config: any) => {
 	let key: Key = null;
 	const props: Props = {};
 	let ref: Ref = null;
 
-	for (let prop in config) {
+	for (const prop in config) {
 		const val = config[prop];
 		if (prop === 'key') {
 			if (hasValidKey(config)) {
@@ -45,9 +46,11 @@ export const jsx = (type: ElementType, config: any) => {
 			}
 			continue;
 		}
-		if (config.hasOwnProperty(prop)) {
+		if ({}.hasOwnProperty.call(config, prop)) {
 			props[prop] = val;
 		}
 	}
 	return ReactElement(type, key, ref, props);
 };
+
+export const jsxDEV = jsx;
