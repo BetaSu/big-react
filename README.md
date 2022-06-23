@@ -17,7 +17,6 @@
 | 规范 | lint-staged                        | ✅       |      |
 | 规范 | tsc                                | ✅       |      |
 | 测试 | jest 环境搭建                      | ⬜️      |      |
-| 测试 | ReactNoop Renderer                 | ⬜️      |      |
 | 规范 | tsc                                | ✅       |      |
 | 构建 | babel 配置                         | ⬜️      |      |
 | 构建 | Dev 环境包的构建                   | ⬜️      |      |
@@ -27,11 +26,26 @@
 
 ### 框架需求
 
-| 类型       | 内容     | 完成情况 | 备注 |
-| ---------- | -------- | -------- | ---- |
-| React      | JSX 转换 | ✅       |      |
-| ReactDOM   | JSX 转换 | ✅       |      |
-| ReactDOM   | JSX 转换 | ✅       |      |
-| Reconciler | JSX 转换 | ✅       |      |
+| 类型       | 内容                      | 完成情况 | 备注         |
+| ---------- | ------------------------- | -------- | ------------ |
+| React      | JSX 转换                  | ✅       |              |
+| ReactDOM   | 浏览器环境 DOM 的增/删/改 | ⬜️      |              |
+| ReactNoop  | ReactNoop Renderer        | ⬜️      |              |
+| Reconciler | Fiber 架构                | ⬜️      |              |
+| Reconciler | 事件模型                  | ⬜️      |              |
+| Reconciler | Lane 模型                 | ⬜️      |              |
+| Reconciler | Update 机制               | ⬜️      |              |
+| Reconciler | reconcile 流程            | ⬜️      | 即 Diff 算法 |
+| Reconciler | 同步调度流程              | ⬜️      |              |
+| Reconciler | 异步调度流程              | ⬜️      |              |
 
 ## 更新日志
+
+### v1
+
+跑通 mount 时更新流程，包括如下需求点：
+
+- JSX 转换
+- Fiber 架构
+- 同步调度流程
+- 浏览器环境 DOM 的增/删/改
