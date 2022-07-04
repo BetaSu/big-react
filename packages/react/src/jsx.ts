@@ -29,7 +29,7 @@ function hasValidRef(config: any) {
 
 const jsx = (type: ElementType, config: any) => {
 	let key: Key = null;
-	const props: Props = {};
+	const props: any = {};
 	let ref: Ref = null;
 
 	for (const prop in config) {

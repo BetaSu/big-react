@@ -17,6 +17,35 @@ function resolvePkgPath(pkgName, isDist) {
 
 export default [
 	{
+		input: `${resolvePkgPath('react-dom', false)}/index.ts`,
+		output: [
+			{
+				file: `${resolvePkgPath('react-dom', true)}/client.js`,
+				name: 'client.js',
+				format: 'umd'
+			},
+			{
+				file: `${resolvePkgPath('react-dom', true)}/index.js`,
+				name: 'index.js',
+				format: 'umd'
+			}
+		],
+		plugins: [
+			typescript(tsConfig),
+			resolve(),
+			generatePackageJson({
+				inputFolder: resolvePkgPath('react-dom', false),
+				outputFolder: resolvePkgPath('react-dom', true),
+				baseContents: ({ name, description, version }) => ({
+					name,
+					description,
+					version,
+					main: 'index.js'
+				})
+			})
+		]
+	},
+	{
 		input: `${resolvePkgPath('react', false)}/index.ts`,
 		output: {
 			file: `${resolvePkgPath('react', true)}/index.js`,

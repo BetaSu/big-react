@@ -26,26 +26,30 @@
 
 ### 框架需求
 
-| 类型       | 内容                      | 完成情况 | 备注         |
-| ---------- | ------------------------- | -------- | ------------ |
-| React      | JSX 转换                  | ✅       |              |
-| ReactDOM   | 浏览器环境 DOM 的增/删/改 | ⬜️      |              |
-| ReactNoop  | ReactNoop Renderer        | ⬜️      |              |
-| Reconciler | Fiber 架构                | ⬜️      |              |
-| Reconciler | 事件模型                  | ⬜️      |              |
-| Reconciler | Lane 模型                 | ⬜️      |              |
-| Reconciler | Update 机制               | ⬜️      |              |
-| Reconciler | reconcile 流程            | ⬜️      | 即 Diff 算法 |
-| Reconciler | 同步调度流程              | ⬜️      |              |
-| Reconciler | 异步调度流程              | ⬜️      |              |
+| 类型       | 内容                        | 完成情况 | 备注 |
+| ---------- | --------------------------- | -------- | ---- |
+| React      | JSX 转换                    | ✅       |      |
+| ReactDOM   | 浏览器环境 DOM 的增/删/改   | ⬜️      |      |
+| ReactNoop  | ReactNoop Renderer          | ⬜️      |      |
+| Reconciler | Fiber 架构                  | ✅       |      |
+| Reconciler | 事件模型                    | ⬜️      |      |
+| Reconciler | Lane 模型                   | ⬜️      |      |
+| Reconciler | 基础 Update 机制            | ✅       |      |
+| Reconciler | 带优先级的 Update 机制      | ⬜️      |      |
+| Reconciler | 插入单节点的 reconcile 流程 | ✅       |      |
+| Reconciler | 插入多节点的 reconcile 流程 | ⬜️      |      |
+| Reconciler | 删除节点的 reconcile 流程   | ⬜️      |      |
+| Reconciler | 同步调度流程                | ⬜️      |      |
+| Reconciler | 异步调度流程                | ⬜️      |      |
 
 ## 更新日志
 
 ### v1
 
-跑通 mount 时更新流程，包括如下需求点：
+插入单节点的 render 阶段 mount 流程，包括如下功能：
 
 - JSX 转换
 - Fiber 架构
-- 同步调度流程
-- 浏览器环境 DOM 的增/删/改
+- 插入单节点的 reconcile 流程
+
+注：还未实现浏览器环境下的渲染

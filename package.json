@@ -6,7 +6,6 @@
 	"license": "MIT",
 	"scripts": {
 		"build:dev": "rm -rf dist && rollup --config scripts/rollup/dev.config.js",
-		"build:prod": "rollup --config scripts/rollup/prod.config.js",
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages"
 	},
 	"devDependencies": {
@@ -32,6 +31,7 @@
 		"typescript": "^4.7.3"
 	},
 	"dependencies": {
-		"react": "^0.0.0"
+		"react": "^0.0.0",
+		"react-dom": "^0.0.0"
 	}
 }
