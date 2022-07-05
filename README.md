@@ -21,7 +21,7 @@
 | 构建 | babel 配置                         | ⬜️      |                                                   |
 | 构建 | Dev 环境包的构建                   | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | 构建 | Prod 环境包的构建                  | ⬜️      |                                                   |
-| 部署 | Github Action 执行 lint 与 test    | ⬜️      |                                                   |
+| 部署 | Github Action 执行 lint 与 test    | ✅      |                                                   |
 | 部署 | Github Action 根据 tag 发布 npm 包 | ⬜️      |                                                   |
 
 ### 框架需求
