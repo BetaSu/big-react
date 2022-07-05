@@ -56,7 +56,7 @@
 
 ## 更新日志
 
-### v1
+### [v1](https://github.com/BetaSu/big-react/tree/v1)
 
 插入单节点的 render 阶段 mount 流程，包括如下功能：
 
