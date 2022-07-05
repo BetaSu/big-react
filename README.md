@@ -39,6 +39,10 @@
 | Reconciler | 插入单节点的 reconcile 流程 | ✅       |      |
 | Reconciler | 插入多节点的 reconcile 流程 | ⬜️      |      |
 | Reconciler | 删除节点的 reconcile 流程   | ⬜️      |      |
+| Reconciler | HostText 类型支持           | ✅       |      |
+| Reconciler | HostComponent 类型支持      | ✅       |      |
+| Reconciler | HostRoot 类型支持           | ✅       |      |
+| Reconciler | FunctionComponent 类型支持  | ⬜️      |      |
 | Reconciler | 同步调度流程                | ⬜️      |      |
 | Reconciler | 异步调度流程                | ⬜️      |      |
 
@@ -63,5 +67,7 @@
 - JSX 转换
 - Fiber 架构
 - 插入单节点的 reconcile 流程
+- HostComponent 类型支持
+- HostRoot 类型支持
 
 注：还未实现浏览器环境下的渲染
