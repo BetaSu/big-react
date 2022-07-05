@@ -12,7 +12,7 @@ const appendAllChildren = (parent: Instance, workInProgress: FiberNode) => {
 	// 遍历workInProgress所有子孙 DOM元素，依次挂载
 	let node = workInProgress.child;
 	while (node !== null) {
-		if (node.tag === HostComponent) {
+		if (node.tag === HostComponent || node.tag === HostText) {
 			appendInitialChild(parent, node.stateNode);
 		} else if (node.child !== null) {
 			node.child.return = node;

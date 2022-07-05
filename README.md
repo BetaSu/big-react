@@ -29,7 +29,10 @@
 | 类型       | 内容                        | 完成情况 | 在哪个版本实现的                                  |
 | ---------- | --------------------------- | -------- | ------------------------------------------------- |
 | React      | JSX 转换                    | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
-| ReactDOM   | 浏览器环境 DOM 的增/删/改   | ⬜️      |                                                   |
+| ReactDOM   | 浏览器环境 DOM 的插入       | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
+| ReactDOM   | 浏览器环境 DOM 的移动       | ⬜️      |                                                   |
+| ReactDOM   | 浏览器环境 DOM 的属性变化   | ⬜️      |                                                   |
+| ReactDOM   | 浏览器环境 DOM 的删除       | ⬜️      |                                                   |
 | ReactNoop  | ReactNoop Renderer          | ⬜️      |                                                   |
 | Reconciler | Fiber 架构                  | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | 事件模型                    | ⬜️      |                                                   |
@@ -39,7 +42,7 @@
 | Reconciler | 插入单节点的 reconcile 流程 | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | 插入多节点的 reconcile 流程 | ⬜️      |                                                   |
 | Reconciler | 删除节点的 reconcile 流程   | ⬜️      |                                                   |
-| Reconciler | HostText 类型支持           | ✅       |                                                   |
+| Reconciler | HostText 类型支持           | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
 | Reconciler | HostComponent 类型支持      | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | HostRoot 类型支持           | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | FunctionComponent 类型支持  | ⬜️      |                                                   |
@@ -59,6 +62,13 @@
 通过`CRA`或`Vite`起一个`React`测试项目后，在本项目执行`pnpm run build:dev`打包`react`与`react-dom`，在测试项目中通过`pnpm link`将项目依赖的`react`与`react-dom`替换为我们打包的`react`与`react-dom`
 
 ## 更新日志
+
+### [v2](https://github.com/BetaSu/big-react/tree/v2)
+
+插入单节点的 mount 流程（可以在浏览器环境渲染 DOM），包括如下功能：
+
+- 浏览器环境 DOM 的插入
+- HostText 类型支持
 
 ### [v1](https://github.com/BetaSu/big-react/tree/v1)
 

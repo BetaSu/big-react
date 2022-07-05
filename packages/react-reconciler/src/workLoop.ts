@@ -1,6 +1,8 @@
 import { beginWork } from './beginWork';
+import { commitMutationEffects } from './commitWork';
 import { completeWork } from './completeWork';
 import { createWorkInProgress, FiberNode, FiberRootNode } from './fiber';
+import { MutationMask, NoFlags } from './fiberFlags';
 import { HostRoot } from './workTags';
 
 let workInProgress: FiberNode | null = null;
@@ -47,8 +49,46 @@ function performSyncWorkOnRoot(root: FiberRootNode) {
 		}
 	} while (true);
 
+	if (workInProgress !== null) {
+		console.error('render阶段结束时wip不为null');
+	}
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+
 	// commit阶段操作
-	console.log('render结束', root);
+	commitRoot(root);
+}
+
+function commitRoot(root: FiberRootNode) {
+	const finishedWork = root.finishedWork;
+
+	if (finishedWork === null) {
+		return;
+	}
+	// 重置
+	root.finishedWork = null;
+
+	const subtreeHasEffect =
+		(finishedWork.subtreeFlags & MutationMask) !== NoFlags;
+	const rootHasEffect = (finishedWork.flags & MutationMask) !== NoFlags;
+
+	if (subtreeHasEffect || rootHasEffect) {
+		// 有副作用要执行
+
+		// 阶段1/3:beforeMutation
+
+		// 阶段2/3:Mutation
+		commitMutationEffects(finishedWork);
+
+		// Fiber Tree切换
+		root.current = finishedWork;
+
+		// 阶段3:Layout
+	} else {
+		// Fiber Tree切换
+		root.current = finishedWork;
+	}
 }
 
 function prepareFreshStack(root: FiberRootNode) {
