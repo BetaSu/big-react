@@ -1,7 +1,12 @@
 import { FiberNode } from './fiber';
 import { NoFlags } from './fiberFlags';
-import { appendInitialChild, createInstance, Instance } from './hostConfig';
-import { HostComponent, HostRoot } from './workTags';
+import {
+	appendInitialChild,
+	createInstance,
+	createTextInstance,
+	Instance
+} from './hostConfig';
+import { HostComponent, HostRoot, HostText } from './workTags';
 
 const appendAllChildren = (parent: Instance, workInProgress: FiberNode) => {
 	// 遍历workInProgress所有子孙 DOM元素，依次挂载
@@ -44,6 +49,8 @@ const bubbleProperties = (completeWork: FiberNode) => {
 };
 
 export const completeWork = (workInProgress: FiberNode) => {
+	const newProps = workInProgress.pendingProps;
+
 	switch (workInProgress.tag) {
 		case HostComponent:
 			// 初始化DOM
@@ -58,6 +65,13 @@ export const completeWork = (workInProgress: FiberNode) => {
 			bubbleProperties(workInProgress);
 			return null;
 		case HostRoot:
+			bubbleProperties(workInProgress);
+			return null;
+		case HostText:
+			// 初始化DOM
+			const textInstanve = createTextInstance(newProps.content);
+			workInProgress.stateNode = textInstanve;
+			// 冒泡flag
 			bubbleProperties(workInProgress);
 			return null;
 		default:

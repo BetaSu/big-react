@@ -2,7 +2,7 @@ import { ReactElement } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import { FiberNode } from './fiber';
 import { processUpdateQueue } from './updateQueue';
-import { HostComponent, HostRoot } from './workTags';
+import { HostComponent, HostRoot, HostText } from './workTags';
 
 export const beginWork = (workInProgress: FiberNode) => {
 	switch (workInProgress.tag) {
@@ -10,6 +10,8 @@ export const beginWork = (workInProgress: FiberNode) => {
 			return updateHostRoot(workInProgress);
 		case HostComponent:
 			return updateHostComponent(workInProgress);
+		case HostText:
+			return null;
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
