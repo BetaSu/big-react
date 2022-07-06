@@ -1,8 +1,14 @@
 import { ReactElement } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import { FiberNode } from './fiber';
+import { renderWithHooks } from './fiberHooks';
 import { processUpdateQueue } from './updateQueue';
-import { HostComponent, HostRoot, HostText } from './workTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './workTags';
 
 export const beginWork = (workInProgress: FiberNode) => {
 	switch (workInProgress.tag) {
@@ -12,11 +18,19 @@ export const beginWork = (workInProgress: FiberNode) => {
 			return updateHostComponent(workInProgress);
 		case HostText:
 			return null;
+		case FunctionComponent:
+			return updateFunctionComponent(workInProgress);
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
 	}
 };
+
+function updateFunctionComponent(workInProgress: FiberNode) {
+	const nextChildren = renderWithHooks(workInProgress);
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
+}
 
 function updateHostComponent(workInProgress: FiberNode) {
 	// 根据element创建fiberNode
