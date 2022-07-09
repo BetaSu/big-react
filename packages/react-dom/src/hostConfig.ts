@@ -1,6 +1,6 @@
 export type Container = Element | Document;
 export type Instance = Element;
-export type TextInstanve = Text;
+export type TextInstance = Text;
 
 export const createInstance = (type: string) => {
 	return document.createElement(type);
