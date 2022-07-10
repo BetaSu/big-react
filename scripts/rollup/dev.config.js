@@ -18,6 +18,7 @@ function resolvePkgPath(pkgName, isDist) {
 export default [
 	{
 		input: `${resolvePkgPath('react-dom', false)}/index.ts`,
+		external: ['react'],
 		output: [
 			{
 				file: `${resolvePkgPath('react-dom', true)}/client.js`,
@@ -36,10 +37,11 @@ export default [
 			generatePackageJson({
 				inputFolder: resolvePkgPath('react-dom', false),
 				outputFolder: resolvePkgPath('react-dom', true),
-				baseContents: ({ name, description, version }) => ({
+				baseContents: ({ name, description, version, peerDependencies }) => ({
 					name,
 					description,
 					version,
+					peerDependencies: { react: version },
 					main: 'index.js'
 				})
 			})

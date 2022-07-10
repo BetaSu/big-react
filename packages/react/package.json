@@ -1,9 +1,9 @@
 {
-  "name": "react",
-  "version": "0.0.0",
-  "description": "React主模块",
-  "module": "index.ts",
-  "dependencies": {
-    "shared": "workspace:*"
-  }
+	"name": "react",
+	"version": "0.0.0",
+	"description": "React主模块",
+	"module": "index.ts",
+	"dependencies": {
+		"shared": "workspace:*"
+	}
 }

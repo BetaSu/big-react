@@ -52,9 +52,9 @@ function ChildReconciler(shouldTrackEffect: boolean) {
 					);
 			}
 		}
-		if (typeof newChild === 'string') {
+		if (typeof newChild === 'string' || typeof newChild === 'number') {
 			return placeSingleChild(
-				reconcileSingleTextNode(returnFiber, currentFirstChild, newChild)
+				reconcileSingleTextNode(returnFiber, currentFirstChild, newChild + '')
 			);
 		}
 		console.error('reconcile时未实现的child 类型');
