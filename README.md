@@ -45,7 +45,12 @@
 | Reconciler | HostText 类型支持           | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
 | Reconciler | HostComponent 类型支持      | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | HostRoot 类型支持           | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
-| Reconciler | FunctionComponent 类型支持  | ⬜️      |                                                   |
+| Reconciler | FunctionComponent 类型支持  | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
+| React      | Hooks 架构 mount 时实现     | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
+| React      | Hooks 架构 update 时实现    | ⬜️      |                                                   |
+| Reconciler | useState 实现               | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
+| Reconciler | useEffect 实现              | ⬜️      |                                                   |
+| Reconciler | useRef 实现                 | ⬜️      |                                                   |
 | Reconciler | 同步调度流程                | ⬜️      |                                                   |
 | Reconciler | 异步调度流程                | ⬜️      |                                                   |
 
@@ -62,6 +67,14 @@
 通过`CRA`或`Vite`起一个`React`测试项目后，在本项目执行`pnpm run build:dev`打包`react`与`react-dom`，在测试项目中通过`pnpm link`将项目依赖的`react`与`react-dom`替换为我们打包的`react`与`react-dom`
 
 ## 更新日志
+
+### [v3](https://github.com/BetaSu/big-react/tree/v3)
+
+实现 useState 的 mount 时流程，包括如下功能：
+
+- FunctionComponent 类型支持
+- Hooks 架构 mount 时实现
+- useState 实现
 
 ### [v2](https://github.com/BetaSu/big-react/tree/v2)
 
