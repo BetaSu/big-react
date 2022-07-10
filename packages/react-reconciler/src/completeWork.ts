@@ -74,8 +74,8 @@ export const completeWork = (workInProgress: FiberNode) => {
 			return null;
 		case HostText:
 			// 初始化DOM
-			const textInstanve = createTextInstance(newProps.content);
-			workInProgress.stateNode = textInstanve;
+			const TextInstance = createTextInstance(newProps.content);
+			workInProgress.stateNode = TextInstance;
 			// 冒泡flag
 			bubbleProperties(workInProgress);
 			return null;
