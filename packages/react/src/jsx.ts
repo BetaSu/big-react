@@ -27,7 +27,7 @@ function hasValidRef(config: any) {
 	return config.ref !== undefined;
 }
 
-const jsx = (type: ElementType, config: any) => {
+export const jsx = (type: ElementType, config: any) => {
 	let key: Key = null;
 	const props: any = {};
 	let ref: Ref = null;
@@ -42,7 +42,7 @@ const jsx = (type: ElementType, config: any) => {
 		}
 		if (prop === 'ref' && val !== undefined) {
 			if (hasValidRef(config)) {
-				ref = '' + val;
+				ref = val;
 			}
 			continue;
 		}
@@ -52,5 +52,13 @@ const jsx = (type: ElementType, config: any) => {
 	}
 	return ReactElement(type, key, ref, props);
 };
+
+export function isValidElement(object: any) {
+	return (
+		typeof object === 'object' &&
+		object !== null &&
+		object.$$typeof === REACT_ELEMENT_TYPE
+	);
+}
 
 export const jsxDEV = jsx;

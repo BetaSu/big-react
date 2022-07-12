@@ -21,9 +21,6 @@ interface Hook {
 
 const { currentDispatcher } = sharedInternals;
 
-// 貌似treeShake错误将currentDispatcher相关逻辑删除，只能暴露副作用
-// console.log(currentDispatcher);
-
 export const renderWithHooks = (workInProgress: FiberNode) => {
 	currentlyRenderingFiber = workInProgress;
 	// 重置
