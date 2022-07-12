@@ -16,15 +16,17 @@
 | 规范 | commitlint + husky                 | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | 规范 | lint-staged                        | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | 规范 | tsc                                | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
-| 测试 | jest 环境搭建                      | ⬜️      |                                                   |
+| 测试 | jest 环境搭建                      | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
 | 规范 | tsc                                | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
-| 构建 | babel 配置                         | ⬜️      |                                                   |
+| 构建 | babel 配置                         | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
 | 构建 | Dev 环境包的构建                   | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | 构建 | Prod 环境包的构建                  | ⬜️      |                                                   |
 | 部署 | Github Action 执行 lint 与 test    | ⬜️      |                                                   |
 | 部署 | Github Action 根据 tag 发布 npm 包 | ⬜️      |                                                   |
 
 ### 框架需求
+
+当前跑通 React 官方测试用例 17 个
 
 | 类型       | 内容                        | 完成情况 | 在哪个版本实现的                                  |
 | ---------- | --------------------------- | -------- | ------------------------------------------------- |
@@ -60,15 +62,25 @@
 
 主要调试方式包括两个：
 
-1. 跑用例
+1. 跑`React`官方的测试用例
 
-跑`React`官方的测试用例（还未实现，需要先实现`ReactNoop`渲染器）
+执行`pnpm test`
 
 2. pnpm link
 
 通过`CRA`或`Vite`起一个`React`测试项目后，在本项目执行`pnpm run build:dev`打包`react`与`react-dom`，在测试项目中通过`pnpm link`将项目依赖的`react`与`react-dom`替换为我们打包的`react`与`react-dom`
 
 ## 更新日志
+
+### [v4](https://github.com/BetaSu/big-react/tree/v4)
+
+初始化测试相关架构，包括如下功能：
+
+- 实现 React.isValidElement
+- jest 环境搭建
+- babel 配置
+- ReactTestUtils
+- 跑通关于 jsx 的 17 个官方用例
 
 ### [v3](https://github.com/BetaSu/big-react/tree/v3)
 
