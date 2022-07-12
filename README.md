@@ -29,10 +29,12 @@
 | 类型       | 内容                        | 完成情况 | 在哪个版本实现的                                  |
 | ---------- | --------------------------- | -------- | ------------------------------------------------- |
 | React      | JSX 转换                    | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
+| React      | React.isValidElement        | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
 | ReactDOM   | 浏览器环境 DOM 的插入       | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
 | ReactDOM   | 浏览器环境 DOM 的移动       | ⬜️      |                                                   |
 | ReactDOM   | 浏览器环境 DOM 的属性变化   | ⬜️      |                                                   |
 | ReactDOM   | 浏览器环境 DOM 的删除       | ⬜️      |                                                   |
+| ReactDOM   | ReactTestUtils              | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
 | ReactNoop  | ReactNoop Renderer          | ⬜️      |                                                   |
 | Reconciler | Fiber 架构                  | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | 事件模型                    | ⬜️      |                                                   |
