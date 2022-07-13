@@ -43,7 +43,9 @@
 | Reconciler | Lane 模型                   | ⬜️      |                                                   |
 | Reconciler | 基础 Update 机制            | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | 带优先级的 Update 机制      | ⬜️      |                                                   |
-| Reconciler | 插入单节点的 reconcile 流程 | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
+| Reconciler | 插入单节点的 mount 流程     | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
+| Reconciler | 插入多节点的 mount 流程     | ⬜️      |                                                   |
+| Reconciler | 插入单节点的 reconcile 流程 | ⬜️      |                                                   |
 | Reconciler | 插入多节点的 reconcile 流程 | ⬜️      |                                                   |
 | Reconciler | 删除节点的 reconcile 流程   | ⬜️      |                                                   |
 | Reconciler | HostText 类型支持           | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |

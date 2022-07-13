@@ -1,26 +1,69 @@
 import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
-import { ReactElement } from 'shared/ReactTypes';
-import { createFiberFromElement, FiberNode } from './fiber';
-import { Placement } from './fiberFlags';
+import { Props, ReactElement } from 'shared/ReactTypes';
+import {
+	createFiberFromElement,
+	createWorkInProgress,
+	FiberNode
+} from './fiber';
+import { ChildDeletion, Placement } from './fiberFlags';
 import { HostText } from './workTags';
 
+/**
+ * mount/reconcile只负责 Placement(插入)/Placement(移动)/ChildDeletion(删除)
+ * 更新（文本节点内容更新、属性更新）在completeWork中，对应Update flag
+ */
+
 function ChildReconciler(shouldTrackEffect: boolean) {
+	function deleteChild(returnFiber: FiberNode, childToDelete: FiberNode) {
+		if (!shouldTrackEffect) {
+			return;
+		}
+		const deletions = returnFiber.deletions;
+		if (deletions === null) {
+			returnFiber.deletions = [childToDelete];
+			returnFiber.flags |= ChildDeletion;
+		} else {
+			deletions.push(childToDelete);
+		}
+	}
 	function reconcileSingleElement(
 		returnFiber: FiberNode,
 		currentFirstChild: FiberNode | null,
 		element: ReactElement
 	) {
-		// 前：abc 后：a  删除bc
+		// TODO 前：abc 后：a  删除bc
 		// 前：a 后：b 删除b、创建a
 		// 前：无 后：a 创建a
-		currentFirstChild;
+		const key = element.key;
+		if (currentFirstChild !== null) {
+			if (currentFirstChild.key === key) {
+				// key相同，比较type
+
+				if (element.$$typeof === REACT_ELEMENT_TYPE) {
+					if (currentFirstChild.type === element.type) {
+						// type相同 可以复用
+						const existing = useFiber(currentFirstChild, element.props);
+						existing.return = returnFiber;
+						return existing;
+					}
+					// type不同，删除旧的
+					deleteChild(returnFiber, currentFirstChild);
+				} else {
+					console.error('未定义的element.$$typeof', element.$$typeof);
+				}
+			} else {
+				// key不同，删除旧的
+				deleteChild(returnFiber, currentFirstChild);
+			}
+		}
+		// 创建新的
 		const fiber = createFiberFromElement(element);
 		fiber.return = returnFiber;
 		return fiber;
 	}
 
 	function placeSingleChild(fiber: FiberNode) {
-		if (shouldTrackEffect) {
+		if (shouldTrackEffect && fiber.alternate === null) {
 			fiber.flags |= Placement;
 		}
 		return fiber;
@@ -31,7 +74,18 @@ function ChildReconciler(shouldTrackEffect: boolean) {
 		currentFirstChild: FiberNode | null,
 		content: string
 	) {
-		currentFirstChild;
+		// 前：b 后：a
+		// TODO 前：abc 后：a
+		// TODO 前：bca 后：a
+		if (currentFirstChild !== null && currentFirstChild.tag === HostText) {
+			const existing = useFiber(currentFirstChild, { content });
+			existing.return = returnFiber;
+			return existing;
+		}
+		if (currentFirstChild !== null) {
+			deleteChild(returnFiber, currentFirstChild);
+		}
+
 		const created = new FiberNode(HostText, { content }, null);
 		created.return = returnFiber;
 		return created;
@@ -62,6 +116,14 @@ function ChildReconciler(shouldTrackEffect: boolean) {
 	}
 
 	return reconcileChildFibers;
+}
+
+function useFiber(fiber: FiberNode, pendingProps: Props): FiberNode {
+	const clone = createWorkInProgress(fiber, pendingProps);
+	clone.index = 0;
+	clone.sibling = null;
+
+	return clone;
 }
 
 export const reconcileChildFibers = ChildReconciler(true);

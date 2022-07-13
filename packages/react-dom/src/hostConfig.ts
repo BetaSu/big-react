@@ -20,3 +20,14 @@ export const appendChildToContainer = (
 ) => {
 	container.appendChild(child);
 };
+
+export const removeChild = (child: Instance, container: Container) => {
+	container.removeChild(child);
+};
+
+export const commitTextUpdate = (
+	textIntance: TextInstance,
+	content: string
+) => {
+	textIntance.nodeValue = content;
+};

@@ -1,3 +1,4 @@
+import { Disptach } from 'react/src/currentDispatcher';
 import { Action } from 'shared/ReactTypes';
 import { FiberNode } from './fiber';
 
@@ -9,6 +10,7 @@ export interface UpdateQueue<State> {
 	shared: {
 		pending: Update<State> | null;
 	};
+	dispatch: Disptach<State> | null;
 }
 
 // 创建
@@ -31,16 +33,18 @@ export const createUpdateQueue = <Action>() => {
 	const updateQueue: UpdateQueue<Action> = {
 		shared: {
 			pending: null
-		}
+		},
+		dispatch: null
 	};
 	return updateQueue;
 };
 
 // 消费
-export const processUpdateQueue = <State>(fiber: FiberNode) => {
-	const updateQueue = fiber.updateQueue as UpdateQueue<State>;
-	let newState: State = fiber.memoizedState;
-
+export const processUpdateQueue = <State>(
+	baseState: State,
+	updateQueue: UpdateQueue<State>,
+	fiber: FiberNode
+): State => {
 	if (updateQueue !== null) {
 		const pending = updateQueue.shared.pending;
 		const pendingUpdate = pending;
@@ -49,13 +53,13 @@ export const processUpdateQueue = <State>(fiber: FiberNode) => {
 		if (pendingUpdate !== null) {
 			const action = pendingUpdate.action;
 			if (action instanceof Function) {
-				newState = action(newState);
+				baseState = action(baseState);
 			} else {
-				newState = action;
+				baseState = action;
 			}
 		}
 	} else {
-		console.error(fiber, ' processUpdateQueue时 updateQueue不存在');
+		console.error(fiber, 'processUpdateQueue时 updateQueue不存在');
 	}
-	fiber.memoizedState = newState;
+	return baseState;
 };
