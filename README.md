@@ -35,7 +35,7 @@
 | ReactDOM   | 浏览器环境 DOM 的插入       | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
 | ReactDOM   | 浏览器环境 DOM 的移动       | ⬜️      |                                                   |
 | ReactDOM   | 浏览器环境 DOM 的属性变化   | ⬜️      |                                                   |
-| ReactDOM   | 浏览器环境 DOM 的删除       | ⬜️      |                                                   |
+| ReactDOM   | 浏览器环境 DOM 的删除       | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | ReactDOM   | ReactTestUtils              | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
 | ReactNoop  | ReactNoop Renderer          | ⬜️      |                                                   |
 | Reconciler | Fiber 架构                  | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
@@ -45,15 +45,15 @@
 | Reconciler | 带优先级的 Update 机制      | ⬜️      |                                                   |
 | Reconciler | 插入单节点的 mount 流程     | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | 插入多节点的 mount 流程     | ⬜️      |                                                   |
-| Reconciler | 插入单节点的 reconcile 流程 | ⬜️      |                                                   |
+| Reconciler | 插入单节点的 reconcile 流程 | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | Reconciler | 插入多节点的 reconcile 流程 | ⬜️      |                                                   |
-| Reconciler | 删除节点的 reconcile 流程   | ⬜️      |                                                   |
+| Reconciler | 删除节点的 reconcile 流程   | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | Reconciler | HostText 类型支持           | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
 | Reconciler | HostComponent 类型支持      | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | HostRoot 类型支持           | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | FunctionComponent 类型支持  | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
 | React      | Hooks 架构 mount 时实现     | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
-| React      | Hooks 架构 update 时实现    | ⬜️      |                                                   |
+| React      | Hooks 架构 update 时实现    | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | Reconciler | useState 实现               | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
 | Reconciler | useEffect 实现              | ⬜️      |                                                   |
 | Reconciler | useRef 实现                 | ⬜️      |                                                   |
@@ -73,6 +73,15 @@
 通过`CRA`或`Vite`起一个`React`测试项目后，在本项目执行`pnpm run build:dev`打包`react`与`react-dom`，在测试项目中通过`pnpm link`将项目依赖的`react`与`react-dom`替换为我们打包的`react`与`react-dom`
 
 ## 更新日志
+
+### [v5](https://github.com/BetaSu/big-react/tree/v5)
+
+实现单节点 update，包括如下功能：
+
+- 浏览器环境 DOM 的删除（比如 h3 变为 p，那么就要经历删除 h3、插入 p）
+- 插入单节点的 reconcile 流程（包括 HostComponent、HostText）
+- 删除节点的 reconcile 流程（为后续 ref、useEffect 特性做准备，实现的比较完备）
+- Hooks 架构 update 时实现
 
 ### [v4](https://github.com/BetaSu/big-react/tree/v4)
 
