@@ -68,7 +68,7 @@ export const completeWork = (workInProgress: FiberNode) => {
 				// TODO 更新元素属性
 			} else {
 				// 初始化DOM
-				const instance = createInstance(workInProgress.type);
+				const instance = createInstance(workInProgress.type, newProps);
 				// 挂载DOM
 				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
