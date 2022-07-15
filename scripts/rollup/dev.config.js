@@ -2,6 +2,7 @@ import typescript from 'rollup-plugin-typescript2';
 import path from 'path';
 import resolve from '@rollup/plugin-babel';
 import babel from '@rollup/plugin-babel';
+import replace from '@rollup/plugin-replace';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 
 const tsConfig = { tsConfig: 'tsconfig.json' };
@@ -14,6 +15,14 @@ function resolvePkgPath(pkgName, isDist) {
 	}
 	return `${pkgPath}/${pkgName}`;
 }
+
+const basePlugins = [
+	typescript(tsConfig),
+	resolve(),
+	replace({
+		__DEV__: process.env.NODE_ENV !== 'production'
+	})
+];
 
 export default [
 	// react-dom
@@ -33,8 +42,7 @@ export default [
 			}
 		],
 		plugins: [
-			typescript(tsConfig),
-			resolve(),
+			...basePlugins,
 			generatePackageJson({
 				inputFolder: resolvePkgPath('react-dom', false),
 				outputFolder: resolvePkgPath('react-dom', true),
@@ -59,7 +67,7 @@ export default [
 				format: 'umd'
 			}
 		],
-		plugins: [typescript(tsConfig), resolve()]
+		plugins: basePlugins
 	},
 	// react
 	{
@@ -70,8 +78,7 @@ export default [
 			format: 'umd'
 		},
 		plugins: [
-			typescript(tsConfig),
-			resolve(),
+			...basePlugins,
 			generatePackageJson({
 				inputFolder: resolvePkgPath('react', false),
 				outputFolder: resolvePkgPath('react', true),
@@ -99,6 +106,6 @@ export default [
 				format: 'umd'
 			}
 		],
-		plugins: [typescript(tsConfig), resolve()]
+		plugins: basePlugins
 	}
 ];

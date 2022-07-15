@@ -11,6 +11,9 @@ import {
 } from './workTags';
 
 export const beginWork = (workInProgress: FiberNode) => {
+	if (__DEV__) {
+		console.log('beginWork流程', workInProgress.type);
+	}
 	switch (workInProgress.tag) {
 		case HostRoot:
 			return updateHostRoot(workInProgress);

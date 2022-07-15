@@ -66,15 +66,29 @@
 
 ## 调试
 
-主要调试方式包括两个：
+提供 3 种调试方式：
 
-1. 跑`React`官方的测试用例
+1. 实时调试
 
-执行`pnpm test`
+执行`pnpm demo`会运行项目`demos`目录下的示例项目（默认项目是针对[v6](https://github.com/BetaSu/big-react/tree/v6)的调试项目）
+
+这种方式的好处是：
+
+- 控制台会打印各个主要步骤的执行信息，可以直观看到执行流程
+
+- 热更新（包括示例代码和源码代码）
 
 2. pnpm link
 
 通过`CRA`或`Vite`起一个`React`测试项目后，在本项目执行`pnpm run build:dev`打包`react`与`react-dom`，在测试项目中通过`pnpm link`将项目依赖的`react`与`react-dom`替换为我们打包的`react`与`react-dom`
+
+这种方式的好处是：最贴合项目中实际使用`React`的情况
+
+3. 跑`React`官方的测试用例
+
+执行`pnpm test`跑官方的测试用例，用例中引用的是执行`pnpm run build:dev`打包的`react`与`react-dom`
+
+这种方式的好处是：可以从官方用例的角度观察框架实现的细节、各种边界情况
 
 ## 更新日志
 

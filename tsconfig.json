@@ -16,5 +16,5 @@
 		"noImplicitReturns": false,
 		"skipLibCheck": true
 	},
-	"include": ["packages"]
+	"include": ["packages", "react-dom.d.ts"]
 }
