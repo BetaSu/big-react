@@ -8,7 +8,8 @@ export default defineConfig({
 	plugins: [
 		react(),
 		replace({
-			__DEV__: process.env.NODE_ENV !== 'production'
+			__LOG__: true,
+			preventAssignment: true
 		})
 	],
 	resolve: {
@@ -24,6 +25,7 @@ export default defineConfig({
 		]
 	},
 	optimizeDeps: {
+		// force: true
 		exclude: ['react', 'react-dom']
 	}
 });

@@ -61,8 +61,10 @@
 | Reconciler | useState 实现                | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
 | Reconciler | useEffect 实现               | ⬜️      |                                                   |
 | Reconciler | useRef 实现                  | ⬜️      |                                                   |
-| Reconciler | 同步调度流程                 | ⬜️      |                                                   |
-| Reconciler | 异步调度流程                 | ⬜️      |                                                   |
+| Reconciler | Legacy 调度流程              | ⬜️      |                                                   |
+| Reconciler | Concurrent 调度流程          | ⬜️      |                                                   |
+| Reconciler | 异常处理流程                 | ⬜️      |                                                   |
+| Reconciler | useErrorBoundary 实现        | ⬜️      |                                                   |
 
 ## 调试
 

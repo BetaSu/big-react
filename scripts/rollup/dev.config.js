@@ -3,13 +3,14 @@ import path from 'path';
 import resolve from '@rollup/plugin-babel';
 import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
+// import del from 'rollup-plugin-delete';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 
 const tsConfig = { tsConfig: 'tsconfig.json' };
+const pkgPath = path.resolve(__dirname, '../../packages');
+const distPath = path.resolve(__dirname, '../../dist/node_modules');
 
 function resolvePkgPath(pkgName, isDist) {
-	const pkgPath = path.resolve(__dirname, '../../packages');
-	const distPath = path.resolve(__dirname, '../../dist/node_modules');
 	if (isDist) {
 		return `${distPath}/${pkgName}`;
 	}
@@ -20,7 +21,8 @@ const basePlugins = [
 	typescript(tsConfig),
 	resolve(),
 	replace({
-		__DEV__: process.env.NODE_ENV !== 'production'
+		__LOG__: false,
+		preventAssignment: true
 	})
 ];
 

@@ -149,17 +149,17 @@ describe('ReactElement', () => {
 	// 	expect(element._owner.stateNode).toBe(instance);
 	// });
 
-	// it('merges an additional argument onto the children prop', () => {
-	// 	const a = 1;
-	// 	const element = React.createElement(
-	// 		ComponentFC,
-	// 		{
-	// 			children: 'text'
-	// 		},
-	// 		a
-	// 	);
-	// 	expect(element.props.children).toBe(a);
-	// });
+	it('merges an additional argument onto the children prop', () => {
+		const a = 1;
+		const element = React.createElement(
+			ComponentFC,
+			{
+				children: 'text'
+			},
+			a
+		);
+		expect(element.props.children).toBe(a);
+	});
 
 	it('does not override children if no rest args are provided', () => {
 		const element = React.createElement(ComponentFC, {
@@ -168,24 +168,24 @@ describe('ReactElement', () => {
 		expect(element.props.children).toBe('text');
 	});
 
-	// it('overrides children if null is provided as an argument', () => {
-	// 	const element = React.createElement(
-	// 		ComponentFC,
-	// 		{
-	// 			children: 'text'
-	// 		},
-	// 		null
-	// 	);
-	// 	expect(element.props.children).toBe(null);
-	// });
+	it('overrides children if null is provided as an argument', () => {
+		const element = React.createElement(
+			ComponentFC,
+			{
+				children: 'text'
+			},
+			null
+		);
+		expect(element.props.children).toBe(null);
+	});
 
-	// it('merges rest arguments onto the children prop in an array', () => {
-	// 	const a = 1;
-	// 	const b = 2;
-	// 	const c = 3;
-	// 	const element = React.createElement(ComponentFC, null, a, b, c);
-	// 	expect(element.props.children).toEqual([1, 2, 3]);
-	// });
+	it('merges rest arguments onto the children prop in an array', () => {
+		const a = 1;
+		const b = 2;
+		const c = 3;
+		const element = React.createElement(ComponentFC, null, a, b, c);
+		expect(element.props.children).toEqual([1, 2, 3]);
+	});
 
 	// // NOTE: We're explicitly not using JSX here. This is intended to test
 	// // classic JS without JSX.

@@ -77,6 +77,8 @@ export function createFiberFromElement(element: ReactElement): FiberNode {
 
 	if (typeof type === 'string') {
 		fiberTag = HostComponent;
+	} else if (typeof type !== 'function') {
+		console.error('未定义的type类型', element);
 	}
 	const fiber = new FiberNode(fiberTag, props, key);
 	fiber.type = type;
