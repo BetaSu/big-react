@@ -3,7 +3,7 @@
 从零实现 React v18 的核心功能，特点如下：
 
 - 👬 与 React 源码最接近的极简实现
-- 💪 虽然实现极简，但功能完备，当前可跑通官方测试用例数量：17
+- 💪 虽然实现极简，但功能完备，当前可跑通官方测试用例数量：25
 - 🚶 按`Git Tag`划分迭代步骤，记录从 0 实现的每个功能
 
 ## TODO List
@@ -35,7 +35,7 @@
 | React      | JSX 转换                     | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | React      | React.isValidElement         | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
 | ReactDOM   | 浏览器环境 DOM 的插入        | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
-| ReactDOM   | 浏览器环境 DOM 的移动        | ⬜️      |                                                   |
+| ReactDOM   | 浏览器环境 DOM 的移动        | ✅       | [v7](https://github.com/BetaSu/big-react/tree/v7) |
 | ReactDOM   | 浏览器环境 DOM 的属性变化    | ⬜️      |                                                   |
 | ReactDOM   | 浏览器环境 DOM 的删除        | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | ReactDOM   | ReactTestUtils               | ✅       | [v4](https://github.com/BetaSu/big-react/tree/v4) |
@@ -48,9 +48,9 @@
 | Reconciler | 基础 Update 机制             | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
 | Reconciler | 带优先级的 Update 机制       | ⬜️      |                                                   |
 | Reconciler | 插入单节点的 mount 流程      | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
-| Reconciler | 插入多节点的 mount 流程      | ⬜️      |                                                   |
+| Reconciler | 插入多节点的 mount 流程      | ✅       | [v7](https://github.com/BetaSu/big-react/tree/v7) |
 | Reconciler | 插入单节点的 reconcile 流程  | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
-| Reconciler | 插入多节点的 reconcile 流程  | ⬜️      |                                                   |
+| Reconciler | 插入多节点的 reconcile 流程  | ✅       | [v7](https://github.com/BetaSu/big-react/tree/v7) |
 | Reconciler | 删除节点的 reconcile 流程    | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | Reconciler | HostText 类型支持            | ✅       | [v2](https://github.com/BetaSu/big-react/tree/v2) |
 | Reconciler | HostComponent 类型支持       | ✅       | [v1](https://github.com/BetaSu/big-react/tree/v1) |
@@ -72,7 +72,7 @@
 
 1. 实时调试
 
-执行`pnpm demo`会运行项目`demos`目录下的示例项目（默认项目是针对[v6](https://github.com/BetaSu/big-react/tree/v6)的调试项目）
+执行`pnpm demo`会运行项目`demos`目录下的示例项目（默认项目是针对[v7](https://github.com/BetaSu/big-react/tree/v7)的调试项目）
 
 这种方式的好处是：
 
@@ -93,6 +93,20 @@
 这种方式的好处是：可以从官方用例的角度观察框架实现的细节、各种边界情况
 
 ## 更新日志
+
+### [v7](https://github.com/BetaSu/big-react/tree/v7)
+
+实现了多节点 reconcile 流程（俗称的 Diff 算法），包括如下功能：
+
+- 修复了 update 时 onClick 回调不更新的 bug
+
+- 插入多节点的 mount 流程
+
+- 插入多节点的 reconcile 流程
+
+- 浏览器环境 DOM 的移动
+
+Diff 算法的测试用例还依赖 useEffect、useRef 的实现，放在后面再实现
 
 ### [v6](https://github.com/BetaSu/big-react/tree/v6)
 
