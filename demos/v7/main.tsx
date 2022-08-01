@@ -21,10 +21,15 @@ function App() {
 
 	const listToUse = isOdd ? before : after;
 
+	console.warn('num is: ', num);
+
 	return (
 		<ul
 			onClick={(e) => {
-				updateNum(num + 1);
+				updateNum((num: number) => num + 1);
+				updateNum((num: number) => num + 2);
+				updateNum((num: number) => num + 3);
+				updateNum((num: number) => num + 4);
 			}}
 		>
 			{listToUse}

@@ -1,5 +1,6 @@
 import { Key, Props, ReactElement, Ref } from 'shared/ReactTypes';
 import { Flags, NoFlags } from './fiberFlags';
+import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { Container } from './hostConfig';
 import { FunctionComponent, HostComponent, WorkTag } from './workTags';
 
@@ -24,6 +25,8 @@ export class FiberNode {
 	memoizedState: any;
 
 	alternate: FiberNode | null;
+
+	lanes: Lanes;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 实例
@@ -52,7 +55,7 @@ export class FiberNode {
 		this.deletions = null;
 
 		// 调度
-		// this.lanes = NoLanes;
+		this.lanes = NoLane;
 		// this.childLanes = NoLanes;
 
 		this.alternate = null;
@@ -63,11 +66,17 @@ export class FiberRootNode {
 	container: Container;
 	current: FiberNode;
 	finishedWork: FiberNode | null;
+	pendingLanes: Lanes;
+	finishedLane: Lane;
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
 		hostRootFiber.stateNode = this;
 		this.finishedWork = null;
+		// 所有未执行的lane的集合
+		this.pendingLanes = NoLanes;
+		// 本轮更新执行的lane
+		this.finishedLane = NoLane;
 	}
 }
 
@@ -115,6 +124,8 @@ export const createWorkInProgress = (
 	// 数据
 	wip.memoizedProps = current.memoizedProps;
 	wip.memoizedState = current.memoizedState;
+
+	wip.lanes = current.lanes;
 
 	return wip;
 };

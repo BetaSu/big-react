@@ -189,6 +189,14 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
 		// 遍历流程
 		for (let i = 0; i < newChild.length; i++) {
+			/**
+			 * TODO after可能还是array 考虑如下，其中list是个array：
+			 * <ul>
+			 * 	<li></li>
+			 * 	{list}
+			 * </ul>
+			 * 这种情况我们应该视after为Fragment
+			 */
 			const after = newChild[i];
 
 			// after对应的fiber，可能来自于复用，也可能是新建

@@ -2,6 +2,7 @@ import { ReactElement } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import { FiberNode } from './fiber';
 import { renderWithHooks } from './fiberHooks';
+import { Lane, NoLane } from './fiberLanes';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
 import {
 	FunctionComponent,
@@ -10,27 +11,30 @@ import {
 	HostText
 } from './workTags';
 
-export const beginWork = (workInProgress: FiberNode) => {
+export const beginWork = (workInProgress: FiberNode, renderLane: Lane) => {
 	if (__LOG__) {
 		console.log('beginWork流程', workInProgress.type);
 	}
+	// 接下来processUpdate会消耗lanes
+	workInProgress.lanes = NoLane;
+
 	switch (workInProgress.tag) {
 		case HostRoot:
-			return updateHostRoot(workInProgress);
+			return updateHostRoot(workInProgress, renderLane);
 		case HostComponent:
 			return updateHostComponent(workInProgress);
 		case HostText:
 			return null;
 		case FunctionComponent:
-			return updateFunctionComponent(workInProgress);
+			return updateFunctionComponent(workInProgress, renderLane);
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
 	}
 };
 
-function updateFunctionComponent(workInProgress: FiberNode) {
-	const nextChildren = renderWithHooks(workInProgress);
+function updateFunctionComponent(workInProgress: FiberNode, renderLane: Lane) {
+	const nextChildren = renderWithHooks(workInProgress, renderLane);
 	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;
 }
@@ -43,13 +47,14 @@ function updateHostComponent(workInProgress: FiberNode) {
 	return workInProgress.child;
 }
 
-function updateHostRoot(workInProgress: FiberNode) {
+function updateHostRoot(workInProgress: FiberNode, renderLane: Lane) {
 	const baseState = workInProgress.memoizedState;
 	const updateQueue = workInProgress.updateQueue as UpdateQueue<Element>;
 	workInProgress.memoizedState = processUpdateQueue(
 		baseState,
 		updateQueue,
-		workInProgress
+		workInProgress,
+		renderLane
 	);
 
 	const nextChildren = workInProgress.memoizedState;
