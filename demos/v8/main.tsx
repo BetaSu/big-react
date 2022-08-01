@@ -4,30 +4,17 @@ import { createRoot } from 'react-dom/client';
 function App() {
 	const [num, updateNum] = useState(0);
 
-	const isOdd = num % 2;
-
-	const before = [
-		<li key={1}>1</li>,
-		<li>2</li>,
-		<li>3</li>,
-		<li key={4}>4</li>
-	];
-	const after = [
-		<li key={4}>4</li>,
-		<li>2</li>,
-		<li>3</li>,
-		<li key={1}>1</li>
-	];
-
-	const listToUse = isOdd ? before : after;
-
 	return (
 		<ul
 			onClick={(e) => {
+				// 注意观察多次更新只会触发一次render阶段，这就是batchedUpdates（批处理），也是我们基础调度能力的体现
 				updateNum((num: number) => num + 1);
+				updateNum((num: number) => num + 2);
+				updateNum((num: number) => num + 3);
+				updateNum((num: number) => num + 4);
 			}}
 		>
-			{listToUse}
+			num值为：{num}
 		</ul>
 	);
 }
