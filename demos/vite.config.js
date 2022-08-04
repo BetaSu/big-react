@@ -21,11 +21,16 @@ export default defineConfig({
 			{
 				find: 'react-dom',
 				replacement: path.resolve(__dirname, '../packages/react-dom')
+			},
+			{
+				find: 'scheduler',
+				replacement: path.resolve(__dirname, '../packages/scheduler')
 			}
 		]
 	},
 	optimizeDeps: {
 		// force: true
+		include: ['scheduler'],
 		exclude: ['react', 'react-dom']
 	}
 });

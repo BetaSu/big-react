@@ -14,7 +14,8 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": false,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"typeRoots": ["./types", "./node_modules/@types/"]
 	},
 	"include": ["packages", "react-dom.d.ts"]
 }

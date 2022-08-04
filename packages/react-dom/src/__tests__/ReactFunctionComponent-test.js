@@ -28,7 +28,9 @@ describe('ReactFunctionComponent', () => {
 	it('should render stateless component', () => {
 		const el = document.createElement('div');
 		ReactDOM.createRoot(el).render(<FunctionComponent name="A" />);
-		expect(el.textContent).toBe('A');
+		setTimeout(() => {
+			expect(el.textContent).toBe('A');
+		});
 	});
 
 	// it('should update stateless component', () => {
