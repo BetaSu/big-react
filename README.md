@@ -6,7 +6,7 @@
 - 💪 虽然实现极简，但功能完备，当前可跑通官方测试用例数量：25
 - 🚶 按`Git Tag`划分迭代步骤，记录从 0 实现的每个功能
 
-如果想加入项目对应的`源码交流群`，和7000+小伙伴们一起交流`React`，可以加我微信，备注「开发」：
+如果想加入项目对应的`源码交流群`，和 7000+小伙伴们一起交流`React`，可以加我微信，备注「开发」：
 
 <img width="200" src="https://user-images.githubusercontent.com/15828041/181666959-57941b01-61b3-47db-9d73-ecc9ae175112.png" alt="卡颂的微信" />
 
@@ -63,7 +63,7 @@
 | React      | Hooks 架构 mount 时实现                | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
 | React      | Hooks 架构 update 时实现               | ✅       | [v5](https://github.com/BetaSu/big-react/tree/v5) |
 | Reconciler | useState 实现                          | ✅       | [v3](https://github.com/BetaSu/big-react/tree/v3) |
-| Reconciler | useEffect 实现                         | ⬜️      |                                                   |
+| Reconciler | useEffect 实现                         | ✅       | [v9](https://github.com/BetaSu/big-react/tree/v9) |
 | Reconciler | useRef 实现                            | ⬜️      |                                                   |
 | Reconciler | Legacy 调度流程（包含 batchedUpdates） | ✅       | [v8](https://github.com/BetaSu/big-react/tree/v8) |
 | Reconciler | Concurrent 调度流程                    | ⬜️      |                                                   |
@@ -97,6 +97,12 @@
 这种方式的好处是：可以从官方用例的角度观察框架实现的细节、各种边界情况
 
 ## 更新日志
+
+### [v9](https://github.com/BetaSu/big-react/tree/v9)
+
+实现了 useEffect，为了实现 useEffct 回调的异步调度，引入了官方的 scheduler 模块。当前 scheduler 模块的生产环境版本放在 packages 目录下，方便对他进行修改。如果后期证实没有需要特别修改的地方，会考虑以 NPM 包的形式引入 schduler。包括如下功能：
+
+- useEffct 实现
 
 ### [v8](https://github.com/BetaSu/big-react/tree/v8)
 
