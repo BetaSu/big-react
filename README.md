@@ -100,9 +100,9 @@
 
 ### [v9](https://github.com/BetaSu/big-react/tree/v9)
 
-实现了 useEffect，为了实现 useEffct 回调的异步调度，引入了官方的 scheduler 模块。当前 scheduler 模块的生产环境版本放在 packages 目录下，方便对他进行修改。如果后期证实没有需要特别修改的地方，会考虑以 NPM 包的形式引入 schduler。包括如下功能：
+实现了 useEffect，为了实现 useEffect 回调的异步调度，引入了官方的 scheduler 模块。当前 scheduler 模块的生产环境版本放在 packages 目录下，方便对他进行修改。如果后期证实没有需要特别修改的地方，会考虑以 NPM 包的形式引入 scheduler。包括如下功能：
 
-- useEffct 实现
+- useEffect 实现
 
 ### [v8](https://github.com/BetaSu/big-react/tree/v8)
 
