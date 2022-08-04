@@ -7,7 +7,7 @@
 	"scripts": {
 		"build:dev": "rm -rf dist && rollup --config scripts/rollup/dev.config.js",
 		"demo": "vite serve demos/v9 --config demos/vite.config.js --force",
-		"lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
+		"lint": "eslint --ext .ts,.jsx,.tsx --fix --quiet ./packages",
 		"test": "jest"
 	},
 	"devDependencies": {
