@@ -23,7 +23,7 @@ import {
 	NoLanes,
 	SyncLane
 } from './fiberLanes';
-import { scheduleMicrotask } from './hostConfig';
+import { scheduleMicrotask } from 'hostConfig';
 import { flushSyncCallbacks, scheduleSyncCallback } from './syncTaskQueue';
 import { HostRoot } from './workTags';
 import * as scheduler from 'scheduler';

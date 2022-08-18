@@ -1,4 +1,6 @@
 import { PackagedElement, updateFiberProps } from './SyntheticEvent';
+import { FiberNode } from 'react-reconciler/src/fiber';
+import { HostText } from 'react-reconciler/src/workTags';
 
 export type Container = PackagedElement | Document;
 export type Instance = PackagedElement;
@@ -35,6 +37,18 @@ export const insertChildToContainer = (
 export const removeChild = (child: Instance, container: Container) => {
 	container.removeChild(child);
 };
+
+export function commitUpdate(finishedWork: FiberNode) {
+	if (__LOG__) {
+		console.log('更新DOM、文本节点内容', finishedWork);
+	}
+	switch (finishedWork.tag) {
+		case HostText:
+			const newContent = finishedWork.pendingProps.content;
+			return commitTextUpdate(finishedWork.stateNode, newContent);
+	}
+	console.error('commitUpdate未支持的类型', finishedWork);
+}
 
 export const commitTextUpdate = (
 	textIntance: TextInstance,

@@ -25,6 +25,13 @@ export default defineConfig({
 			{
 				find: 'scheduler',
 				replacement: path.resolve(__dirname, '../packages/scheduler')
+			},
+			{
+				find: 'hostConfig',
+				replacement: path.resolve(
+					__dirname,
+					'../packages/react-dom/src/hostConfig.ts'
+				)
 			}
 		]
 	},

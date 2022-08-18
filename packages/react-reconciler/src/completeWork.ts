@@ -6,7 +6,7 @@ import {
 	createInstance,
 	createTextInstance,
 	Instance
-} from './hostConfig';
+} from 'hostConfig';
 import {
 	FunctionComponent,
 	HostComponent,

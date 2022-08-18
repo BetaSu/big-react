@@ -11,5 +11,6 @@ module.exports = {
 		// 对于 scheduler react-jest react-test-renderer
 		'packages'
 	],
-	testEnvironment: 'jsdom'
+	testEnvironment: 'jsdom',
+	setupFilesAfterEnv: ['./scripts/jest/setupJest.js']
 };
