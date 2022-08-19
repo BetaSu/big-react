@@ -1,4 +1,5 @@
 {
+	"compileOnSave": true,
 	"compilerOptions": {
 		"target": "ESNext",
 		"useDefineForClassFields": true,
@@ -15,7 +16,10 @@
 		"noUnusedParameters": true,
 		"noImplicitReturns": false,
 		"skipLibCheck": true,
-		"typeRoots": ["./types", "./node_modules/@types/"]
-	},
-	"include": ["packages", "react-dom.d.ts"]
+		"typeRoots": ["./types", "./node_modules/@types/"],
+		"baseUrl": "./packages",
+		"paths": {
+			"hostConfig": ["./react-noop-renderer/src/hostConfig.ts"]
+		}
+	}
 }

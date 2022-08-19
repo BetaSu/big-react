@@ -8,7 +8,6 @@
 		"scheduler": "workspace:*"
 	},
 	"peerDependencies": {
-		"react": "workspace:*",
-		"react-dom": "workspace:*"
+		"react": "workspace:*"
 	}
 }

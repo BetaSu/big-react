@@ -9,3 +9,5 @@ declare module 'scheduler' {
 
 	export const NormalPriority: TSchedulerPriority;
 }
+
+declare module 'scheduler/unstable_mock' {}

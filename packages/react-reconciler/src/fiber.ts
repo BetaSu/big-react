@@ -2,7 +2,7 @@ import { Key, Props, ReactElement, Ref } from 'shared/ReactTypes';
 import { Flags, NoFlags } from './fiberFlags';
 import { Effect } from './fiberHooks';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
-import { Container } from './hostConfig';
+import { Container } from 'hostConfig';
 import { FunctionComponent, HostComponent, WorkTag } from './workTags';
 
 export class FiberNode {

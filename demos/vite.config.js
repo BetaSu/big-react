@@ -23,14 +23,16 @@ export default defineConfig({
 				replacement: path.resolve(__dirname, '../packages/react-dom')
 			},
 			{
-				find: 'scheduler',
-				replacement: path.resolve(__dirname, '../packages/scheduler')
+				find: 'hostConfig',
+				replacement: path.resolve(
+					__dirname,
+					'../packages/react-dom/src/hostConfig.ts'
+				)
 			}
 		]
 	},
 	optimizeDeps: {
 		// force: true
-		include: ['scheduler'],
 		exclude: ['react', 'react-dom']
 	}
 });

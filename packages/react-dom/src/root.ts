@@ -6,8 +6,14 @@ import {
 import { ReactElement } from 'shared/ReactTypes';
 import { initEvent } from './SyntheticEvent';
 
+const containerToRoot = new Map();
+
 export function createRoot(container: Container) {
-	const root = createContainer(container);
+	let root = containerToRoot.get(container);
+	if (!root) {
+		root = createContainer(container);
+		containerToRoot.set(container, root);
+	}
 	return {
 		render(element: ReactElement) {
 			initEvent(container, 'click');
