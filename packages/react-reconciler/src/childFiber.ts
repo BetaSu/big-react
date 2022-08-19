@@ -33,13 +33,14 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 		currentFirstChild: FiberNode | null
 	) {
 		if (!shouldTrackEffects) {
-			return;
+			return null;
 		}
 		let childToDelete = currentFirstChild;
 		while (childToDelete !== null) {
 			deleteChild(returnFiber, childToDelete);
 			childToDelete = childToDelete.sibling;
 		}
+		return null;
 	}
 	function reconcileSingleElement(
 		returnFiber: FiberNode,
@@ -209,6 +210,10 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 			 */
 			const after = newChild[i];
 
+			if (Array.isArray(after)) {
+				console.error('TODO 还未实现嵌套Array情况下的diff');
+			}
+
 			// after对应的fiber，可能来自于复用，也可能是新建
 			const newFiber = updateFromMap(
 				returnFiber,
@@ -289,8 +294,8 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 			);
 		}
 
-		console.warn('reconcile时未实现的child 类型', newChild, currentFirstChild);
-		return null;
+		// 其他情况全部视为删除旧的节点
+		return deleteRemainingChildren(returnFiber, currentFirstChild);
 	}
 
 	return reconcileChildFibers;

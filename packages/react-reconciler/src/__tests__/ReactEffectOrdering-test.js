@@ -22,10 +22,10 @@ describe('ReactHooksWithNoopRenderer', () => {
 	beforeEach(() => {
 		jest.resetModules();
 		jest.useFakeTimers();
-		// setTimeout._isMockFunction = true;
+
 		React = require('react');
 		act = require('jest-react').act;
-		Scheduler = require('scheduler');
+		Scheduler = require('scheduler/unstable_mock');
 		ReactNoop = require('react-noop-renderer');
 
 		useEffect = React.useEffect;
@@ -51,6 +51,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 		await act(async () => {
 			root.render(<Parent />);
 		});
+
 		expect(root).toMatchRenderedOutput('Child');
 		await act(async () => {
 			root.render(null);

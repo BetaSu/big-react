@@ -12,5 +12,9 @@ module.exports = {
 		'packages'
 	],
 	testEnvironment: 'jsdom',
+	fakeTimers: {
+		enableGlobally: true,
+		legacyFakeTimers: true
+	},
 	setupFilesAfterEnv: ['./scripts/jest/setupJest.js']
 };

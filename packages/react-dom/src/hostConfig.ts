@@ -31,7 +31,7 @@ export const insertChildToContainer = (
 	container: Container,
 	before: Instance
 ) => {
-	container.insertBefore(before, child);
+	container.insertBefore(child, before);
 };
 
 export const removeChild = (child: Instance, container: Container) => {
