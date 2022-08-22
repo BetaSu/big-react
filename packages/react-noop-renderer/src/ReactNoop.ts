@@ -1,7 +1,7 @@
 import { ReactElement } from 'shared/ReactTypes';
 import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
 import Reconciler from 'react-reconciler';
-import * as Scheduler from 'scheduler/unstable_mock';
+import * as Scheduler from 'scheduler';
 import { Container, Instance } from './hostConfig';
 
 let idCounter = 0;
@@ -82,6 +82,9 @@ export function createRoot() {
 	return {
 		// 用于jest-react
 		_Scheduler: Scheduler,
+		getChildren() {
+			return getChildren(container);
+		},
 		getChildrenAsJSX() {
 			return getChildrenAsJSX(container);
 		},

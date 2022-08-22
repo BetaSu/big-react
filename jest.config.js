@@ -7,10 +7,11 @@ module.exports = {
 		// 对于 React ReactDOM
 		'dist/node_modules',
 		// 对于第三方依赖
-		...defaults.moduleDirectories,
-		// 对于 scheduler react-jest react-test-renderer
-		'packages'
+		...defaults.moduleDirectories
 	],
+	moduleNameMapper: {
+		'^scheduler$': '<rootDir>/node_modules/scheduler/unstable_mock.js'
+	},
 	testEnvironment: 'jsdom',
 	fakeTimers: {
 		enableGlobally: true,

@@ -25,7 +25,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
 		React = require('react');
 		act = require('jest-react').act;
-		Scheduler = require('scheduler/unstable_mock');
+		Scheduler = require('scheduler');
 		ReactNoop = require('react-noop-renderer');
 
 		useEffect = React.useEffect;

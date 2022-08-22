@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"shared": "workspace:*",
-		"scheduler": "workspace:*"
+		"scheduler": "^0.23.0"
 	},
 	"peerDependencies": {
 		"react": "workspace:*"

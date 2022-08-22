@@ -2,7 +2,7 @@ import { Container } from './hostConfig';
 
 // 支持的事件类型
 const validEventTypeList = ['click'];
-const elementEventPropsKey = '__props';
+export const elementEventPropsKey = '__props';
 
 type EventCallback = (e: SyntheticEvent) => void;
 interface Paths {

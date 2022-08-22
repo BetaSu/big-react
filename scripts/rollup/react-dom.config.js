@@ -26,7 +26,12 @@ export default [
 	// react-dom
 	{
 		input: `${pkgPath}/index.ts`,
-		external: Object.keys(peerDependencies),
+		// 注意区分peerDependencies、dependencies、以及external参数
+		// peerDependencies一定属于external，因为它的代码不会打入React-DOM
+		// dependencies中：
+		//  "react-reconciler": "workspace:*" 不属于external，因为他的代码需要打入React-DOM
+		//  "scheduler": "..." 属于external，因为他的代码不需要打入React-DOM
+		external: [...Object.keys(peerDependencies), 'scheduler'],
 		output: [
 			{
 				file: `${pkgDistPath}/client.js`,
@@ -49,11 +54,15 @@ export default [
 			generatePackageJson({
 				inputFolder: pkgPath,
 				outputFolder: pkgDistPath,
-				baseContents: ({ name, description, version }) => ({
+				baseContents: ({ name, description, version, dependencies }) => ({
 					name,
 					description,
 					version,
+					// 根据上述external处注释，要注意包源码和打包产物中依赖的区别
 					peerDependencies: { react: version },
+					dependencies: {
+						scheduler: dependencies.scheduler
+					},
 					main: 'index.js'
 				})
 			})

@@ -18,11 +18,17 @@ export function createContainer(container: Container) {
 	return root;
 }
 
-export function updateContainer(element: ReactElement, root: FiberRootNode) {
+export function updateContainer(
+	element: ReactElement | null,
+	root: FiberRootNode
+) {
 	const hostRootFiber = root.current;
 	const rootRenderPriority = SyncLane;
-	const update = createUpdate<ReactElement>(element, rootRenderPriority);
-	enqueueUpdate(hostRootFiber.updateQueue as UpdateQueue<ReactElement>, update);
+	const update = createUpdate<ReactElement | null>(element, rootRenderPriority);
+	enqueueUpdate(
+		hostRootFiber.updateQueue as UpdateQueue<ReactElement | null>,
+		update
+	);
 	scheduleUpdateOnFiber(hostRootFiber, rootRenderPriority);
 	return element;
 }

@@ -43,8 +43,7 @@
 		"tslib": "^2.4.0",
 		"typescript": "^4.7.3",
 		"vite": "^3.0.0",
-		"jest-react": "^0.14.0",
-		"react-test-renderer": "workspace:^18.2.0"
+		"jest-react": "^0.14.0"
 	},
 	"dependencies": {
 		"scheduler": "^0.23.0"

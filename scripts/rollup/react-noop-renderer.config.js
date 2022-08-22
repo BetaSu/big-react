@@ -24,7 +24,7 @@ export default [
 	// React-Noop-Renderer
 	{
 		input: `${pkgPath}/index.ts`,
-		external: Object.keys(peerDependencies),
+		external: [...Object.keys(peerDependencies), 'scheduler'],
 		output: [
 			{
 				file: `${pkgDistPath}/index.js`,

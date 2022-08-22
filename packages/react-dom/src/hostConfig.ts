@@ -2,7 +2,7 @@ import { PackagedElement, updateFiberProps } from './SyntheticEvent';
 import { FiberNode } from 'react-reconciler/src/fiber';
 import { HostText } from 'react-reconciler/src/workTags';
 
-export type Container = PackagedElement | Document;
+export type Container = PackagedElement;
 export type Instance = PackagedElement;
 export type TextInstance = Text;
 
