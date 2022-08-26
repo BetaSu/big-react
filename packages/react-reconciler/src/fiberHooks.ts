@@ -7,21 +7,33 @@ import {
 	createUpdateQueue,
 	enqueueUpdate,
 	processUpdateQueue,
+	Update,
 	UpdateQueue
 } from './updateQueue';
 import { scheduleUpdateOnFiber } from './workLoop';
-import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
+import {
+	Lane,
+	Lanes,
+	mergeLanes,
+	NoLane,
+	NoLanes,
+	requestUpdateLane
+} from './fiberLanes';
 import { Flags, PassiveEffect } from './fiberFlags';
 import { HookHasEffect, Passive } from './hookEffectTags';
 
 let workInProgressHook: Hook | null = null;
 let currentHook: Hook | null = null;
 let currentlyRenderingFiber: FiberNode | null = null;
-let renderLane: Lane = NoLane;
+let renderLanes: Lanes = NoLanes;
 interface Hook {
 	memoizedState: any;
 	// 对于state，保存update相关数据
 	updateQueue: unknown;
+	// 对于state，保存开始更新前就存在的updateList（上次更新遗留）
+	baseQueue: Update<any> | null;
+	// 对于state，基于baseState开始计算更新，与memoizedState的区别在于上次更新是否存在跳过
+	baseState: any;
 	next: Hook | null;
 }
 
@@ -32,7 +44,7 @@ export const renderWithHooks = (workInProgress: FiberNode, lane: Lane) => {
 	// 重置
 	workInProgress.memoizedState = null;
 	workInProgress.updateQueue = null;
-	renderLane = lane;
+	renderLanes = lane;
 
 	const current = workInProgress.alternate;
 	if (current !== null) {
@@ -49,7 +61,7 @@ export const renderWithHooks = (workInProgress: FiberNode, lane: Lane) => {
 	currentlyRenderingFiber = null;
 	workInProgressHook = null;
 	currentHook = null;
-	renderLane = NoLane;
+	renderLanes = NoLane;
 
 	return children;
 };
@@ -91,16 +103,53 @@ function mountState<State>(
 function updateState<State>(): [State, Disptach<State>] {
 	const hook = updateWorkInProgressHook();
 	const queue = hook.updateQueue as UpdateQueue<State>;
-	const baseState = hook.memoizedState;
+	const baseState = hook.baseState;
 
 	// TODO 缺少render阶段更新的处理逻辑
 
-	hook.memoizedState = processUpdateQueue(
-		baseState,
-		queue,
-		currentlyRenderingFiber as FiberNode,
-		renderLane
-	);
+	const current = currentHook as Hook;
+	let baseQueue = current.baseQueue;
+
+	const pending = queue.shared.pending;
+
+	if (pending !== null) {
+		// 基于baseQueue拼装pendingQueue
+		if (baseQueue !== null) {
+			// baseQueue = b2 -> b0 -> b1 -> b2
+			// pending = p2 -> p0 -> p1 -> p2
+
+			// b0
+			const baseFirst = baseQueue.next;
+			// p0
+			const pendingFirst = pending.next;
+			// baseQueue = b2 -> p0 -> p1 -> p2
+			baseQueue.next = pendingFirst;
+			// pending = p2 -> b0 -> b1 -> b2
+			pending.next = baseFirst;
+			// 拼接完成后：先pending，再baseQueue
+			// baseQueue = b2 -> p0 -> p1 -> p2 -> b0 -> b1 -> b2
+		}
+		// pending保存在current中，因为commit阶段不完成，current不会变为wip
+		// 所以可以保证多次render阶段（只要不进入commit）都能从current恢复pending
+		current.baseQueue = baseQueue = pending;
+		queue.shared.pending = null;
+	}
+	if (baseQueue !== null) {
+		const {
+			memoizedState,
+			baseState: newBaseState,
+			baseQueue: newBaseQueue,
+			skippedUpdateLanes
+		} = processUpdateQueue(baseState, baseQueue, renderLanes);
+		(currentlyRenderingFiber as FiberNode).lanes = mergeLanes(
+			(currentlyRenderingFiber as FiberNode).lanes,
+			skippedUpdateLanes
+		);
+		hook.memoizedState = memoizedState;
+		hook.baseState = newBaseState;
+		hook.baseQueue = newBaseQueue;
+	}
+
 	return [hook.memoizedState, queue.dispatch as Disptach<State>];
 }
 
@@ -237,6 +286,8 @@ function mountWorkInProgressHook(): Hook {
 	const hook: Hook = {
 		memoizedState: null,
 		updateQueue: null,
+		baseQueue: null,
+		baseState: null,
 		next: null
 	};
 	if (workInProgressHook === null) {
@@ -297,6 +348,8 @@ function updateWorkInProgressHook(): Hook {
 			memoizedState: currentHook.memoizedState,
 			// 对于state，保存update相关数据
 			updateQueue: currentHook.updateQueue,
+			baseState: currentHook.baseState,
+			baseQueue: currentHook.baseQueue,
 			next: null
 		};
 

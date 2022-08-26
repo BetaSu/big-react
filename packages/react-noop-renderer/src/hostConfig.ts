@@ -17,6 +17,7 @@ export interface TextInstance {
 }
 
 import { FiberNode } from 'react-reconciler/src/fiber';
+import { DefaultLane } from 'react-reconciler/src/fiberLanes';
 import { HostText } from 'react-reconciler/src/workTags';
 
 let instanceCounter = 0;

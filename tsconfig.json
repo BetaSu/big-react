@@ -19,7 +19,7 @@
 		"typeRoots": ["./types", "./node_modules/@types/"],
 		"baseUrl": "./packages",
 		"paths": {
-			"hostConfig": ["./react-noop-renderer/src/hostConfig.ts"]
+			"hostConfig": ["./react-dom/src/hostConfig.ts"]
 		}
 	}
 }

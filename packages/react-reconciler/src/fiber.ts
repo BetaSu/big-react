@@ -4,6 +4,7 @@ import { Effect } from './fiberHooks';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { Container } from 'hostConfig';
 import { FunctionComponent, HostComponent, WorkTag } from './workTags';
+import { CallbackNode } from 'scheduler';
 
 export class FiberNode {
 	pendingProps: Props;
@@ -73,7 +74,9 @@ export class FiberRootNode {
 	current: FiberNode;
 	finishedWork: FiberNode | null;
 	pendingLanes: Lanes;
-	finishedLane: Lane;
+	finishedLanes: Lanes;
+	callbackNode: CallbackNode | null;
+	callbackPriority: Lane;
 	pendingPassiveEffects: PendingPassiveEffects;
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
@@ -90,8 +93,13 @@ export class FiberRootNode {
 
 		// 所有未执行的lane的集合
 		this.pendingLanes = NoLanes;
-		// 本轮更新执行的lane
-		this.finishedLane = NoLane;
+		// 本轮更新执行的lanes
+		this.finishedLanes = NoLane;
+
+		// 调度的回调函数
+		this.callbackNode = null;
+		// 调度的回调函数优先级
+		this.callbackPriority = NoLane;
 	}
 }
 
