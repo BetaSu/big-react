@@ -64,7 +64,7 @@
 | Reconciler | useEffect 实现                         | ✅       | [v9](https://github.com/BetaSu/big-react/tree/v9)   |
 | Reconciler | useRef 实现                            | ⬜️      |                                                     |
 | Reconciler | Legacy 调度流程（包含 batchedUpdates） | ✅       | [v8](https://github.com/BetaSu/big-react/tree/v8)   |
-| Reconciler | Concurrent 调度流程                    | ⬜️      |                                                     |
+| Reconciler | Concurrent 调度流程                    | ✅       | [v11](https://github.com/BetaSu/big-react/tree/v11) |
 | Reconciler | 异常处理流程                           | ⬜️      |                                                     |
 | Reconciler | useErrorBoundary 实现                  | ⬜️      |                                                     |
 
@@ -95,6 +95,13 @@
 这种方式的好处是：可以从官方用例的角度观察框架实现的细节、各种边界情况
 
 ## 更新日志
+
+### [v11](https://github.com/BetaSu/big-react/tree/v11)
+
+实现了并发更新，通过修改 packages/react-dom/src/SyntheticEvent.ts 中的 eventTypeToEventPriority 方法下的 click 对应优先级，
+可以观察同步更新（SyncLane）与其他优先级下的点击事件中触发更新的区别（是否会开启时间切片）。包括如下功能：
+
+- Concurrent 调度流程
 
 ### [v10](https://github.com/BetaSu/big-react/tree/v10)
 
