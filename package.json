@@ -10,8 +10,11 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@commitlint/cli": "^17.1.2",
+		"@commitlint/config-conventional": "^17.1.0",
 		"@typescript-eslint/eslint-plugin": "^5.40.0",
 		"@typescript-eslint/parser": "^5.40.0",
+		"commitlint": "^17.1.2",
 		"eslint": "^8.25.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin,": "link:@typescript-eslint/eslint-plugin,",
