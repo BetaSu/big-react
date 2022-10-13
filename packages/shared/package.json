@@ -1,8 +1,0 @@
-{
-	"name": "shared",
-	"version": "0.0.0",
-	"description": "通用模块",
-	"dependencies": {
-		"react": "workspace:*"
-	}
-}
