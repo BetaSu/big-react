@@ -1,0 +1,16 @@
+{
+	"name": "react-dom",
+	"version": "1.0.0",
+	"description": "",
+	"module": "index.ts",
+	"dependencies": {
+		"shared": "workspace:*",
+		"react-reconciler": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "workspace:*"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}
