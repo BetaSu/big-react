@@ -6,9 +6,10 @@
 - 💪 功能完备，当前可跑通官方测试用例数量：34
 - 🚶 按`Git Tag`划分迭代步骤，记录从 0 实现的每个功能
 
-如果想加入项目对应的`源码交流群`，和 7000+小伙伴们一起交流`React`，可以加我微信，备注「开发」：
+如果想看我是如何从0到1实现React18的，可以购买如下课程：
 
-<img width="200" src="https://user-images.githubusercontent.com/15828041/181666959-57941b01-61b3-47db-9d73-ecc9ae175112.png" alt="卡颂的微信" />
+<img width="200" src="https://user-images.githubusercontent.com/15828041/204089108-eaccf461-1521-4a68-bcd1-d04aef1bd6ad.png" alt="卡颂" />
+
 
 ## TODO List
 
