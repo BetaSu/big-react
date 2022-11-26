@@ -6,7 +6,7 @@
 - 💪 功能完备，当前可跑通官方测试用例数量：34
 - 🚶 按`Git Tag`划分迭代步骤，记录从 0 实现的每个功能
 
-如果想看我是如何从0到1实现React18的，可以购买如下课程：
+如果想跟着我学习「如何从0到1实现React18」，可以购买如下课程：
 
 <img width="200" src="https://user-images.githubusercontent.com/15828041/204089108-eaccf461-1521-4a68-bcd1-d04aef1bd6ad.png" alt="卡颂" />
 
