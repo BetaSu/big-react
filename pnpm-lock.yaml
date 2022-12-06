@@ -84,9 +84,11 @@ importers:
   packages/react-dom:
     specifiers:
       react-reconciler: workspace:*
+      scheduler: ^0.23.0
       shared: workspace:*
     dependencies:
       react-reconciler: link:../react-reconciler
+      scheduler: 0.23.0
       shared: link:../shared
 
   packages/react-noop-renderer:

@@ -8,7 +8,7 @@
 		"build:dev": "rm -rf dist && rollup --config scripts/rollup/dev.config.js",
 		"demo": "vite serve demos/v11 --config demos/vite.config.js --force",
 		"lint": "eslint --ext .ts,.jsx,.tsx --fix --quiet ./packages",
-		"test": "jest"
+		"test": "jest --config scripts/jest/jest.config.js"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.18.6",
