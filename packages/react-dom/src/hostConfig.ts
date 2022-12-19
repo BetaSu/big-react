@@ -1,14 +1,15 @@
-import { PackagedElement, updateFiberProps } from './SyntheticEvent';
+import { DOMElement, updateFiberProps } from './SyntheticEvent';
 import { FiberNode } from 'react-reconciler/src/fiber';
 import { HostText } from 'react-reconciler/src/workTags';
 
-export type Container = PackagedElement;
-export type Instance = PackagedElement;
+export type Container = Element;
+export type Instance = DOMElement;
 export type TextInstance = Text;
 
 export const createInstance = (type: string, props: any): Instance => {
-	const element = document.createElement(type);
-	return updateFiberProps(element, props);
+	const element = document.createElement(type) as unknown;
+	updateFiberProps(element as DOMElement, props);
+	return element as DOMElement;
 };
 
 export const createTextInstance = (content: string) => {

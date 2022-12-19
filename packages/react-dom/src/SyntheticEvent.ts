@@ -9,7 +9,7 @@ const { unstable_runWithPriority: runWithPriority } = Scheduler;
 
 // 支持的事件类型
 const validEventTypeList = ['click'];
-export const elementEventPropsKey = '__props';
+export const elementPropsKey = '__props';
 
 type EventCallback = (e: SyntheticEvent) => void;
 interface Paths {
@@ -17,13 +17,12 @@ interface Paths {
 	bubble: EventCallback[];
 }
 interface SyntheticEvent extends Event {
-	type: string;
 	__stopPropagation: boolean;
 }
 
-export interface PackagedElement extends Element {
-	[elementEventPropsKey]: {
-		[eventType: string]: EventCallback;
+export interface DOMElement extends Element {
+	[elementPropsKey]: {
+		[key: string]: any;
 	};
 }
 
@@ -51,27 +50,8 @@ function getEventCallbackNameFromtEventType(
 }
 
 // 将支持的事件回调保存在DOM中
-export const updateFiberProps = (
-	node: Element,
-	props: any
-): PackagedElement => {
-	(node as PackagedElement)[elementEventPropsKey] =
-		(node as PackagedElement)[elementEventPropsKey] || {};
-
-	validEventTypeList.forEach((eventType) => {
-		const callbackNameList = getEventCallbackNameFromtEventType(eventType);
-
-		if (!callbackNameList) {
-			return;
-		}
-		callbackNameList.forEach((callbackName) => {
-			if (Object.hasOwnProperty.call(props, callbackName)) {
-				(node as PackagedElement)[elementEventPropsKey][callbackName] =
-					props[callbackName];
-			}
-		});
-	});
-	return node as PackagedElement;
+export const updateFiberProps = (node: DOMElement, props: any) => {
+	(node as DOMElement)[elementPropsKey] = props;
 };
 
 const triggerEventFlow = (paths: EventCallback[], se: SyntheticEvent) => {
@@ -96,7 +76,7 @@ const dispatchEvent = (container: Container, eventType: string, e: Event) => {
 	}
 
 	const { capture, bubble } = collectPaths(
-		targetElement as PackagedElement,
+		targetElement as DOMElement,
 		container,
 		eventType
 	);
@@ -115,7 +95,7 @@ const dispatchEvent = (container: Container, eventType: string, e: Event) => {
 
 // 收集从目标元素到HostRoot之间所有目标回调函数
 const collectPaths = (
-	targetElement: PackagedElement,
+	targetElement: DOMElement,
 	container: Container,
 	eventType: string
 ): Paths => {
@@ -125,12 +105,12 @@ const collectPaths = (
 	};
 	// 收集事件回调是冒泡的顺序
 	while (targetElement && targetElement !== container) {
-		const eventProps = targetElement[elementEventPropsKey];
-		if (eventProps) {
+		const elementProps = targetElement[elementPropsKey];
+		if (elementProps) {
 			const callbackNameList = getEventCallbackNameFromtEventType(eventType);
 			if (callbackNameList) {
 				callbackNameList.forEach((callbackName, i) => {
-					const eventCallback = eventProps[callbackName];
+					const eventCallback = elementProps[callbackName];
 					if (eventCallback) {
 						if (i === 0) {
 							// 反向插入捕获阶段的事件回调
@@ -143,7 +123,7 @@ const collectPaths = (
 				});
 			}
 		}
-		targetElement = targetElement.parentNode as PackagedElement;
+		targetElement = targetElement.parentNode as DOMElement;
 	}
 	return paths;
 };

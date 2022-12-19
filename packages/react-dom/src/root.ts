@@ -4,7 +4,7 @@ import {
 	createContainer
 } from 'react-reconciler/src/fiberReconciler';
 import { ReactElement } from 'shared/ReactTypes';
-import { initEvent, elementEventPropsKey } from './SyntheticEvent';
+import { initEvent, elementPropsKey } from './SyntheticEvent';
 
 const containerToRoot = new Map();
 
@@ -14,7 +14,7 @@ function clearContainerDOM(container: Container) {
 	}
 	for (let i = 0; i < container.childNodes.length; i++) {
 		const childNode = container.childNodes[i];
-		if (!Object.hasOwnProperty.call(childNode, elementEventPropsKey)) {
+		if (!Object.hasOwnProperty.call(childNode, elementPropsKey)) {
 			container.removeChild(childNode);
 			// 当移除节点时，再遍历时length会减少，所以相应i需要减少一个
 			i--;

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 function App() {
 	const [num, updateNum] = useState(0);
-	const len = 1000;
+	const len = 8;
 
 	console.log('num', num);
 	return (

@@ -23,6 +23,10 @@ export default defineConfig({
 				replacement: path.resolve(__dirname, '../packages/react-dom')
 			},
 			{
+				find: 'react-reconciler',
+				replacement: path.resolve(__dirname, '../packages/react-reconciler')
+			},
+			{
 				find: 'hostConfig',
 				replacement: path.resolve(
 					__dirname,
