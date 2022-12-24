@@ -111,7 +111,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 		lanes: Lanes
 	): FiberNode | null {
 		// 确定key
-		let keyToUse = element.key !== null ? element.key : index;
+		const keyToUse = element.key !== null ? element.key : index;
 
 		const before = existingChildren.get(keyToUse);
 
