@@ -1,4 +1,4 @@
-import { Disptach } from 'react/src/currentDispatcher';
+import { Dispatch } from 'react/src/currentDispatcher';
 import { Action } from 'shared/ReactTypes';
 import { Update } from './fiberFlags';
 import {
@@ -19,7 +19,7 @@ export interface UpdateQueue<State> {
 	shared: {
 		pending: Update<State> | null;
 	};
-	dispatch: Disptach<State> | null;
+	dispatch: Dispatch<State> | null;
 }
 
 // 创建
