@@ -3,7 +3,7 @@ export type ElementType = any;
 export type Key = string | null;
 export type Props = {
 	[key: string]: any;
-	children?: ReactElement;
+	children?: any;
 };
 
 export interface ReactElement {

@@ -1,4 +1,4 @@
-import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
+import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols';
 import { Key, ElementType, Ref, Props, ReactElement } from 'shared/ReactTypes';
 
 const ReactElement = function (
@@ -26,6 +26,8 @@ function hasValidKey(config: any) {
 function hasValidRef(config: any) {
 	return config.ref !== undefined;
 }
+
+export const Fragment = REACT_FRAGMENT_TYPE;
 
 export const jsx = (type: ElementType, config: any, ...maybeChildren: any) => {
 	let key: Key = null;

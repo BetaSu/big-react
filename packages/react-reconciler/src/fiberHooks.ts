@@ -1,4 +1,4 @@
-import { Dispatcher, Disptach } from 'react/src/currentDispatcher';
+import { Dispatcher, Dispatch } from 'react/src/currentDispatcher';
 import { Action } from 'shared/ReactTypes';
 import sharedInternals from 'shared/internals';
 import { FiberNode } from './fiber';
@@ -78,7 +78,7 @@ const HooksDispatcherOnUpdate: Dispatcher = {
 
 function mountState<State>(
 	initialState: (() => State) | State
-): [State, Disptach<State>] {
+): [State, Dispatch<State>] {
 	const hook = mountWorkInProgressHook();
 	let memoizedState: State;
 	if (initialState instanceof Function) {
@@ -100,7 +100,7 @@ function mountState<State>(
 	return [memoizedState, dispatch];
 }
 
-function updateState<State>(): [State, Disptach<State>] {
+function updateState<State>(): [State, Dispatch<State>] {
 	const hook = updateWorkInProgressHook();
 	const queue = hook.updateQueue as UpdateQueue<State>;
 	const baseState = hook.baseState;
@@ -150,7 +150,7 @@ function updateState<State>(): [State, Disptach<State>] {
 		hook.baseQueue = newBaseQueue;
 	}
 
-	return [hook.memoizedState, queue.dispatch as Disptach<State>];
+	return [hook.memoizedState, queue.dispatch as Dispatch<State>];
 }
 
 function dispatchSetState<State>(

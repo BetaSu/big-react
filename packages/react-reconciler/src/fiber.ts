@@ -3,7 +3,12 @@ import { Flags, NoFlags } from './fiberFlags';
 import { Effect } from './fiberHooks';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { Container } from 'hostConfig';
-import { FunctionComponent, HostComponent, WorkTag } from './workTags';
+import {
+	Fragment,
+	FunctionComponent,
+	HostComponent,
+	WorkTag
+} from './workTags';
 import { CallbackNode } from 'scheduler';
 
 export class FiberNode {
@@ -33,7 +38,7 @@ export class FiberNode {
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 实例
 		this.tag = tag;
-		this.key = key;
+		this.key = key || null;
 		this.stateNode = null;
 		this.type = null;
 
@@ -103,7 +108,10 @@ export class FiberRootNode {
 	}
 }
 
-export function createFiberFromElement(element: ReactElement): FiberNode {
+export function createFiberFromElement(
+	element: ReactElement,
+	lanes: Lanes
+): FiberNode {
 	const { type, key, props } = element;
 	let fiberTag: WorkTag = FunctionComponent;
 
@@ -114,7 +122,18 @@ export function createFiberFromElement(element: ReactElement): FiberNode {
 	}
 	const fiber = new FiberNode(fiberTag, props, key);
 	fiber.type = type;
+	fiber.lanes = lanes;
 
+	return fiber;
+}
+
+export function createFiberFromFragment(
+	elements: ReactElement[],
+	lanes: Lanes,
+	key: Key
+): FiberNode {
+	const fiber = new FiberNode(Fragment, elements, key);
+	fiber.lanes = lanes;
 	return fiber;
 }
 

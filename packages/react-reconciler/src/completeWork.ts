@@ -8,6 +8,7 @@ import {
 	Instance
 } from 'hostConfig';
 import {
+	Fragment,
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
@@ -85,7 +86,9 @@ export const completeWork = (workInProgress: FiberNode) => {
 			// 冒泡flag
 			bubbleProperties(workInProgress);
 			return null;
+		case FunctionComponent:
 		case HostRoot:
+		case Fragment:
 			bubbleProperties(workInProgress);
 			return null;
 		case HostText:
@@ -103,9 +106,6 @@ export const completeWork = (workInProgress: FiberNode) => {
 			}
 
 			// 冒泡flag
-			bubbleProperties(workInProgress);
-			return null;
-		case FunctionComponent:
 			bubbleProperties(workInProgress);
 			return null;
 		default:
