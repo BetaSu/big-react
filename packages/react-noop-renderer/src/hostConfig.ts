@@ -1,6 +1,5 @@
 export interface Container {
 	rootID: number;
-	pendingChildren: (Instance | TextInstance)[];
 	children: (Instance | TextInstance)[];
 }
 export interface Instance {
@@ -17,7 +16,6 @@ export interface TextInstance {
 }
 
 import { FiberNode } from 'react-reconciler/src/fiber';
-import { DefaultLane } from 'react-reconciler/src/fiberLanes';
 import { HostText } from 'react-reconciler/src/workTags';
 
 let instanceCounter = 0;
@@ -25,7 +23,7 @@ let instanceCounter = 0;
 export const createInstance = (type: string, props: any): Instance => {
 	const instance = {
 		id: instanceCounter++,
-		type: type,
+		type,
 		children: [],
 		parent: -1,
 		props

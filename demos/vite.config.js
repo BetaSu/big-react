@@ -27,10 +27,15 @@ export default defineConfig({
 				replacement: path.resolve(__dirname, '../packages/react-reconciler')
 			},
 			{
+				find: 'react-noop-renderer',
+				replacement: path.resolve(__dirname, '../packages/react-noop-renderer')
+			},
+			{
 				find: 'hostConfig',
 				replacement: path.resolve(
 					__dirname,
-					'../packages/react-dom/src/hostConfig.ts'
+					'../packages/react-noop-renderer/src/hostConfig.ts'
+					// '../packages/react-dom/src/hostConfig.ts'
 				)
 			}
 		]

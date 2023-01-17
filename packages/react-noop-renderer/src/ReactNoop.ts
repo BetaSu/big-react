@@ -1,5 +1,5 @@
 import { ReactElement } from 'shared/ReactTypes';
-import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
+import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols';
 import Reconciler from 'react-reconciler';
 import * as Scheduler from 'scheduler';
 import { Container, Instance } from './hostConfig';
@@ -9,35 +9,34 @@ let idCounter = 0;
 export function createRoot() {
 	const container: Container = {
 		rootID: idCounter++,
-		pendingChildren: [],
 		children: []
 	};
 	const root = Reconciler.createContainer(container);
 
-	function getChildren(root: Container) {
-		if (root) {
-			return root.children;
+	function getChildren(parent: Container | Instance) {
+		if (parent) {
+			return parent.children;
 		}
 		return null;
 	}
 
 	function getChildrenAsJSX(root: Container) {
 		const children = childToJSX(getChildren(root));
-		if (children === null) {
-			return null;
-		}
 		if (Array.isArray(children)) {
-			// 对应混合了Instance与TextInstance，应该用Fragment处理
-			console.error('TODO Fragment的case，还未实现');
+			return {
+				$$typeof: REACT_ELEMENT_TYPE,
+				type: REACT_FRAGMENT_TYPE,
+				key: null,
+				ref: null,
+				props: { children },
+				__mark: 'KaSong'
+			};
 		}
 		return children;
 	}
 
 	// 递归将整棵子树变为JSX
 	function childToJSX(child: any): any {
-		if (child === null) {
-			return null;
-		}
 		if (['string', 'number'].includes(typeof child)) {
 			return child;
 		}
@@ -58,7 +57,6 @@ export function createRoot() {
 		}
 		// 这是Instance
 		if (Array.isArray(child.children)) {
-			// This is an instance.
 			const instance: Instance = child;
 			const children = childToJSX(instance.children);
 			const props = instance.props;
@@ -71,7 +69,7 @@ export function createRoot() {
 				type: instance.type,
 				key: null,
 				ref: null,
-				props: props,
+				props,
 				__mark: 'KaSong'
 			};
 		}

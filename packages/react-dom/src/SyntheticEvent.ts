@@ -29,7 +29,7 @@ export interface DOMElement extends Element {
 function createSyntheticEvent(e: Event): SyntheticEvent {
 	const syntheticEvent = e as SyntheticEvent;
 	syntheticEvent.__stopPropagation = false;
-	const originStopPropagation = e.stopPropagation;
+	const originStopPropagation = e.stopPropagation.bind(e);
 
 	syntheticEvent.stopPropagation = () => {
 		syntheticEvent.__stopPropagation = true;
