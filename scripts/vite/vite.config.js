@@ -24,9 +24,13 @@ export default defineConfig({
 				replacement: resolvePkgPath('react-dom')
 			},
 			{
+				find: 'react-noop-renderer',
+				replacement: resolvePkgPath('react-noop-renderer')
+			},
+			{
 				find: 'hostConfig',
 				replacement: path.resolve(
-					resolvePkgPath('react-dom'),
+					resolvePkgPath('react-noop-renderer'),
 					'./src/hostConfig.ts'
 				)
 			}
