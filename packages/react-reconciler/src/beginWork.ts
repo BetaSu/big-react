@@ -61,7 +61,7 @@ function updateHostComponent(workInProgress: FiberNode, renderLanes: Lanes) {
 
 function updateHostRoot(workInProgress: FiberNode, renderLanes: Lanes) {
 	const baseState = workInProgress.memoizedState;
-	const updateQueue = workInProgress.updateQueue as UpdateQueue<Element>;
+	const updateQueue = workInProgress.updateQueue as UpdateQueue<ReactElement>;
 	const pending = updateQueue.shared.pending;
 	updateQueue.shared.pending = null;
 	const { memoizedState } = processUpdateQueue(baseState, pending, renderLanes);
