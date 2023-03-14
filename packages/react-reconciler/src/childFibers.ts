@@ -184,13 +184,20 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 		return firstNewFiber;
 	}
 
+	function getElementKeyToUse(element: any, index?: number): Key {
+		if (Array.isArray(element)) {
+			return index;
+		}
+		return element.key !== null ? element.key : index;
+	}
+
 	function updateFromMap(
 		returnFiber: FiberNode,
 		existingChildren: ExistingChildren,
 		index: number,
 		element: any
 	): FiberNode | null {
-		const keyToUse = element.key !== null ? element.key : index;
+		const keyToUse = getElementKeyToUse(element, index);
 		const before = existingChildren.get(keyToUse);
 
 		// HostText
@@ -224,11 +231,6 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 						}
 					}
 					return createFiberFromElement(element);
-			}
-
-			// TODO 数组类型
-			if (Array.isArray(element) && __DEV__) {
-				console.warn('还未实现数组类型的child');
 			}
 		}
 
