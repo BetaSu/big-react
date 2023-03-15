@@ -185,7 +185,11 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 	}
 
 	function getElementKeyToUse(element: any, index?: number): Key {
-		if (Array.isArray(element)) {
+		if (
+			Array.isArray(element) ||
+			typeof element === 'string' ||
+			typeof element === 'number'
+		) {
 			return index;
 		}
 		return element.key !== null ? element.key : index;
