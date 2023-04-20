@@ -11,6 +11,7 @@ import {
 	HostRoot,
 	HostText
 } from './workTags';
+import { Ref } from './fiberFlags';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 	if (__LOG__) {
@@ -55,6 +56,7 @@ function updateHostComponent(workInProgress: FiberNode, renderLanes: Lanes) {
 	// 根据element创建fiberNode
 	const nextProps = workInProgress.pendingProps;
 	const nextChildren = nextProps.children;
+	markRef(workInProgress.alternate, workInProgress);
 	reconcileChildren(workInProgress, nextChildren, renderLanes);
 	return workInProgress.child;
 }
@@ -95,5 +97,16 @@ function reconcileChildren(
 			children,
 			renderLanes
 		);
+	}
+}
+
+function markRef(current: FiberNode | null, workInProgress: FiberNode) {
+	const ref = workInProgress.ref;
+
+	if (
+		(current === null && ref !== null) ||
+		(current !== null && current.ref !== ref)
+	) {
+		workInProgress.flags |= Ref;
 	}
 }
