@@ -81,17 +81,19 @@ export function renderWithHooks(wip: FiberNode, lane: Lane) {
 const HooksDispatcherOnMount: Dispatcher = {
 	useState: mountState,
 	useEffect: mountEffect,
-	useTransition: mountTransition
+	useTransition: mountTransition,
+	useRef: mountRef
 };
 
 const HooksDispatcherOnUpdate: Dispatcher = {
 	useState: updateState,
 	useEffect: updateEffect,
-	useTransition: updateTransition
+	useTransition: updateTransition,
+	useRef: updateRef
 };
 
 function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
-	const hook = mountWorkInProgresHook();
+	const hook = mountWorkInProgressHook();
 	const nextDeps = deps === undefined ? null : deps;
 	(currentlyRenderingFiber as FiberNode).flags |= PassiveEffect;
 
@@ -104,7 +106,7 @@ function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
 }
 
 function updateEffect(create: EffectCallback | void, deps: EffectDeps | void) {
-	const hook = updateWorkInProgresHook();
+	const hook = updateWorkInProgressHook();
 	const nextDeps = deps === undefined ? null : deps;
 	let destroy: EffectCallback | void;
 
@@ -188,7 +190,7 @@ function createFCUpdateQueue<State>() {
 
 function updateState<State>(): [State, Dispatch<State>] {
 	// 找到当前useState对应的hook数据
-	const hook = updateWorkInProgresHook();
+	const hook = updateWorkInProgressHook();
 
 	// 计算新state的逻辑
 	const queue = hook.updateQueue as UpdateQueue<State>;
@@ -233,7 +235,7 @@ function updateState<State>(): [State, Dispatch<State>] {
 	return [hook.memoizedState, queue.dispatch as Dispatch<State>];
 }
 
-function updateWorkInProgresHook(): Hook {
+function updateWorkInProgressHook(): Hook {
 	// TODO render阶段触发的更新
 	let nextCurrentHook: Hook | null;
 
@@ -287,7 +289,7 @@ function mountState<State>(
 	initialState: (() => State) | State
 ): [State, Dispatch<State>] {
 	// 找到当前useState对应的hook数据
-	const hook = mountWorkInProgresHook();
+	const hook = mountWorkInProgressHook();
 	let memoizedState;
 	if (initialState instanceof Function) {
 		memoizedState = initialState();
@@ -307,7 +309,7 @@ function mountState<State>(
 
 function mountTransition(): [boolean, (callback: () => void) => void] {
 	const [isPending, setPending] = mountState(false);
-	const hook = mountWorkInProgresHook();
+	const hook = mountWorkInProgressHook();
 	const start = startTransition.bind(null, setPending);
 	hook.memoizedState = start;
 	return [isPending, start];
@@ -315,9 +317,21 @@ function mountTransition(): [boolean, (callback: () => void) => void] {
 
 function updateTransition(): [boolean, (callback: () => void) => void] {
 	const [isPending] = updateState();
-	const hook = updateWorkInProgresHook();
+	const hook = updateWorkInProgressHook();
 	const start = hook.memoizedState;
 	return [isPending as boolean, start];
+}
+
+function mountRef<T>(initialValue: T): { current: T } {
+	const hook = mountWorkInProgressHook();
+	const ref = { current: initialValue };
+	hook.memoizedState = ref;
+	return ref;
+}
+
+function updateRef<T>(initialValue: T): { current: T } {
+	const hook = updateWorkInProgressHook();
+	return hook.memoizedState;
 }
 
 function startTransition(setPending: Dispatch<boolean>, callback: () => void) {
@@ -342,7 +356,7 @@ function dispatchSetState<State>(
 	scheduleUpdateOnFiber(fiber, lane);
 }
 
-function mountWorkInProgresHook(): Hook {
+function mountWorkInProgressHook(): Hook {
 	const hook: Hook = {
 		memoizedState: null,
 		updateQueue: null,
