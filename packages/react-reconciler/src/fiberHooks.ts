@@ -68,12 +68,14 @@ export const renderWithHooks = (workInProgress: FiberNode, lane: Lane) => {
 
 const HooksDispatcherOnMount: Dispatcher = {
 	useState: mountState,
-	useEffect: mountEffect
+	useEffect: mountEffect,
+	useRef: mountRef
 };
 
 const HooksDispatcherOnUpdate: Dispatcher = {
 	useState: updateState,
-	useEffect: updateEffect
+	useEffect: updateEffect,
+	useRef: updateRef
 };
 
 function mountState<State>(
@@ -224,6 +226,19 @@ function areHookInputsEqual(nextDeps: TEffectDeps, prevDeps: TEffectDeps) {
 		return false;
 	}
 	return true;
+}
+
+// const ref = useRef(null)
+
+function mountRef<T>(initialValue: T): { current: T } {
+	const hook = mountWorkInProgressHook();
+	const ref = { current: initialValue };
+	hook.memoizedState = ref;
+	return ref;
+}
+function updateRef<T>(initialValue: T): { current: T } {
+	const hook = updateWorkInProgressHook();
+	return hook.memoizedState;
 }
 
 export interface Effect {

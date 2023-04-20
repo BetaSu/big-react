@@ -112,7 +112,7 @@ export function createFiberFromElement(
 	element: ReactElement,
 	lanes: Lanes
 ): FiberNode {
-	const { type, key, props } = element;
+	const { type, key, props, ref } = element;
 	let fiberTag: WorkTag = FunctionComponent;
 
 	if (typeof type === 'string') {
@@ -123,6 +123,7 @@ export function createFiberFromElement(
 	const fiber = new FiberNode(fiberTag, props, key);
 	fiber.type = type;
 	fiber.lanes = lanes;
+	fiber.ref = ref;
 
 	return fiber;
 }
@@ -166,6 +167,7 @@ export const createWorkInProgress = (
 	// 数据
 	wip.memoizedProps = current.memoizedProps;
 	wip.memoizedState = current.memoizedState;
+	wip.ref = current.ref;
 
 	wip.lanes = current.lanes;
 

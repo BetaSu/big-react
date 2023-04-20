@@ -1,6 +1,6 @@
 import { updateFiberProps } from 'react-dom/src/SyntheticEvent';
 import { FiberNode } from './fiber';
-import { NoFlags, Update } from './fiberFlags';
+import { NoFlags, Ref, Update } from './fiberFlags';
 import {
 	appendInitialChild,
 	createInstance,
@@ -58,6 +58,9 @@ const bubbleProperties = (completeWork: FiberNode) => {
 function markUpdate(fiber: FiberNode) {
 	fiber.flags |= Update;
 }
+function markRef(fiber: FiberNode) {
+	fiber.flags |= Ref;
+}
 
 export const completeWork = (workInProgress: FiberNode) => {
 	if (__LOG__) {
@@ -74,12 +77,22 @@ export const completeWork = (workInProgress: FiberNode) => {
 				// 不应该在此处调用updateFiberProps，应该跟着判断属性变化的逻辑，在这里打flag
 				// 再在commitWork中更新fiberProps，我准备把这个过程留到「属性变化」相关需求一起做
 				updateFiberProps(workInProgress.stateNode, newProps);
+
+				// 标记Ref
+				if (current.ref !== workInProgress.ref) {
+					markRef(workInProgress);
+				}
 			} else {
 				// 初始化DOM
 				const instance = createInstance(workInProgress.type, newProps);
 				// 挂载DOM
 				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
+
+				// 标记Ref
+				if (workInProgress.ref !== null) {
+					markRef(workInProgress);
+				}
 
 				// TODO 初始化元素属性
 			}

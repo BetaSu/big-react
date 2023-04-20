@@ -5,6 +5,7 @@ import { FiberNode } from './fiber';
 import { renderWithHooks } from './fiberHooks';
 import { Lane, Lanes, NoLane } from './fiberLanes';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
+import { Ref } from './fiberFlags';
 import {
 	FunctionComponent,
 	HostComponent,
@@ -55,6 +56,7 @@ function updateHostComponent(workInProgress: FiberNode, renderLanes: Lanes) {
 	// 根据element创建fiberNode
 	const nextProps = workInProgress.pendingProps;
 	const nextChildren = nextProps.children;
+	markRef(workInProgress.alternate, workInProgress);
 	reconcileChildren(workInProgress, nextChildren, renderLanes);
 	return workInProgress.child;
 }
@@ -95,5 +97,15 @@ function reconcileChildren(
 			children,
 			renderLanes
 		);
+	}
+}
+
+function markRef(current: FiberNode | null, wip: FiberNode) {
+	const ref = wip.ref;
+	if (
+		(current === null && ref !== null) ||
+		(current !== null && current.ref !== ref)
+	) {
+		wip.flags |= Ref;
 	}
 }
