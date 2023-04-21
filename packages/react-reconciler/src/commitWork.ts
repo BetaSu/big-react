@@ -71,7 +71,7 @@ const commitMutationEffectsOnFiber = (
 	if ((flags & Placement) !== NoFlags) {
 		// 插入/移动
 		commitPlacement(finishedWork);
-		finishedWork.flags &= ~Placement;
+		finishedWork.flags ^= Placement;
 	}
 	if ((flags & ChildDeletion) !== NoFlags) {
 		const deletions = finishedWork.deletions;
@@ -81,16 +81,16 @@ const commitMutationEffectsOnFiber = (
 				commitDeletion(childToDelete, root);
 			});
 		}
-		finishedWork.flags &= ~ChildDeletion;
+		finishedWork.flags ^= ChildDeletion;
 	}
 	if ((flags & Update) !== NoFlags) {
 		commitUpdate(finishedWork);
-		finishedWork.flags &= ~Update;
+		finishedWork.flags ^= Update;
 	}
 	if ((flags & PassiveEffect) !== NoFlags) {
 		// 收集因deps变化而需要执行的useEffect
 		commitPassiveEffect(finishedWork, root, 'update');
-		finishedWork.flags &= ~PassiveEffect;
+		finishedWork.flags ^= PassiveEffect;
 	}
 	if ((flags & Ref) !== NoFlags && tag === HostComponent) {
 		safelyDetachRef(finishedWork);
@@ -380,7 +380,7 @@ export function commitHookEffectListDestroy(flags: Flags, lastEffect: Effect) {
 			destroy();
 		}
 		// 后续不会再触发create
-		effect.tag &= ~HookHasEffect;
+		effect.tag ^= HookHasEffect;
 	});
 }
 
