@@ -9,9 +9,11 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	ContextProvider
 } from './workTags';
 import { Ref } from './fiberFlags';
+import { pushProvider } from './fiberContext';
 
 // 递归中的递阶段
 export const beginWork = (wip: FiberNode, renderLane: Lane) => {
@@ -27,6 +29,8 @@ export const beginWork = (wip: FiberNode, renderLane: Lane) => {
 			return updateFunctionComponent(wip, renderLane);
 		case Fragment:
 			return updateFragment(wip);
+		case ContextProvider:
+			return updateContextProvider(wip);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork未实现的类型');
@@ -35,6 +39,28 @@ export const beginWork = (wip: FiberNode, renderLane: Lane) => {
 	}
 	return null;
 };
+
+function updateContextProvider(wip: FiberNode) {
+	const providerType = wip.type;
+	const context = providerType._context;
+	const oldProps = wip.memoizedProps;
+	const newProps = wip.pendingProps;
+
+	const newValue = newProps.value;
+
+	if (__DEV__ && !('value' in newProps)) {
+		console.error('<Context.Provider>需要传递value props');
+	}
+	pushProvider(context, newValue);
+	if (oldProps !== null) {
+		// TODO oldValue === newValue bailout路径
+		// TODO oldValue !== newValue 向下DFS，标记沿途子孙节点
+	}
+
+	const children = newProps.children;
+	reconcileChildren(wip, children);
+	return wip.child;
+}
 
 function updateFragment(wip: FiberNode) {
 	const nextChildren = wip.pendingProps;
@@ -81,13 +107,13 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
 	}
 }
 
-function markRef(current: FiberNode | null, workInProgress: FiberNode) {
-	const ref = workInProgress.ref;
+function markRef(current: FiberNode | null, wip: FiberNode) {
+	const ref = wip.ref;
 
 	if (
 		(current === null && ref !== null) ||
 		(current !== null && current.ref !== ref)
 	) {
-		workInProgress.flags |= Ref;
+		wip.flags |= Ref;
 	}
 }

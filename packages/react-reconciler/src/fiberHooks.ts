@@ -1,8 +1,7 @@
-import { Dispatch } from 'react/src/currentDispatcher';
-import { Dispatcher } from 'react/src/currentDispatcher';
+import { Dispatch, Dispatcher } from 'react/src/currentDispatcher';
 import currentBatchConfig from 'react/src/currentBatchConfig';
 import internals from 'shared/internals';
-import { Action } from 'shared/ReactTypes';
+import { Action, ReactContext } from 'shared/ReactTypes';
 import { FiberNode } from './fiber';
 import { Flags, PassiveEffect } from './fiberFlags';
 import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
@@ -82,14 +81,16 @@ const HooksDispatcherOnMount: Dispatcher = {
 	useState: mountState,
 	useEffect: mountEffect,
 	useTransition: mountTransition,
-	useRef: mountRef
+	useRef: mountRef,
+	useContext: readContext
 };
 
 const HooksDispatcherOnUpdate: Dispatcher = {
 	useState: updateState,
 	useEffect: updateEffect,
 	useTransition: updateTransition,
-	useRef: updateRef
+	useRef: updateRef,
+	useContext: readContext
 };
 
 function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
@@ -378,4 +379,13 @@ function mountWorkInProgressHook(): Hook {
 		workInProgressHook = hook;
 	}
 	return workInProgressHook;
+}
+
+function readContext<T>(context: ReactContext<T>) {
+	const consumer = currentlyRenderingFiber;
+	if (consumer === null) {
+		throw new Error('context需要存在consumer');
+	}
+	const value = context._currentValue;
+	return value;
 }

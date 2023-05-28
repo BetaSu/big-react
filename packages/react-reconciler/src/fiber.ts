@@ -1,5 +1,6 @@
 import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
 import {
+	ContextProvider,
 	Fragment,
 	FunctionComponent,
 	HostComponent,
@@ -10,6 +11,7 @@ import { Container } from 'hostConfig';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { Effect } from './fiberHooks';
 import { CallbackNode } from 'scheduler';
+import { REACT_PROVIDER_TYPE } from 'shared/ReactSymbols';
 
 export class FiberNode {
 	type: any;
@@ -78,7 +80,6 @@ export class FiberRootNode {
 
 	callbackNode: CallbackNode | null;
 	callbackPriority: Lane;
-
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
@@ -134,8 +135,13 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 	if (typeof type === 'string') {
 		// <div/> type: 'div'
 		fiberTag = HostComponent;
+	} else if (
+		typeof type === 'object' &&
+		type.$$typeof === REACT_PROVIDER_TYPE
+	) {
+		fiberTag = ContextProvider;
 	} else if (typeof type !== 'function' && __DEV__) {
-		console.warn('为定义的type类型', element);
+		console.warn('未定义的type类型', element);
 	}
 	const fiber = new FiberNode(fiberTag, props, key);
 	fiber.type = type;
