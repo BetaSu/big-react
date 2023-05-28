@@ -5,6 +5,7 @@ import { renderWithHooks } from './fiberHooks';
 import { Lane } from './fiberLanes';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
 import {
+	ContextProvider,
 	Fragment,
 	FunctionComponent,
 	HostComponent,
@@ -12,6 +13,7 @@ import {
 	HostText
 } from './workTags';
 import { Ref } from './fiberFlags';
+import { pushProvider } from './fiberContext';
 
 // 递归中的递阶段
 export const beginWork = (wip: FiberNode, renderLane: Lane) => {
@@ -27,6 +29,8 @@ export const beginWork = (wip: FiberNode, renderLane: Lane) => {
 			return updateFunctionComponent(wip, renderLane);
 		case Fragment:
 			return updateFragment(wip);
+		case ContextProvider:
+			return updateContextProvider(wip);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork未实现的类型');
@@ -35,6 +39,35 @@ export const beginWork = (wip: FiberNode, renderLane: Lane) => {
 	}
 	return null;
 };
+
+function updateContextProvider(wip: FiberNode) {
+	// {
+	// 	$$typeof: REACT_PROVIDER_TYPE,
+	// 	_context: context
+	// };
+	const providerType = wip.type;
+	const context = providerType._context;
+	const oldProps = wip.memoizedProps;
+	const newProps = wip.pendingProps;
+	const newValue = newProps.value;
+
+	if (__DEV__ && !('value' in newProps)) {
+		console.warn('<Context.Provider>需要传递value props');
+	}
+	if (newValue !== oldProps.value) {
+		// TODO
+		// context.value变化
+		// 从Provider向下DFS，寻找消费了当前变化的contexxt的consumer
+		// 如果找到consumer，从consumer向上便遍历到Provider
+		// 标记沿途组件存在更新
+	}
+
+	// TODO context入栈过程
+	pushProvider(context, newValue);
+	const nextChildren = newProps.children;
+	reconcileChildren(wip, nextChildren);
+	return wip.child;
+}
 
 function updateFragment(wip: FiberNode) {
 	const nextChildren = wip.pendingProps;

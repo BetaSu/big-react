@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build:dev": "rm -rf dist && rollup --config scripts/rollup/dev.config.js",
-		"demo": "vite serve demos/ref --config scripts/vite/vite.config.js --force",
+		"demo": "vite serve demos/context --config scripts/vite/vite.config.js --force",
 		"lint": "eslint --ext .ts,.jsx,.tsx --fix --quiet ./packages",
 		"test": "jest --config scripts/jest/jest.config.js"
 	},
