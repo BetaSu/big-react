@@ -4,12 +4,15 @@ import { Effect } from './fiberHooks';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { Container } from 'hostConfig';
 import {
+	ContextProvider,
 	Fragment,
 	FunctionComponent,
 	HostComponent,
-	WorkTag
+	WorkTag,
+	ContextConsumer
 } from './workTags';
 import { CallbackNode } from 'scheduler';
+import { REACT_CONTEXT_TYPE, REACT_PROVIDER_TYPE } from 'shared/ReactSymbols';
 
 export class FiberNode {
 	pendingProps: Props;
@@ -117,6 +120,15 @@ export function createFiberFromElement(
 
 	if (typeof type === 'string') {
 		fiberTag = HostComponent;
+	} else if (typeof type === 'object' && type !== null) {
+		switch (type.$$typeof) {
+			case REACT_PROVIDER_TYPE:
+				fiberTag = ContextProvider;
+				break;
+			case REACT_CONTEXT_TYPE:
+				fiberTag = ContextConsumer;
+				break;
+		}
 	} else if (typeof type !== 'function') {
 		console.error('未定义的type类型', element);
 	}

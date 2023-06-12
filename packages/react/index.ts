@@ -5,6 +5,8 @@ import currentDispatcher, {
 
 import { jsx, isValidElement as isValidElementFn } from './src/jsx';
 
+export { createContext } from './src/context';
+
 export const useState: Dispatcher['useState'] = (initialState) => {
 	const dispatcher = resolveDispatcher() as Dispatcher;
 	return dispatcher.useState(initialState);
