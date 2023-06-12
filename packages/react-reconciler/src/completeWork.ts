@@ -1,6 +1,8 @@
 import { updateFiberProps } from 'react-dom/src/SyntheticEvent';
 import { FiberNode } from './fiber';
 import { NoFlags, Ref, Update } from './fiberFlags';
+import { ReactProviderType } from 'shared/ReactTypes';
+import { popProvider } from './fiberContext';
 import {
 	appendInitialChild,
 	createInstance,
@@ -12,7 +14,8 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	ContextProvider
 } from './workTags';
 
 function markRef(fiber: FiberNode) {
@@ -117,6 +120,13 @@ export const completeWork = (workInProgress: FiberNode) => {
 			}
 
 			// 冒泡flag
+			bubbleProperties(workInProgress);
+			return null;
+		case ContextProvider:
+			const context: ReactContext<any> = (
+				workInProgress.type as ReactProviderType<any>
+			)._context;
+			popProvider(context, workInProgress);
 			bubbleProperties(workInProgress);
 			return null;
 		default:

@@ -1,5 +1,9 @@
 import { Fragment } from 'react-reconciler/src/workTags';
-import { ReactElement } from 'shared/ReactTypes';
+import {
+	ReactContext,
+	ReactElement,
+	ReactProviderType
+} from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import { FiberNode } from './fiber';
 import { renderWithHooks } from './fiberHooks';
@@ -9,9 +13,11 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	ContextProvider
 } from './workTags';
 import { Ref } from './fiberFlags';
+import { pushProvider, prepareToReadContext } from './fiberContext';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 	if (__LOG__) {
@@ -31,6 +37,8 @@ export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 			return updateFunctionComponent(workInProgress, renderLanes);
 		case Fragment:
 			return updateFragment(workInProgress, renderLanes);
+		case ContextProvider:
+			return updateContextProvider(workInProgress, renderLanes);
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
@@ -47,6 +55,7 @@ function updateFunctionComponent(
 	workInProgress: FiberNode,
 	renderLanes: Lanes
 ) {
+	prepareToReadContext(workInProgress, renderLanes);
 	const nextChildren = renderWithHooks(workInProgress, renderLanes);
 	reconcileChildren(workInProgress, nextChildren, renderLanes);
 	return workInProgress.child;
@@ -71,6 +80,20 @@ function updateHostRoot(workInProgress: FiberNode, renderLanes: Lanes) {
 
 	const nextChildren = workInProgress.memoizedState;
 	reconcileChildren(workInProgress, nextChildren, renderLanes);
+	return workInProgress.child;
+}
+
+function updateContextProvider(workInProgress: FiberNode, renderLanes: Lanes) {
+	const providerType: ReactProviderType<any> = workInProgress.type;
+	const context = providerType._context;
+
+	const newProps = workInProgress.pendingProps;
+	const newValue = newProps.value;
+
+	pushProvider(workInProgress, context, newValue);
+
+	const newChildren = newProps.children;
+	reconcileChildren(workInProgress, newChildren, renderLanes);
 	return workInProgress.child;
 }
 

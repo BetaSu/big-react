@@ -21,6 +21,7 @@ import {
 } from './fiberLanes';
 import { Flags, PassiveEffect } from './fiberFlags';
 import { HookHasEffect, Passive } from './hookEffectTags';
+import { readContext } from './fiberContext';
 
 let workInProgressHook: Hook | null = null;
 let currentHook: Hook | null = null;
@@ -69,13 +70,15 @@ export const renderWithHooks = (workInProgress: FiberNode, lane: Lane) => {
 const HooksDispatcherOnMount: Dispatcher = {
 	useState: mountState,
 	useEffect: mountEffect,
-	useRef: mountRef
+	useRef: mountRef,
+	useContext: readContext
 };
 
 const HooksDispatcherOnUpdate: Dispatcher = {
 	useState: updateState,
 	useEffect: updateEffect,
-	useRef: updateRef
+	useRef: updateRef,
+	useContext: readContext
 };
 
 function mountState<State>(
