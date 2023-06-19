@@ -1,7 +1,11 @@
-import { Fragment } from 'react-reconciler/src/workTags';
+import { Fragment, LazyComponent } from 'react-reconciler/src/workTags';
 import { ReactElement } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
-import { FiberNode } from './fiber';
+import {
+	FiberNode,
+	createWorkInProgress,
+	resolveLazyComponentTag
+} from './fiber';
 import { renderWithHooks } from './fiberHooks';
 import { Lane, Lanes, NoLane } from './fiberLanes';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
@@ -12,6 +16,8 @@ import {
 	HostText
 } from './workTags';
 import { Ref } from './fiberFlags';
+import { resolveDefaultProps } from './fiberLazyComponent';
+import { LazyComponent as LazyComponentType } from 'react/src/lazy';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 	if (__LOG__) {
@@ -31,6 +37,8 @@ export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 			return updateFunctionComponent(workInProgress, renderLanes);
 		case Fragment:
 			return updateFragment(workInProgress, renderLanes);
+		case LazyComponent:
+			return mountLazyComponent(workInProgress, renderLanes);
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
@@ -108,5 +116,24 @@ function markRef(current: FiberNode | null, workInProgress: FiberNode) {
 		(current !== null && current.ref !== ref)
 	) {
 		workInProgress.flags |= Ref;
+	}
+}
+
+function mountLazyComponent(workInProgress: FiberNode, renderLanes: Lanes) {
+	const elementType = workInProgress.type;
+
+	const props = workInProgress.pendingProps;
+	const lazyComponent: LazyComponentType<any, any> = elementType;
+	const payload = lazyComponent._payload;
+	const init = lazyComponent._init;
+
+	const Component = init(payload);
+	// 能到这里说明异步结束了
+	workInProgress.type = Component;
+	const resolvedTag = (workInProgress.tag = resolveLazyComponentTag(Component));
+	workInProgress.pendingProps = resolveDefaultProps(Component, props);
+	switch (resolvedTag) {
+		case FunctionComponent:
+			return updateFunctionComponent(workInProgress, renderLanes);
 	}
 }

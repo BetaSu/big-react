@@ -7,9 +7,11 @@ import {
 	Fragment,
 	FunctionComponent,
 	HostComponent,
-	WorkTag
+	WorkTag,
+	LazyComponent
 } from './workTags';
 import { CallbackNode } from 'scheduler';
+import { REACT_LAZY_TYPE } from 'shared/ReactSymbols';
 
 export class FiberNode {
 	pendingProps: Props;
@@ -117,6 +119,12 @@ export function createFiberFromElement(
 
 	if (typeof type === 'string') {
 		fiberTag = HostComponent;
+	} else if (typeof type === 'object' && type !== null) {
+		switch (type.$$typeof) {
+			case REACT_LAZY_TYPE:
+				fiberTag = LazyComponent;
+				break;
+		}
 	} else if (typeof type !== 'function') {
 		console.error('未定义的type类型', element);
 	}
@@ -173,3 +181,12 @@ export const createWorkInProgress = (
 
 	return wip;
 };
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function resolveLazyComponentTag(Component: Function): WorkTag {
+	if (typeof Component === 'function') {
+		// 不考虑class
+		return FunctionComponent;
+	}
+	throw '未知的tag';
+}

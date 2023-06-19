@@ -12,7 +12,8 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	LazyComponent
 } from './workTags';
 
 function markRef(fiber: FiberNode) {
@@ -100,6 +101,7 @@ export const completeWork = (workInProgress: FiberNode) => {
 		case FunctionComponent:
 		case HostRoot:
 		case Fragment:
+		case LazyComponent:
 			bubbleProperties(workInProgress);
 			return null;
 		case HostText:
