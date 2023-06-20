@@ -1,13 +1,18 @@
-import { Fragment, LazyComponent } from 'react-reconciler/src/workTags';
-import { ReactElement } from 'shared/ReactTypes';
+import {
+	Fragment,
+	LazyComponent,
+	SuspenseComponent
+} from 'react-reconciler/src/workTags';
+import { Props, ReactElement } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import {
 	FiberNode,
+	createFiberFromFragment,
 	createWorkInProgress,
 	resolveLazyComponentTag
 } from './fiber';
 import { renderWithHooks } from './fiberHooks';
-import { Lane, Lanes, NoLane } from './fiberLanes';
+import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
 import {
 	FunctionComponent,
@@ -15,7 +20,7 @@ import {
 	HostRoot,
 	HostText
 } from './workTags';
-import { Ref } from './fiberFlags';
+import { Ref, NoFlags, DidCapture } from './fiberFlags';
 import { resolveDefaultProps } from './fiberLazyComponent';
 import { LazyComponent as LazyComponentType } from 'react/src/lazy';
 
@@ -39,6 +44,8 @@ export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 			return updateFragment(workInProgress, renderLanes);
 		case LazyComponent:
 			return mountLazyComponent(workInProgress, renderLanes);
+		case SuspenseComponent:
+			return updateSuspenseComponent(workInProgress, renderLanes);
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
@@ -136,4 +143,127 @@ function mountLazyComponent(workInProgress: FiberNode, renderLanes: Lanes) {
 		case FunctionComponent:
 			return updateFunctionComponent(workInProgress, renderLanes);
 	}
+}
+
+function updateSuspenseComponent(
+	workInProgress: FiberNode,
+	renderLanes: Lanes
+) {
+	const current = workInProgress.alternate;
+	const nextProps = workInProgress.pendingProps;
+
+	let showFallback = false;
+	const didSuspend = (workInProgress.flags & DidCapture) !== NoFlags;
+
+	if (didSuspend) {
+		showFallback = true;
+		workInProgress.flags &= ~DidCapture;
+	}
+
+	if (current === null) {
+		const nextPrimaryChildren = nextProps.children;
+		const nextFallbackChildren = nextProps.fallback;
+
+		if (showFallback) {
+			const fallbackFragment = mountSuspenseFallbackChildren(
+				workInProgress,
+				nextPrimaryChildren,
+				nextFallbackChildren,
+				renderLanes
+			);
+			return fallbackFragment;
+		} else {
+			return mountSuspensePrimaryChildren(
+				workInProgress,
+				nextPrimaryChildren,
+				renderLanes
+			);
+		}
+	} else {
+		const nextFallbackChildren = nextProps.fallback;
+		const nextPrimaryChildren = nextProps.children;
+		if (showFallback) {
+			const fallbackChildFragment = updateSuspenseFallbackChildren(
+				workInProgress,
+				nextPrimaryChildren,
+				nextFallbackChildren,
+				renderLanes
+			);
+			return fallbackChildFragment;
+		} else {
+			return updateSuspensePrimaryChildren(
+				workInProgress,
+				nextPrimaryChildren,
+				renderLanes
+			);
+		}
+	}
+}
+
+function mountSuspenseFallbackChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	fallbackChildren: any,
+	renderLanes: any
+) {
+	const progressedPrimaryFragment: FiberNode | null = workInProgress.child;
+
+	let primaryChildFragment;
+	let fallbackChildFragment;
+
+	if (progressedPrimaryFragment !== null) {
+		primaryChildFragment = progressedPrimaryFragment;
+		primaryChildFragment.childLanes = NoLanes;
+		primaryChildFragment.pendingProps = primaryChildren;
+
+		fallbackChildFragment = createFiberFromFragment(
+			fallbackChildren,
+			renderLanes,
+			null
+		);
+	} else {
+		primaryChildFragment = createFiberFromFragment(
+			primaryChildren,
+			renderLanes,
+			null
+		);
+		fallbackChildFragment = createFiberFromFragment(
+			fallbackChildren,
+			renderLanes,
+			null
+		);
+	}
+
+	primaryChildFragment.return = workInProgress;
+	fallbackChildFragment.return = workInProgress;
+	primaryChildFragment.sibling = fallbackChildFragment;
+	workInProgress.child = primaryChildFragment;
+
+	return fallbackChildFragment;
+}
+function updateSuspenseFallbackChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	fallbackChildren: any,
+	renderLanes: any
+) {
+	const current = workInProgress.alternate!;
+	const currentPrimaryChildFragment: FiberNode = current.child;
+	const currentFallbackChildFragment: FiberNode | null =
+		currentPrimaryChildFragment.sibling;
+}
+
+function mountSuspensePrimaryChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	renderLanes: Lanes
+) {
+	const primaryChildFragment = createFiberFromFragment(
+		primaryChildren,
+		renderLanes,
+		null
+	);
+	primaryChildFragment.return = workInProgress;
+	workInProgress.child = primaryChildFragment;
+	return primaryChildFragment;
 }

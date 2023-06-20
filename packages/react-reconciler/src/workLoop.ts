@@ -212,8 +212,7 @@ function renderRoot(
 			shouldTimeSlice ? workLoopConcurrent() : workLoopSync();
 			break;
 		} catch (e) {
-			console.error('workLoop发生错误', e);
-			workInProgress = null;
+			handleThrow(root, e);
 		}
 	} while (true);
 
@@ -400,4 +399,9 @@ function completeUnitOfWork(fiber: FiberNode) {
 		node = node.return;
 		workInProgress = node;
 	} while (node !== null);
+}
+
+function handleThrow(root: FiberRootNode, thrownValue: any): void {
+	console.error('workLoop发生错误', thrownValue, workInProgress);
+	workInProgress = null;
 }

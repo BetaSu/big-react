@@ -11,3 +11,7 @@ export const REACT_FRAGMENT_TYPE = supportSymbol
 export const REACT_LAZY_TYPE = supportSymbol
 	? Symbol.for('react.lazy')
 	: 0xead4;
+
+export const REACT_SUSPENSE_TYPE: symbol = supportSymbol
+	? Symbol.for('react.suspense')
+	: 0xead1;

@@ -8,10 +8,11 @@ import {
 	FunctionComponent,
 	HostComponent,
 	WorkTag,
-	LazyComponent
+	LazyComponent,
+	SuspenseComponent
 } from './workTags';
 import { CallbackNode } from 'scheduler';
-import { REACT_LAZY_TYPE } from 'shared/ReactSymbols';
+import { REACT_LAZY_TYPE, REACT_SUSPENSE_TYPE } from 'shared/ReactSymbols';
 
 export class FiberNode {
 	pendingProps: Props;
@@ -123,6 +124,9 @@ export function createFiberFromElement(
 		switch (type.$$typeof) {
 			case REACT_LAZY_TYPE:
 				fiberTag = LazyComponent;
+				break;
+			case REACT_SUSPENSE_TYPE:
+				fiberTag = SuspenseComponent;
 				break;
 		}
 	} else if (typeof type !== 'function') {
