@@ -167,7 +167,6 @@ function updateSuspenseComponent(
 		showFallback = true;
 		workInProgress.flags &= ~DidCapture;
 	}
-console.log('updateSuspenseComponent')
 	const nextPrimaryChildren = nextProps.children;
 	const nextFallbackChildren = nextProps.fallback;
 
@@ -214,7 +213,7 @@ console.log('updateSuspenseComponent')
 				renderLanes,
 				null
 			);
-
+			
 			primaryFragment.flags |= Placement;
 			if (workInProgress.child) {
 				if (workInProgress.deletions !== null) {

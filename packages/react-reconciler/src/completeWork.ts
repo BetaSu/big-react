@@ -125,7 +125,9 @@ export const completeWork = (workInProgress: FiberNode) => {
 			return null;
 		case SuspenseComponent:
 			const retryQueue = workInProgress.updateQueue as RetryQueue | null;
-			if (retryQueue !== null) workInProgress.flags |= Update;
+			if (retryQueue !== null) {
+				workInProgress.flags |= Update;
+			}
 			bubbleProperties(workInProgress);
 			return null;
 		default:
