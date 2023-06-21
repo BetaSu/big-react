@@ -170,6 +170,7 @@ function updateSuspenseComponent(
 	const nextPrimaryChildren = nextProps.children;
 	const nextFallbackChildren = nextProps.fallback;
 
+	// 源码中会用Offline去保存状态
 	if (current === null) {
 		if (showFallback) {
 			const fallbackFragment = createFiberFromFragment(
