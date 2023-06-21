@@ -181,7 +181,7 @@ function updateSuspenseComponent(
 			fallbackFragment.flags |= Placement;
 			workInProgress.child = fallbackFragment;
 			fallbackFragment.return = workInProgress;
-			console.log('fallbackFragment', fallbackFragment);
+
 			return fallbackFragment;
 		} else {
 			const primaryFragment = createFiberFromFragment(
@@ -193,7 +193,6 @@ function updateSuspenseComponent(
 			primaryFragment.flags |= Placement;
 			workInProgress.child = primaryFragment;
 			primaryFragment.return = workInProgress;
-			console.log('primaryFragment', primaryFragment);
 
 			return primaryFragment;
 		}
@@ -214,7 +213,7 @@ function updateSuspenseComponent(
 				renderLanes,
 				null
 			);
-			
+
 			primaryFragment.flags |= Placement;
 			if (workInProgress.child) {
 				if (workInProgress.deletions !== null) {
