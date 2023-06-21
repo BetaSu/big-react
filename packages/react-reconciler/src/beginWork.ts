@@ -20,7 +20,13 @@ import {
 	HostRoot,
 	HostText
 } from './workTags';
-import { Ref, NoFlags, DidCapture } from './fiberFlags';
+import {
+	Ref,
+	NoFlags,
+	DidCapture,
+	Placement,
+	ChildDeletion
+} from './fiberFlags';
 import { resolveDefaultProps } from './fiberLazyComponent';
 import { LazyComponent as LazyComponentType } from 'react/src/lazy';
 
@@ -142,6 +148,8 @@ function mountLazyComponent(workInProgress: FiberNode, renderLanes: Lanes) {
 	switch (resolvedTag) {
 		case FunctionComponent:
 			return updateFunctionComponent(workInProgress, renderLanes);
+		default:
+			return null;
 	}
 }
 
@@ -159,111 +167,69 @@ function updateSuspenseComponent(
 		showFallback = true;
 		workInProgress.flags &= ~DidCapture;
 	}
+console.log('updateSuspenseComponent')
+	const nextPrimaryChildren = nextProps.children;
+	const nextFallbackChildren = nextProps.fallback;
 
 	if (current === null) {
-		const nextPrimaryChildren = nextProps.children;
-		const nextFallbackChildren = nextProps.fallback;
-
 		if (showFallback) {
-			const fallbackFragment = mountSuspenseFallbackChildren(
-				workInProgress,
-				nextPrimaryChildren,
+			const fallbackFragment = createFiberFromFragment(
 				nextFallbackChildren,
-				renderLanes
+				renderLanes,
+				null
 			);
+			workInProgress.child = fallbackFragment;
+			fallbackFragment.return = workInProgress;
+			console.log('fallbackFragment', fallbackFragment);
 			return fallbackFragment;
 		} else {
-			return mountSuspensePrimaryChildren(
-				workInProgress,
+			const primaryFragment = createFiberFromFragment(
 				nextPrimaryChildren,
-				renderLanes
+				renderLanes,
+				null
 			);
+
+			primaryFragment.flags |= Placement;
+			workInProgress.child = primaryFragment;
+			primaryFragment.return = workInProgress;
+			console.log('primaryFragment', primaryFragment);
+
+			return primaryFragment;
 		}
 	} else {
-		const nextFallbackChildren = nextProps.fallback;
-		const nextPrimaryChildren = nextProps.children;
 		if (showFallback) {
-			const fallbackChildFragment = updateSuspenseFallbackChildren(
-				workInProgress,
-				nextPrimaryChildren,
+			const fallbackFragment = createFiberFromFragment(
 				nextFallbackChildren,
-				renderLanes
+				renderLanes,
+				null
 			);
-			return fallbackChildFragment;
+			workInProgress.child = fallbackFragment;
+			fallbackFragment.return = workInProgress;
+			fallbackFragment.flags |= Placement;
+			console.log('fallbackFragment', fallbackFragment);
+			return fallbackFragment;
 		} else {
-			return updateSuspensePrimaryChildren(
-				workInProgress,
+			const primaryFragment = createFiberFromFragment(
 				nextPrimaryChildren,
-				renderLanes
+				renderLanes,
+				null
 			);
+
+			primaryFragment.flags |= Placement;
+			if (workInProgress.child) {
+				if (workInProgress.deletions !== null) {
+					workInProgress.deletions.push(workInProgress.child!);
+				} else {
+					workInProgress.deletions = [workInProgress.child!];
+				}
+				workInProgress.flags |= ChildDeletion;
+			}
+
+			workInProgress.child = primaryFragment;
+			primaryFragment.return = workInProgress;
+			console.log('primaryFragment', primaryFragment);
+
+			return primaryFragment;
 		}
 	}
-}
-
-function mountSuspenseFallbackChildren(
-	workInProgress: FiberNode,
-	primaryChildren: any,
-	fallbackChildren: any,
-	renderLanes: any
-) {
-	const progressedPrimaryFragment: FiberNode | null = workInProgress.child;
-
-	let primaryChildFragment;
-	let fallbackChildFragment;
-
-	if (progressedPrimaryFragment !== null) {
-		primaryChildFragment = progressedPrimaryFragment;
-		primaryChildFragment.childLanes = NoLanes;
-		primaryChildFragment.pendingProps = primaryChildren;
-
-		fallbackChildFragment = createFiberFromFragment(
-			fallbackChildren,
-			renderLanes,
-			null
-		);
-	} else {
-		primaryChildFragment = createFiberFromFragment(
-			primaryChildren,
-			renderLanes,
-			null
-		);
-		fallbackChildFragment = createFiberFromFragment(
-			fallbackChildren,
-			renderLanes,
-			null
-		);
-	}
-
-	primaryChildFragment.return = workInProgress;
-	fallbackChildFragment.return = workInProgress;
-	primaryChildFragment.sibling = fallbackChildFragment;
-	workInProgress.child = primaryChildFragment;
-
-	return fallbackChildFragment;
-}
-function updateSuspenseFallbackChildren(
-	workInProgress: FiberNode,
-	primaryChildren: any,
-	fallbackChildren: any,
-	renderLanes: any
-) {
-	const current = workInProgress.alternate!;
-	const currentPrimaryChildFragment: FiberNode = current.child;
-	const currentFallbackChildFragment: FiberNode | null =
-		currentPrimaryChildFragment.sibling;
-}
-
-function mountSuspensePrimaryChildren(
-	workInProgress: FiberNode,
-	primaryChildren: any,
-	renderLanes: Lanes
-) {
-	const primaryChildFragment = createFiberFromFragment(
-		primaryChildren,
-		renderLanes,
-		null
-	);
-	primaryChildFragment.return = workInProgress;
-	workInProgress.child = primaryChildFragment;
-	return primaryChildFragment;
 }

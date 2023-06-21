@@ -125,10 +125,9 @@ export function createFiberFromElement(
 			case REACT_LAZY_TYPE:
 				fiberTag = LazyComponent;
 				break;
-			case REACT_SUSPENSE_TYPE:
-				fiberTag = SuspenseComponent;
-				break;
 		}
+	} else if (type === REACT_SUSPENSE_TYPE) {
+		fiberTag = SuspenseComponent;
 	} else if (typeof type !== 'function') {
 		console.error('未定义的type类型', element);
 	}

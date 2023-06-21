@@ -17,11 +17,11 @@ export interface ReactElement {
 
 export type Action<State> = State | ((prevState: State) => State);
 
-export interface Wakeable<Result, NextResult = void> {
+export interface Wakeable<Result = any> {
 	then(
-		onFulfill: () => Thenable<Result>,
-		onReject: () => Thenable<Result>
-	): void | Wakeable<NextResult>;
+		onFulfill: () => Result,
+		onReject: () => Result
+	): void | Wakeable<Result>;
 }
 
 interface ThenableImpl<T, Result, Err> {

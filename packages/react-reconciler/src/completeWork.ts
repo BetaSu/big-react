@@ -13,8 +13,10 @@ import {
 	HostComponent,
 	HostRoot,
 	HostText,
-	LazyComponent
+	LazyComponent,
+	SuspenseComponent
 } from './workTags';
+import { RetryQueue } from './fiberThrow';
 
 function markRef(fiber: FiberNode) {
 	fiber.flags |= Ref;
@@ -119,6 +121,11 @@ export const completeWork = (workInProgress: FiberNode) => {
 			}
 
 			// 冒泡flag
+			bubbleProperties(workInProgress);
+			return null;
+		case SuspenseComponent:
+			const retryQueue = workInProgress.updateQueue as RetryQueue | null;
+			if (retryQueue !== null) workInProgress.flags |= Update;
 			bubbleProperties(workInProgress);
 			return null;
 		default:

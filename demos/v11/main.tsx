@@ -1,23 +1,23 @@
-import { useState, useEffect, lazy } from 'react';
+import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const Comp = lazy(() => import('./component'));
-
 function App() {
-	console.log(lazy);
 	const [num, updateNum] = useState(0);
 	const len = 8;
 
-	useEffect(() => {
-		Comp().then((res) => {
-			console.log(res);
-		});
-	}, []);
 	console.log('num', num);
 	return (
-		<div>
-			<Comp />
-		</div>
+		<ul
+			onClick={(e) => {
+				updateNum((num: number) => num + 1);
+			}}
+		>
+			{Array(len)
+				.fill(1)
+				.map((_, i) => {
+					return <Child i={`${i} ${num}`} />;
+				})}
+		</ul>
 	);
 }
 
