@@ -25,8 +25,17 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	SuspenseComponent
 } from './workTags';
+import { RetryQueue } from './fiberThrow';
+import { Wakeable } from 'shared/ReactTypes';
+import { SyncLane } from './fiberLanes';
+import {
+	ensureRootIsScheduled,
+	markRootUpdated,
+	markUpdateLaneFromFiberToRoot
+} from './workLoop';
 
 let nextEffect: FiberNode | null = null;
 
@@ -84,8 +93,16 @@ const commitMutationEffectsOnFiber = (
 		finishedWork.flags &= ~ChildDeletion;
 	}
 	if ((flags & Update) !== NoFlags) {
-		commitUpdate(finishedWork);
 		finishedWork.flags &= ~Update;
+		if (tag === SuspenseComponent) {
+			const retryQueue = finishedWork.updateQueue as RetryQueue;
+			if (retryQueue !== null) {
+				finishedWork.updateQueue = null;
+				attachSuspenseRetryListeners(finishedWork, retryQueue);
+			}
+		} else {
+			commitUpdate(finishedWork);
+		}
 	}
 	if ((flags & PassiveEffect) !== NoFlags) {
 		// 收集因deps变化而需要执行的useEffect
@@ -400,6 +417,39 @@ export function commitHookEffectListMount(flags: Flags, lastEffect: Effect) {
 		const create = effect.create;
 		if (typeof create === 'function') {
 			effect.destroy = create();
+		}
+	});
+}
+
+function getRetryCache(finishedWork: FiberNode) {
+	switch (finishedWork.tag) {
+		case SuspenseComponent:
+			let retryCache = finishedWork.stateNode;
+			if (retryCache === null) {
+				retryCache = finishedWork.stateNode = new WeakSet();
+			}
+			return retryCache;
+	}
+}
+
+function resolveRetryWakeable(boundaryFiber: FiberNode) {
+	const root = markUpdateLaneFromFiberToRoot(boundaryFiber, SyncLane);
+	if (root !== null) {
+		markRootUpdated(root, SyncLane);
+		ensureRootIsScheduled(root);
+	}
+}
+
+function attachSuspenseRetryListeners(
+	finishedWork: FiberNode,
+	wakeables: RetryQueue
+) {
+	const retryCache = getRetryCache(finishedWork);
+	wakeables.forEach((wakeable) => {
+		const retry = resolveRetryWakeable.bind(null, finishedWork);
+		if (!retryCache.has(wakeable)) {
+			retryCache.add(wakeable);
+			wakeable.then(retry, retry);
 		}
 	});
 }

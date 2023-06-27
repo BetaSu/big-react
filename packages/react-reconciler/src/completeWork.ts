@@ -1,6 +1,6 @@
 import { updateFiberProps } from 'react-dom/src/SyntheticEvent';
 import { FiberNode } from './fiber';
-import { NoFlags, Ref, Update } from './fiberFlags';
+import { NoFlags, Ref, Update, Visibility } from './fiberFlags';
 import {
 	appendInitialChild,
 	createInstance,
@@ -12,8 +12,12 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	LazyComponent,
+	OffscreenComponent,
+	SuspenseComponent
 } from './workTags';
+import { RetryQueue } from './fiberThrow';
 
 function markRef(fiber: FiberNode) {
 	fiber.flags |= Ref;
@@ -100,6 +104,7 @@ export const completeWork = (workInProgress: FiberNode) => {
 		case FunctionComponent:
 		case HostRoot:
 		case Fragment:
+		case LazyComponent:
 			bubbleProperties(workInProgress);
 			return null;
 		case HostText:
@@ -118,6 +123,19 @@ export const completeWork = (workInProgress: FiberNode) => {
 
 			// 冒泡flag
 			bubbleProperties(workInProgress);
+			return null;
+		case SuspenseComponent:
+			const retryQueue = workInProgress.updateQueue as RetryQueue | null;
+			if (retryQueue !== null) {
+				workInProgress.flags |= Update;
+			}
+			bubbleProperties(workInProgress);
+			return null;
+		case OffscreenComponent:
+			const nextIsHidden = workInProgress.memoizedProps?.mode === 'hidden';
+			if (!nextIsHidden) {
+				bubbleProperties(workInProgress);
+			}
 			return null;
 		default:
 			console.error('completeWork未定义的fiber.tag', workInProgress);

@@ -7,9 +7,18 @@ import {
 	Fragment,
 	FunctionComponent,
 	HostComponent,
-	WorkTag
+	WorkTag,
+	LazyComponent,
+	SuspenseComponent,
+	OffscreenComponent
 } from './workTags';
 import { CallbackNode } from 'scheduler';
+import { REACT_LAZY_TYPE, REACT_SUSPENSE_TYPE } from 'shared/ReactSymbols';
+import {
+	OffscreenInstance,
+	OffscreenProps,
+	OffscreenVisible
+} from './fiberOffscreenComponent';
 
 export class FiberNode {
 	pendingProps: Props;
@@ -117,6 +126,14 @@ export function createFiberFromElement(
 
 	if (typeof type === 'string') {
 		fiberTag = HostComponent;
+	} else if (typeof type === 'object' && type !== null) {
+		switch (type.$$typeof) {
+			case REACT_LAZY_TYPE:
+				fiberTag = LazyComponent;
+				break;
+		}
+	} else if (type === REACT_SUSPENSE_TYPE) {
+		fiberTag = SuspenseComponent;
 	} else if (typeof type !== 'function') {
 		console.error('未定义的type类型', element);
 	}
@@ -173,3 +190,28 @@ export const createWorkInProgress = (
 
 	return wip;
 };
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function resolveLazyComponentTag(Component: Function): WorkTag {
+	if (typeof Component === 'function') {
+		// 不考虑class
+		return FunctionComponent;
+	}
+	throw '未知的tag';
+}
+
+export function createFiberFromOffscreen(
+	pendingProps: OffscreenProps,
+	lanes: Lanes,
+	key: null | string
+) {
+	const fiber = new FiberNode(OffscreenComponent, pendingProps, key);
+	fiber.lanes = lanes;
+	// TODO
+	const primaryChildInstance: OffscreenInstance = {
+		visibility: OffscreenVisible,
+		retryCache: null
+	};
+	fiber.stateNode = primaryChildInstance;
+	return fiber;
+}
