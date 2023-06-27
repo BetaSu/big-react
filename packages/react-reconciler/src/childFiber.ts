@@ -1,4 +1,8 @@
-import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols';
+import {
+	REACT_ELEMENT_TYPE,
+	REACT_FRAGMENT_TYPE,
+	REACT_LAZY_TYPE
+} from 'shared/ReactSymbols';
 import { Props, ReactElement } from 'shared/ReactTypes';
 import {
 	createFiberFromElement,
@@ -9,6 +13,7 @@ import {
 import { ChildDeletion, Placement } from './fiberFlags';
 import { Lanes } from './fiberLanes';
 import { Fragment, HostText } from './workTags';
+import { LazyComponent } from 'react/src/lazy';
 
 /**
  * mount/reconcile只负责 Placement(插入)/Placement(移动)/ChildDeletion(删除)
@@ -16,6 +21,12 @@ import { Fragment, HostText } from './workTags';
  */
 
 type ExistingChildren = Map<string | number, FiberNode>;
+
+function resolveLazy(lazyType: LazyComponent<any, any>) {
+	const payload = lazyType._payload;
+	const init = lazyType._init;
+	return init(payload);
+}
 
 function ChildReconciler(shouldTrackEffects: boolean) {
 	function deleteChild(returnFiber: FiberNode, childToDelete: FiberNode) {
@@ -60,7 +71,12 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 				// key相同，比较type
 
 				if (element.$$typeof === REACT_ELEMENT_TYPE) {
-					if (current.type === element.type) {
+					if (
+						current.type === element.type ||
+						(typeof element.type === 'object' &&
+							element.type.$$typeof === REACT_LAZY_TYPE &&
+							resolveLazy(element.type) === currentFirstChild?.type)
+					) {
 						// type相同 可以复用
 						let props = element.props;
 						if (element.type === REACT_FRAGMENT_TYPE) {

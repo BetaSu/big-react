@@ -8,7 +8,7 @@ const delay = (t: number) =>
 
 const Comp = lazy(() =>
 	import('./component').then((res) => {
-		return delay(3000).then(() => {
+		return delay(1000).then(() => {
 			console.log('ready render Comp');
 			return res;
 		});

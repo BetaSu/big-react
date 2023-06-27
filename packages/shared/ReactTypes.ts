@@ -58,3 +58,5 @@ export type Thenable<T, Result = void, Err = any> =
 	| PendingThenable<T, Result, Err>
 	| FulfilledThenable<T, Result, Err>
 	| RejectedThenable<T, Result, Err>;
+
+export type OffscreenMode = 'hidden' | 'visible';

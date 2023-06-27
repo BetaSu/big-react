@@ -9,10 +9,16 @@ import {
 	HostComponent,
 	WorkTag,
 	LazyComponent,
-	SuspenseComponent
+	SuspenseComponent,
+	OffscreenComponent
 } from './workTags';
 import { CallbackNode } from 'scheduler';
 import { REACT_LAZY_TYPE, REACT_SUSPENSE_TYPE } from 'shared/ReactSymbols';
+import {
+	OffscreenInstance,
+	OffscreenProps,
+	OffscreenVisible
+} from './fiberOffscreenComponent';
 
 export class FiberNode {
 	pendingProps: Props;
@@ -192,4 +198,20 @@ export function resolveLazyComponentTag(Component: Function): WorkTag {
 		return FunctionComponent;
 	}
 	throw '未知的tag';
+}
+
+export function createFiberFromOffscreen(
+	pendingProps: OffscreenProps,
+	lanes: Lanes,
+	key: null | string
+) {
+	const fiber = new FiberNode(OffscreenComponent, pendingProps, key);
+	fiber.lanes = lanes;
+	// TODO
+	const primaryChildInstance: OffscreenInstance = {
+		visibility: OffscreenVisible,
+		retryCache: null
+	};
+	fiber.stateNode = primaryChildInstance;
+	return fiber;
 }

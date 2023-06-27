@@ -1,6 +1,7 @@
 import {
 	Fragment,
 	LazyComponent,
+	OffscreenComponent,
 	SuspenseComponent
 } from 'react-reconciler/src/workTags';
 import { Props, ReactElement } from 'shared/ReactTypes';
@@ -8,6 +9,7 @@ import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import {
 	FiberNode,
 	createFiberFromFragment,
+	createFiberFromOffscreen,
 	createWorkInProgress,
 	resolveLazyComponentTag
 } from './fiber';
@@ -29,6 +31,8 @@ import {
 } from './fiberFlags';
 import { resolveDefaultProps } from './fiberLazyComponent';
 import { LazyComponent as LazyComponentType } from 'react/src/lazy';
+import { jsx } from 'react/src/jsx';
+import { OffscreenProps } from './fiberOffscreenComponent';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 	if (__LOG__) {
@@ -52,6 +56,8 @@ export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
 			return mountLazyComponent(workInProgress, renderLanes);
 		case SuspenseComponent:
 			return updateSuspenseComponent(workInProgress, renderLanes);
+		case OffscreenComponent:
+			return updateOffscreenComponent(workInProgress, renderLanes);
 		default:
 			console.error('beginWork未处理的情况');
 			return null;
@@ -173,61 +179,184 @@ function updateSuspenseComponent(
 	// 源码中会用Offline去保存状态
 	if (current === null) {
 		if (showFallback) {
-			const fallbackFragment = createFiberFromFragment(
+			const fallbackFragment = mountSuspenseFallbackChildren(
+				workInProgress,
+				nextPrimaryChildren,
 				nextFallbackChildren,
-				renderLanes,
-				null
+				renderLanes
 			);
-			fallbackFragment.flags |= Placement;
-			workInProgress.child = fallbackFragment;
-			fallbackFragment.return = workInProgress;
-
 			return fallbackFragment;
 		} else {
-			const primaryFragment = createFiberFromFragment(
+			return mountSuspensePrimaryChildren(
+				workInProgress,
 				nextPrimaryChildren,
-				renderLanes,
-				null
+				renderLanes
 			);
-
-			primaryFragment.flags |= Placement;
-			workInProgress.child = primaryFragment;
-			primaryFragment.return = workInProgress;
-
-			return primaryFragment;
 		}
 	} else {
 		if (showFallback) {
-			const fallbackFragment = createFiberFromFragment(
-				nextFallbackChildren,
-				renderLanes,
-				null
-			);
-			workInProgress.child = fallbackFragment;
-			fallbackFragment.return = workInProgress;
-			fallbackFragment.flags |= Placement;
-			return fallbackFragment;
-		} else {
-			const primaryFragment = createFiberFromFragment(
+			const fallbackChildFragment = updateSuspenseFallbackChildren(
+				workInProgress,
 				nextPrimaryChildren,
-				renderLanes,
-				null
+				nextFallbackChildren,
+				renderLanes
 			);
-
-			primaryFragment.flags |= Placement;
-			if (workInProgress.child) {
-				if (workInProgress.deletions !== null) {
-					workInProgress.deletions.push(workInProgress.child!);
-				} else {
-					workInProgress.deletions = [workInProgress.child!];
-				}
-				workInProgress.flags |= ChildDeletion;
-			}
-
-			workInProgress.child = primaryFragment;
-			primaryFragment.return = workInProgress;
-
-			return primaryFragment;
+			return fallbackChildFragment;
+		} else {
+			return updateSuspensePrimaryChildren(
+				workInProgress,
+				nextPrimaryChildren,
+				renderLanes
+			);
 		}
+	}
+}
+
+function mountSuspenseFallbackChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	fallbackChildren: any,
+	renderLanes: Lanes
+) {
+	const primaryChildProps: OffscreenProps = {
+		mode: 'hidden',
+		children: primaryChildren
+	};
+	const primaryChildFragment = mountWorkInProgressOffscreenFiber(
+		primaryChildProps,
+		NoLanes
+	);
+	const fallbackFragment = createFiberFromFragment(
+		fallbackChildren,
+		renderLanes,
+		null
+	);
+	primaryChildFragment.return = fallbackFragment.return = workInProgress;
+	primaryChildFragment.sibling = fallbackFragment;
+	workInProgress.child = primaryChildFragment;
+	return fallbackFragment;
+}
+
+function mountSuspensePrimaryChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	renderLanes: Lanes
+) {
+	const primaryChildProps: OffscreenProps = {
+		mode: 'visible',
+		children: primaryChildren
+	};
+	const primaryChildFragment = mountWorkInProgressOffscreenFiber(
+		primaryChildProps,
+		renderLanes
+	);
+	primaryChildFragment.return = workInProgress;
+	workInProgress.child = primaryChildFragment;
+	return primaryChildFragment;
+}
+function updateSuspenseFallbackChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	fallbackChildren: any,
+	renderLanes: Lanes
+) {
+	const current = workInProgress.alternate!;
+	const currentPrimaryChildFragment = current.child as FiberNode;
+	const currentFallbackChildFragment: FiberNode | null =
+		currentPrimaryChildFragment.sibling;
+	const primaryChildProps: OffscreenProps = {
+		mode: 'hidden',
+		children: primaryChildren
+	};
+	const primaryChildFragment = updateWorkInProgressOffscreenFiber(
+		currentPrimaryChildFragment,
+		primaryChildProps
+	);
+	let fallbackChildFragment!: FiberNode;
+	if (currentFallbackChildFragment !== null) {
+		fallbackChildFragment = createWorkInProgress(
+			currentFallbackChildFragment,
+			fallbackChildren
+		);
+	} else {
+		fallbackChildFragment = createFiberFromFragment(
+			fallbackChildren,
+			renderLanes,
+			null
+		);
+		fallbackChildFragment.flags |= Placement;
+	}
+
+	workInProgress.deletions = null;
+	workInProgress.flags &= ~ChildDeletion;
+
+	fallbackChildFragment.return = workInProgress;
+	primaryChildFragment.return = workInProgress;
+	primaryChildFragment.sibling = fallbackChildFragment;
+	workInProgress.child = primaryChildFragment;
+
+	return fallbackChildFragment;
+}
+
+function updateSuspensePrimaryChildren(
+	workInProgress: FiberNode,
+	primaryChildren: any,
+	renderLanes: Lanes
+) {
+	const current = workInProgress.alternate!;
+	const currentPrimaryChildFragment = current.child as FiberNode;
+	const currentFallbackChildFragment = currentPrimaryChildFragment.sibling;
+
+	const primaryChildFragment = updateWorkInProgressOffscreenFiber(
+		currentPrimaryChildFragment,
+		{
+			mode: 'visible',
+			children: primaryChildren
+		}
+	);
+
+	primaryChildFragment.return = workInProgress;
+	primaryChildFragment.sibling = null;
+
+	if (currentFallbackChildFragment !== null) {
+		const deletions = workInProgress.deletions;
+		if (deletions === null) {
+			workInProgress.deletions = [currentFallbackChildFragment];
+			workInProgress.flags |= ChildDeletion;
+		} else {
+			deletions.push(currentFallbackChildFragment);
+		}
+	}
+
+	workInProgress.child = primaryChildFragment;
+	return primaryChildFragment;
+}
+
+function mountWorkInProgressOffscreenFiber(
+	offscreenProps: OffscreenProps,
+	renderLanes: Lanes
+) {
+	return createFiberFromOffscreen(offscreenProps, renderLanes, null);
+}
+
+function updateWorkInProgressOffscreenFiber(
+	current: FiberNode,
+	offscreenProps: OffscreenProps
+) {
+	return createWorkInProgress(current, offscreenProps);
+}
+
+function updateOffscreenComponent(
+	workInProgress: FiberNode,
+	renderLanes: Lanes
+) {
+	// debugger;
+	const nextProps: OffscreenProps = workInProgress.pendingProps;
+	const nextChildren = nextProps.children;
+	if (nextProps.mode === 'hidden') {
+		return null;
+	} else {
+		reconcileChildren(workInProgress, nextChildren, renderLanes);
+		return workInProgress.child;
 	}
 }

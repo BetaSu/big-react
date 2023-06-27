@@ -1,6 +1,6 @@
 import { updateFiberProps } from 'react-dom/src/SyntheticEvent';
 import { FiberNode } from './fiber';
-import { NoFlags, Ref, Update } from './fiberFlags';
+import { NoFlags, Ref, Update, Visibility } from './fiberFlags';
 import {
 	appendInitialChild,
 	createInstance,
@@ -14,6 +14,7 @@ import {
 	HostRoot,
 	HostText,
 	LazyComponent,
+	OffscreenComponent,
 	SuspenseComponent
 } from './workTags';
 import { RetryQueue } from './fiberThrow';
@@ -129,6 +130,12 @@ export const completeWork = (workInProgress: FiberNode) => {
 				workInProgress.flags |= Update;
 			}
 			bubbleProperties(workInProgress);
+			return null;
+		case OffscreenComponent:
+			const nextIsHidden = workInProgress.memoizedProps?.mode === 'hidden';
+			if (!nextIsHidden) {
+				bubbleProperties(workInProgress);
+			}
 			return null;
 		default:
 			console.error('completeWork未定义的fiber.tag', workInProgress);
