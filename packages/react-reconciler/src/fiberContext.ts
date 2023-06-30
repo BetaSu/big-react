@@ -8,7 +8,7 @@ export function pushProvider<T>(context: ReactContext<T>, newValue: T) {
 }
 
 export function popProvider<T>(context: ReactContext<T>) {
+	valueStack.pop();
 	const currentValue = valueStack[valueStack.length - 1];
 	context._currentValue = currentValue;
-	valueStack.pop();
 }

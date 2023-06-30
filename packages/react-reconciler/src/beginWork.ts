@@ -54,12 +54,14 @@ function updateContextProvider(wip: FiberNode) {
 	if (__DEV__ && !('value' in newProps)) {
 		console.warn('<Context.Provider>需要传递value props');
 	}
-	if (newValue !== oldProps.value) {
-		// TODO
-		// context.value变化
-		// 从Provider向下DFS，寻找消费了当前变化的contexxt的consumer
-		// 如果找到consumer，从consumer向上便遍历到Provider
-		// 标记沿途组件存在更新
+	if (oldProps !== null) {
+		if (newValue !== oldProps.value) {
+			// TODO
+			// context.value变化
+			// 从Provider向下DFS，寻找消费了当前变化的contexxt的consumer
+			// 如果找到consumer，从consumer向上便遍历到Provider
+			// 标记沿途组件存在更新
+		}
 	}
 
 	// TODO context入栈过程
