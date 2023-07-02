@@ -6,6 +6,7 @@ import {
 	isValidElement as isValidElementFn
 } from './src/jsx';
 export { REACT_FRAGMENT_TYPE as Fragment } from 'shared/ReactSymbols';
+export { createContext } from './src/context';
 // React
 
 export const useState: Dispatcher['useState'] = (initialState) => {
@@ -26,6 +27,11 @@ export const useTransition: Dispatcher['useTransition'] = () => {
 export const useRef: Dispatcher['useRef'] = (initialValue) => {
 	const dispatcher = resolveDispatcher() as Dispatcher;
 	return dispatcher.useRef(initialValue);
+};
+
+export const useContext: Dispatcher['useContext'] = (context) => {
+	const dispatcher = resolveDispatcher() as Dispatcher;
+	return dispatcher.useContext(context);
 };
 
 // 内部数据共享层
