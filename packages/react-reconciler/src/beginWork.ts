@@ -64,7 +64,6 @@ function updateContextProvider(wip: FiberNode) {
 		}
 	}
 
-	// TODO context入栈过程
 	pushProvider(context, newValue);
 	const nextChildren = newProps.children;
 	reconcileChildren(wip, nextChildren);
