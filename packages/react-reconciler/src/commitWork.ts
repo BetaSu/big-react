@@ -269,12 +269,13 @@ function getHostParent(fiber: FiberNode) {
 }
 
 function recordHostChildrenToDelete(beginNode: FiberNode): FiberNode[] {
-	if (beginNode.tag !== Fragment) return [beginNode];
+	if (beginNode.tag !== Fragment && beginNode.tag !== FunctionComponent)
+		return [beginNode];
 	const hostChildrenToDelete: FiberNode[] = [];
 	const processQueue: FiberNode[] = [beginNode];
 	while (processQueue.length) {
 		const node = processQueue.shift();
-		if (node && node.tag !== Fragment) {
+		if (node && node.tag !== Fragment && node.tag !== FunctionComponent) {
 			hostChildrenToDelete.push(node);
 			continue;
 		}
