@@ -268,14 +268,18 @@ function getHostParent(fiber: FiberNode) {
 	console.error('getHostParent未找到hostParent');
 }
 
+function isHostTypeFiberNode(fiber: FiberNode) {
+	const tag = fiber.tag;
+	return [HostComponent, HostRoot, HostText].includes(tag);
+}
+
 function recordHostChildrenToDelete(beginNode: FiberNode): FiberNode[] {
-	if (beginNode.tag !== Fragment && beginNode.tag !== FunctionComponent)
-		return [beginNode];
+	if (isHostTypeFiberNode(beginNode)) return [beginNode];
 	const hostChildrenToDelete: FiberNode[] = [];
 	const processQueue: FiberNode[] = [beginNode];
 	while (processQueue.length) {
 		const node = processQueue.shift();
-		if (node && node.tag !== Fragment && node.tag !== FunctionComponent) {
+		if (node && isHostTypeFiberNode(node)) {
 			hostChildrenToDelete.push(node);
 			continue;
 		}
