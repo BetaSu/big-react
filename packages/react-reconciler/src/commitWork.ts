@@ -25,7 +25,8 @@ import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText
+	HostText,
+	Fragment
 } from './workTags';
 
 let nextEffect: FiberNode | null = null;
@@ -267,22 +268,28 @@ function getHostParent(fiber: FiberNode) {
 	console.error('getHostParent未找到hostParent');
 }
 
-function recordHostChildrenToDelete(
-	hostChildrenToDelete: FiberNode[],
-	unmountFiber: FiberNode
-) {
-	const lastOne = hostChildrenToDelete[hostChildrenToDelete.length - 1];
-	if (!lastOne) {
-		hostChildrenToDelete.push(unmountFiber);
-	} else {
-		let node = lastOne.sibling;
-		while (node !== null) {
-			if (unmountFiber === node) {
-				hostChildrenToDelete.push(unmountFiber);
-			}
-			node = node.sibling;
+function isHostTypeFiberNode(fiber: FiberNode) {
+	const tag = fiber.tag;
+	return [HostComponent, HostRoot, HostText].includes(tag);
+}
+
+function recordHostChildrenToDelete(beginNode: FiberNode): FiberNode[] {
+	if (isHostTypeFiberNode(beginNode)) return [beginNode];
+	const hostChildrenToDelete: FiberNode[] = [];
+	const processQueue: FiberNode[] = [beginNode];
+	while (processQueue.length) {
+		const node = processQueue.shift();
+		if (node && isHostTypeFiberNode(node)) {
+			hostChildrenToDelete.push(node);
+			continue;
+		}
+		let childNode = node?.child;
+		while (childNode) {
+			processQueue.push(childNode);
+			childNode = childNode.sibling;
 		}
 	}
+	return hostChildrenToDelete;
 }
 
 /**
@@ -295,17 +302,16 @@ function commitDeletion(childToDelete: FiberNode, root: FiberRootNode) {
 		console.log('删除DOM、组件unmount', childToDelete);
 	}
 	// 在Fragment之前，只需删除子树的根Host节点，但支持Fragment后，可能需要删除同级多个节点
-	const hostChildrenToDelete: FiberNode[] = [];
+	const hostChildrenToDelete: FiberNode[] =
+		recordHostChildrenToDelete(childToDelete);
 
 	commitNestedUnmounts(childToDelete, (unmountFiber) => {
 		switch (unmountFiber.tag) {
 			case HostComponent:
-				recordHostChildrenToDelete(hostChildrenToDelete, unmountFiber);
 				// 解绑ref
 				safelyDetachRef(unmountFiber);
 				return;
 			case HostText:
-				recordHostChildrenToDelete(hostChildrenToDelete, unmountFiber);
 				return;
 			case FunctionComponent:
 				// effect相关操作
