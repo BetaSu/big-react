@@ -305,22 +305,20 @@ function commitDeletion(childToDelete: FiberNode, root: FiberRootNode) {
 	const hostChildrenToDelete: FiberNode[] =
 		recordHostChildrenToDelete(childToDelete);
 
-	for (let i = 0; i < hostChildrenToDelete.length; i++) {
-		commitNestedUnmounts(hostChildrenToDelete[i], (unmountFiber) => {
-			switch (unmountFiber.tag) {
-				case HostComponent:
-					// 解绑ref
-					safelyDetachRef(unmountFiber);
-					return;
-				case HostText:
-					return;
-				case FunctionComponent:
-					// effect相关操作
-					commitPassiveEffect(unmountFiber, root, 'unmount');
-					return;
-			}
-		});
-	}
+	commitNestedUnmounts(childToDelete, (unmountFiber) => {
+		switch (unmountFiber.tag) {
+			case HostComponent:
+				// 解绑ref
+				safelyDetachRef(unmountFiber);
+				return;
+			case HostText:
+				return;
+			case FunctionComponent:
+				// effect相关操作
+				commitPassiveEffect(unmountFiber, root, 'unmount');
+				return;
+		}
+	});
 
 	if (hostChildrenToDelete.length) {
 		const hostParent = getHostParent(childToDelete) as Container;
