@@ -7,6 +7,7 @@ import {
 } from './src/jsx';
 export { REACT_FRAGMENT_TYPE as Fragment } from 'shared/ReactSymbols';
 export { createContext } from './src/context';
+export { REACT_SUSPENSE_TYPE as Suspense } from 'shared/ReactSymbols';
 // React
 
 export const useState: Dispatcher['useState'] = (initialState) => {
@@ -32,6 +33,11 @@ export const useRef: Dispatcher['useRef'] = (initialValue) => {
 export const useContext: Dispatcher['useContext'] = (context) => {
 	const dispatcher = resolveDispatcher() as Dispatcher;
 	return dispatcher.useContext(context);
+};
+
+export const use: Dispatcher['use'] = (usable) => {
+	const dispatcher = resolveDispatcher() as Dispatcher;
+	return dispatcher.use(usable);
 };
 
 // 内部数据共享层
