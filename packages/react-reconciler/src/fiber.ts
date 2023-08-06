@@ -6,14 +6,20 @@ import {
 	HostComponent,
 	WorkTag,
 	SuspenseComponent,
-	OffscreenComponent
+	OffscreenComponent,
+	LazyComponent,
+	IndeterminateComponent
 } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
 import { Container } from 'hostConfig';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
 import { Effect } from './fiberHooks';
 import { CallbackNode } from 'scheduler';
-import { REACT_PROVIDER_TYPE, REACT_SUSPENSE_TYPE } from 'shared/ReactSymbols';
+import {
+	REACT_PROVIDER_TYPE,
+	REACT_SUSPENSE_TYPE,
+	REACT_LAZY_TYPE
+} from 'shared/ReactSymbols';
 
 export class FiberNode {
 	type: any;
@@ -152,6 +158,8 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 		fiberTag = ContextProvider;
 	} else if (type === REACT_SUSPENSE_TYPE) {
 		fiberTag = SuspenseComponent;
+	} else if (typeof type === 'object' && type.$$typeof === REACT_LAZY_TYPE) {
+		fiberTag = LazyComponent;
 	} else if (typeof type !== 'function' && __DEV__) {
 		console.warn('为定义的type类型', element);
 	}

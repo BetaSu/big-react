@@ -1,14 +1,17 @@
 export type WorkTag =
 	| typeof FunctionComponent
+	| typeof IndeterminateComponent
 	| typeof HostRoot
 	| typeof HostComponent
 	| typeof HostText
 	| typeof Fragment
 	| typeof ContextProvider
 	| typeof SuspenseComponent
-	| typeof OffscreenComponent;
+	| typeof OffscreenComponent
+	| typeof LazyComponent;
 
 export const FunctionComponent = 0;
+export const IndeterminateComponent = 2;
 export const HostRoot = 3;
 
 export const HostComponent = 5;
@@ -19,3 +22,5 @@ export const ContextProvider = 8;
 
 export const SuspenseComponent = 13;
 export const OffscreenComponent = 14;
+
+export const LazyComponent = 16;
