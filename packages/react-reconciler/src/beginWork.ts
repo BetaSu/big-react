@@ -19,8 +19,7 @@ import {
 	HostText,
 	OffscreenComponent,
 	SuspenseComponent,
-	LazyComponent,
-	IndeterminateComponent
+	LazyComponent
 } from './workTags';
 import {
 	Ref,
