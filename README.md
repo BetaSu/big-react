@@ -69,6 +69,8 @@
 | Reconciler | Suspense 组件实现                      | ✅       | [Suspense](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)      |
 | Reconciler | Offscreen 组件实现                     | ✅       | [Offscreen](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)     |
 | Reconciler | use hook 实现                          | ✅       | [use hook](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)      |
+| React | React.lazy 实现                          | ✅       |  [Lazy 实现](https://github.com/BetaSu/big-react/pull/49/files) 由[L-Qun](https://github.com/L-Qun)完成    |
+
 
 ## 调试
 
