@@ -158,7 +158,6 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 	} else if (type === REACT_SUSPENSE_TYPE) {
 		fiberTag = SuspenseComponent;
 	} else if (typeof type === 'object' && type.$$typeof === REACT_LAZY_TYPE) {
-		console.log('element', element);
 		fiberTag = LazyComponent;
 	} else if (typeof type !== 'function' && __DEV__) {
 		console.warn('为定义的type类型', element);
