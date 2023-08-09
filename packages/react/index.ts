@@ -7,6 +7,7 @@ import {
 } from './src/jsx';
 export { REACT_FRAGMENT_TYPE as Fragment } from 'shared/ReactSymbols';
 export { createContext } from './src/context';
+export { lazy } from './src/lazy';
 export { REACT_SUSPENSE_TYPE as Suspense } from 'shared/ReactSymbols';
 // React
 

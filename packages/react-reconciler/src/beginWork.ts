@@ -18,7 +18,8 @@ import {
 	HostRoot,
 	HostText,
 	OffscreenComponent,
-	SuspenseComponent
+	SuspenseComponent,
+	LazyComponent
 } from './workTags';
 import {
 	Ref,
@@ -50,6 +51,8 @@ export const beginWork = (wip: FiberNode, renderLane: Lane) => {
 			return updateSuspenseComponent(wip);
 		case OffscreenComponent:
 			return updateOffscreenComponent(wip);
+		case LazyComponent:
+			return mountLazyComponent(wip, renderLane);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork未实现的类型');
@@ -58,6 +61,17 @@ export const beginWork = (wip: FiberNode, renderLane: Lane) => {
 	}
 	return null;
 };
+
+function mountLazyComponent(wip: FiberNode, renderLane: Lane) {
+	const LazyType = wip.type;
+	const payload = LazyType._payload;
+	const init = LazyType._init;
+	const Component = init(payload);
+	wip.type = Component;
+	wip.tag = FunctionComponent;
+	const child = updateFunctionComponent(wip, renderLane);
+	return child;
+}
 
 function updateContextProvider(wip: FiberNode) {
 	const providerType = wip.type;
