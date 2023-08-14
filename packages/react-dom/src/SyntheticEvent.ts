@@ -51,7 +51,7 @@ function createSyntheticEvent(e: Event) {
 	syntheticEvent.stopPropagation = () => {
 		syntheticEvent.__stopPropagation = true;
 		if (originStopPropagation) {
-			originStopPropagation();
+			originStopPropagation.call(e);
 		}
 	};
 	return syntheticEvent;

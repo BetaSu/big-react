@@ -8,6 +8,7 @@ import {
 export { REACT_FRAGMENT_TYPE as Fragment } from 'shared/ReactSymbols';
 export { createContext } from './src/context';
 export { REACT_SUSPENSE_TYPE as Suspense } from 'shared/ReactSymbols';
+export { memo } from './src/memo';
 // React
 
 export const useState: Dispatcher['useState'] = (initialState) => {
@@ -38,6 +39,16 @@ export const useContext: Dispatcher['useContext'] = (context) => {
 export const use: Dispatcher['use'] = (usable) => {
 	const dispatcher = resolveDispatcher() as Dispatcher;
 	return dispatcher.use(usable);
+};
+
+export const useMemo: Dispatcher['useMemo'] = (nextCreate, deps) => {
+	const dispatcher = resolveDispatcher() as Dispatcher;
+	return dispatcher.useMemo(nextCreate, deps);
+};
+
+export const useCallback: Dispatcher['useCallback'] = (callback, deps) => {
+	const dispatcher = resolveDispatcher() as Dispatcher;
+	return dispatcher.useCallback(callback, deps);
 };
 
 // 内部数据共享层

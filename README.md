@@ -69,6 +69,8 @@
 | Reconciler | Suspense 组件实现                      | ✅       | [Suspense](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)      |
 | Reconciler | Offscreen 组件实现                     | ✅       | [Offscreen](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)     |
 | Reconciler | use hook 实现                          | ✅       | [use hook](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)      |
+| Reconciler | eagerState 性能优化策略                | ⬜️      |                                                                                                      |
+| Reconciler | bailout 性能优化策略                   | ⬜️      |                                                                                                      |
 
 ## 调试
 
