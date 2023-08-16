@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from 'react';
+import { useState, useContext, createContext, memo } from 'react';
 
 const ctx = createContext(0);
 
@@ -18,14 +18,14 @@ export default function App() {
 	);
 }
 
-function Cpn() {
+const Cpn = memo(function () {
 	console.log('Cpn render');
 	return (
 		<div>
 			<Child />
 		</div>
 	);
-}
+});
 
 function Child() {
 	console.log('Child render');

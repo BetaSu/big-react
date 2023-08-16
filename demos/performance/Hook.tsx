@@ -1,12 +1,10 @@
-import { useState, useContext, createContext, memo } from 'react';
-
-const ctx = createContext(0);
+import { useState, memo, useCallback } from 'react';
 
 export default function App() {
 	const [num, update] = useState(0);
 	console.log('App render ', num);
 
-	const addOne = () => update((num) => num + 1);
+	const addOne = useCallback(() => update((num) => num + 1), []);
 
 	return (
 		<div>

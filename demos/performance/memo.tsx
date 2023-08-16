@@ -1,6 +1,4 @@
-import { useState, useContext, createContext } from 'react';
-
-const ctx = createContext(0);
+import { useState, memo } from 'react';
 
 export default function App() {
 	const [num, update] = useState(0);
@@ -13,7 +11,7 @@ export default function App() {
 	);
 }
 
-function Cpn({ num, name }) {
+const Cpn = memo(function ({ num, name }) {
 	console.log('render ', name);
 	return (
 		<div>
@@ -21,7 +19,7 @@ function Cpn({ num, name }) {
 			<Child />
 		</div>
 	);
-}
+});
 
 function Child() {
 	console.log('Child render');

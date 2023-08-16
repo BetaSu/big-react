@@ -8,12 +8,12 @@ export default function App() {
 		<div>
 			<button onClick={() => update(num + 1)}>+ 1</button>
 			<p>num is: {num}</p>
-			<ExpensiveChild />
+			<ExpensiveSubtree />
 		</div>
 	);
 }
 
-function ExpensiveChild() {
-	console.log('ExpensiveChild render');
+function ExpensiveSubtree() {
+	console.log('ExpensiveSubtree render');
 	return <p>i am child</p>;
 }
