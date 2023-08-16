@@ -71,11 +71,11 @@
 | Reconciler | use hook 实现                          | ✅       | [use hook](https://github.com/BetaSu/big-react/commit/306bcf975bca29c19b4d5423cdf01ed7af131c32)      |
 | React | React.lazy 实现                          | ✅       |  [Lazy 实现](https://github.com/BetaSu/big-react/pull/49/files) 由[L-Qun](https://github.com/L-Qun)完成    |
 | React | React.memo 实现                          | ✅       |  [Lazy 实现]([https://github.com/BetaSu/big-react/pull/49/files](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525))    |
-| Reconciler | bailout性能优化策略                          | ✅       |  [bailout 实现]([https://github.com/BetaSu/big-react/pull/49/files](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525))    |
-| Reconciler | eagerState性能优化策略                          | ✅       |  [eagerState 实现]([https://github.com/BetaSu/big-react/pull/49/files](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525))    |
-| Reconciler | useMemo 实现                         | ✅       |  [useMemo 实现]([https://github.com/BetaSu/big-react/pull/49/files](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525))    |
-| Reconciler | useCallback 实现                          | ✅       |  [useCallback 实现]([https://github.com/BetaSu/big-react/pull/49/files](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525))    |
-| Reconciler | context兼容bailout策略                          | ✅       |  [context兼容]([https://github.com/BetaSu/big-react/pull/49/files](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525))    |
+| Reconciler | bailout性能优化策略                          | ✅       |  [bailout 实现](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525)    |
+| Reconciler | eagerState性能优化策略                          | ✅       |  [eagerState 实现](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525)   |
+| Reconciler | useMemo 实现                         | ✅       |  [useMemo 实现](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525)    |
+| Reconciler | useCallback 实现                          | ✅       |  [useCallback 实现](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525)    |
+| Reconciler | context兼容bailout策略                          | ✅       |  [context兼容](https://github.com/BetaSu/big-react/commit/bb1cedd2a4e6ba99562d28fdaa38e52d8da70525)    |
 
 
 
