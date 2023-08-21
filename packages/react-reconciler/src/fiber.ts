@@ -7,7 +7,7 @@ import {
 	WorkTag,
 	SuspenseComponent,
 	OffscreenComponent,
-	LazyComponent
+	LazyComponent,
 	MemoComponent
 } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
