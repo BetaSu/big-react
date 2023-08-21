@@ -7,7 +7,7 @@ export type WorkTag =
 	| typeof ContextProvider
 	| typeof SuspenseComponent
 	| typeof OffscreenComponent
-	| typeof LazyComponent;
+	| typeof LazyComponent
 	| typeof MemoComponent;
 
 export const FunctionComponent = 0;
