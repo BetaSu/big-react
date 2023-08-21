@@ -1,6 +1,6 @@
 {
 	"name": "react-dom",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"description": "",
 	"module": "index.ts",
 	"dependencies": {
@@ -9,5 +9,8 @@
 	},
 	"peerDependencies": {
 		"react": "workspace:*"
-	}
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
 }

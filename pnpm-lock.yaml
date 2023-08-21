@@ -124,23 +124,25 @@ importers:
         specifier: workspace:*
         version: link:../shared
 
-  packages/react-reconciler:
+  packages/react-noop-renderer:
     dependencies:
       react:
         specifier: workspace:*
         version: link:../react
-      react-dom:
+      react-reconciler:
         specifier: workspace:*
-        version: link:../react-dom
+        version: link:../react-reconciler
       shared:
         specifier: workspace:*
         version: link:../shared
 
-  packages/shared:
+  packages/react-reconciler:
     dependencies:
-      react:
-        specifier: workspace:*
-        version: link:../react
+      shared:
+        specifier: 'workspace: *'
+        version: link:../shared
+
+  packages/shared: {}
 
 packages:
 
