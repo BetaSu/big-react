@@ -138,13 +138,13 @@ function updateMemoComponent(wip: FiberNode, renderLane: Lane) {
 	if (current !== null) {
 		const prevProps = current.memoizedProps;
 
-		// 浅比较props
-		if (shallowEqual(prevProps, nextProps) && current.ref === wip.ref) {
-			didReceiveUpdate = false;
-			wip.pendingProps = prevProps;
+		// state context
+		if (!checkScheduledUpdateOrContext(current, renderLane)) {
+			// 浅比较props
+			if (shallowEqual(prevProps, nextProps) && current.ref === wip.ref) {
+				didReceiveUpdate = false;
+				wip.pendingProps = prevProps;
 
-			// state context
-			if (!checkScheduledUpdateOrContext(current, renderLane)) {
 				// 满足四要素
 				wip.lanes = current.lanes;
 				return bailoutOnAlreadyFinishedWork(wip, renderLane);
