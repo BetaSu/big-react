@@ -21,6 +21,13 @@ export default defineConfig({
 			{
 				find: 'react-dom',
 				replacement: path.resolve(__dirname, '../packages/react-dom')
+			},
+			{
+				find: 'hostConfig',
+				replacement: path.resolve(
+					__dirname,
+					'../packages/react-dom/src/hostConfig.ts'
+				)
 			}
 		]
 	},

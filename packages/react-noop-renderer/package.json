@@ -1,0 +1,14 @@
+{
+	"name": "react-noop-renderer",
+	"version": "0.0.0",
+	"description": "用于 debug Fiber内部运行流程的渲染器，没有明确的渲染产出",
+	"main": "index.ts",
+	"license": "MIT",
+	"dependencies": {
+		"react-reconciler": "workspace:*",
+		"shared": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "workspace:*"
+	}
+}

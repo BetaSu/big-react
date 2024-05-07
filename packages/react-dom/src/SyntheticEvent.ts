@@ -1,8 +1,15 @@
 import { Container } from './hostConfig';
+import * as Scheduler from 'scheduler';
+import {
+	SyncLane,
+	DefaultLane,
+	InputContinuousLane
+} from 'react-reconciler/src/fiberLanes';
+const { unstable_runWithPriority: runWithPriority } = Scheduler;
 
 // 支持的事件类型
 const validEventTypeList = ['click'];
-const elementEventPropsKey = '__props';
+export const elementEventPropsKey = '__props';
 
 type EventCallback = (e: SyntheticEvent) => void;
 interface Paths {
@@ -70,7 +77,10 @@ export const updateFiberProps = (
 const triggerEventFlow = (paths: EventCallback[], se: SyntheticEvent) => {
 	for (let i = 0; i < paths.length; i++) {
 		const callback = paths[i];
-		callback.call(null, se);
+		runWithPriority(eventTypeToEventPriority(se.type), () => {
+			callback.call(null, se);
+		});
+
 		if (se.__stopPropagation) {
 			break;
 		}
@@ -149,4 +159,17 @@ export const initEvent = (container: Container, eventType: string) => {
 	container.addEventListener(eventType, (e) => {
 		dispatchEvent(container, eventType, e);
 	});
+};
+const eventTypeToEventPriority = (eventType: string) => {
+	switch (eventType) {
+		case 'click':
+		case 'keydown':
+		case 'keyup':
+			return SyncLane;
+		case 'scroll':
+			return InputContinuousLane;
+		// TODO 更多事件类型
+		default:
+			return DefaultLane;
+	}
 };
