@@ -72,8 +72,8 @@ export function isValidElement(object: any) {
 }
 
 // jsxDEV传入的后续几个参数与jsx不同
-export const jsxDEV = (type: ElementType, config: any) => {
-	let key: Key = null;
+export const jsxDEV = (type: ElementType, config: any, key: Key) => {
+	key = key === undefined ? null : String(key);
 	const props: any = {};
 	let ref: Ref = null;
 
