@@ -1,148 +1,156 @@
-import { Disptach } from 'react/src/currentDispatcher';
+import { Dispatch } from 'react/src/currentDispatcher';
 import { Action } from 'shared/ReactTypes';
-import { Update } from './fiberFlags';
-import {
-	isSubsetOfLanes,
-	Lane,
-	Lanes,
-	mergeLanes,
-	NoLanes
-} from './fiberLanes';
+import { isSubsetOfLanes, Lane, mergeLanes, NoLane } from './fiberLanes';
+import { FiberNode } from './fiber';
 
 export interface Update<State> {
 	action: Action<State>;
 	lane: Lane;
 	next: Update<any> | null;
+	hasEagerState: boolean;
+	eagerState: State | null;
 }
 
 export interface UpdateQueue<State> {
 	shared: {
 		pending: Update<State> | null;
 	};
-	dispatch: Disptach<State> | null;
+	dispatch: Dispatch<State> | null;
 }
 
-// 创建
 export const createUpdate = <State>(
 	action: Action<State>,
-	lane: Lane
+	lane: Lane,
+	hasEagerState = false,
+	eagerState = null
 ): Update<State> => {
-	if (__LOG__) {
-		console.log('创建update：', action, lane);
-	}
 	return {
 		action,
 		lane,
-		next: null
+		next: null,
+		hasEagerState,
+		eagerState
 	};
 };
 
-// 插入
-export const enqueueUpdate = <Action>(
-	updateQueue: UpdateQueue<Action>,
-	update: Update<Action>
+export const createUpdateQueue = <State>() => {
+	return {
+		shared: {
+			pending: null
+		},
+		dispatch: null
+	} as UpdateQueue<State>;
+};
+
+export const enqueueUpdate = <State>(
+	updateQueue: UpdateQueue<State>,
+	update: Update<State>,
+	fiber: FiberNode,
+	lane: Lane
 ) => {
-	if (__LOG__) {
-		console.log('将update插入更新队列：', update);
-	}
 	const pending = updateQueue.shared.pending;
 	if (pending === null) {
+		// pending = a -> a
 		update.next = update;
 	} else {
-		// pending = a -> a
 		// pending = b -> a -> b
 		// pending = c -> a -> b -> c
 		update.next = pending.next;
 		pending.next = update;
 	}
 	updateQueue.shared.pending = update;
+
+	fiber.lanes = mergeLanes(fiber.lanes, lane);
+	const alternate = fiber.alternate;
+	if (alternate !== null) {
+		alternate.lanes = mergeLanes(alternate.lanes, lane);
+	}
 };
 
-// 初始化
-export const createUpdateQueue = <Action>() => {
-	const updateQueue: UpdateQueue<Action> = {
-		shared: {
-			pending: null
-		},
-		dispatch: null
-	};
-	return updateQueue;
-};
+export function basicStateReducer<State>(
+	state: State,
+	action: Action<State>
+): State {
+	if (action instanceof Function) {
+		// baseState 1 update (x) => 4x -> memoizedState 4
+		return action(state);
+	} else {
+		// baseState 1 update 2 -> memoizedState 2
+		return action;
+	}
+}
 
-// 消费
 export const processUpdateQueue = <State>(
 	baseState: State,
 	pendingUpdate: Update<State> | null,
-	renderLanes: Lanes
+	renderLane: Lane,
+	onSkipUpdate?: <State>(update: Update<State>) => void
 ): {
 	memoizedState: State;
-	skippedUpdateLanes: Lanes;
 	baseState: State;
-	baseQueue: null | Update<State>;
+	baseQueue: Update<State> | null;
 } => {
 	const result: ReturnType<typeof processUpdateQueue<State>> = {
 		memoizedState: baseState,
 		baseState,
-		baseQueue: null,
-		skippedUpdateLanes: NoLanes
+		baseQueue: null
 	};
 
 	if (pendingUpdate !== null) {
-		let update = pendingUpdate;
+		// 第一个update
+		const first = pendingUpdate.next;
+		let pending = pendingUpdate.next as Update<any>;
 
-		// 更新后的baseState（有跳过情况下与memoizedState不同）
 		let newBaseState = baseState;
-		// 更新后的baseQueue第一个节点
 		let newBaseQueueFirst: Update<State> | null = null;
-		// 更新后的baseQueue最后一个节点
 		let newBaseQueueLast: Update<State> | null = null;
+		let newState = baseState;
 
 		do {
-			const updateLane = update.lane;
+			const updateLane = pending.lane;
+			if (!isSubsetOfLanes(renderLane, updateLane)) {
+				// 优先级不够 被跳过
+				const clone = createUpdate(pending.action, pending.lane);
 
-			if (!isSubsetOfLanes(renderLanes, updateLane)) {
-				// 优先级不足
-				const clone = createUpdate(update.action, update.lane);
-				if (newBaseQueueLast === null) {
-					// 没有被跳过的update
-					newBaseQueueFirst = newBaseQueueLast = clone;
-					// baseState从此开始计算
-					newBaseState = result.memoizedState;
+				onSkipUpdate?.(clone);
+
+				// 是不是第一个被跳过的
+				if (newBaseQueueFirst === null) {
+					// first u0 last = u0
+					newBaseQueueFirst = clone;
+					newBaseQueueLast = clone;
+					newBaseState = newState;
 				} else {
-					newBaseQueueLast.next = clone;
-					newBaseQueueLast = newBaseQueueLast.next;
+					// first u0 -> u1 -> u2
+					// last u2
+					(newBaseQueueLast as Update<State>).next = clone;
+					newBaseQueueLast = clone;
 				}
-				// 记录跳过的lane
-				result.skippedUpdateLanes = mergeLanes(
-					result.skippedUpdateLanes,
-					update.lane
-				);
 			} else {
 				// 优先级足够
 				if (newBaseQueueLast !== null) {
-					// 之前有跳过的
-					const clone = createUpdate(update.action, update.lane);
+					const clone = createUpdate(pending.action, NoLane);
 					newBaseQueueLast.next = clone;
-					newBaseQueueLast = newBaseQueueLast.next;
+					newBaseQueueLast = clone;
 				}
 
-				const action = update.action;
-				if (action instanceof Function) {
-					result.memoizedState = action(result.memoizedState);
+				const action = pending.action;
+				if (pending.hasEagerState) {
+					newState = pending.eagerState;
 				} else {
-					result.memoizedState = action;
+					newState = basicStateReducer(baseState, action);
 				}
 			}
-			update = update.next as Update<State>;
-		} while (update !== pendingUpdate);
+			pending = pending.next as Update<any>;
+		} while (pending !== first);
 
 		if (newBaseQueueLast === null) {
-			// 没有跳过的，memoizedState应该与baseState一致
-			newBaseState = result.memoizedState;
+			// 本次计算没有update被跳过
+			newBaseState = newState;
 		} else {
-			// 形成环状链表
 			newBaseQueueLast.next = newBaseQueueFirst;
 		}
+		result.memoizedState = newState;
 		result.baseState = newBaseState;
 		result.baseQueue = newBaseQueueLast;
 	}

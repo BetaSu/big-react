@@ -1,39 +1,41 @@
+import { getPackageJSON, resolvePkgPath, getBaseRollupPlugins } from './utils';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 import alias from '@rollup/plugin-alias';
-import path from 'path';
-import { resolvePkgPath, getBaseRollupPlugins, getPackageJSON } from './utils';
 
-const { name, peerDependencies } = getPackageJSON('react-noop-renderer');
+const { name, module, peerDependencies } = getPackageJSON(
+	'react-noop-renderer'
+);
+// react-dom包的路径
 const pkgPath = resolvePkgPath(name);
+// react-dom产物路径
 const pkgDistPath = resolvePkgPath(name, true);
 
-const basePlugins = getBaseRollupPlugins({
-	typescript: {
-		tsconfigOverride: {
-			compilerOptions: {
-				baseUrl: path.resolve(pkgPath, '../'),
-				paths: {
-					hostConfig: [`./${name}/src/hostConfig.ts`]
-				}
-			}
-		}
-	}
-});
-
 export default [
-	// React-Noop-Renderer
+	// react-noop-renderer
 	{
-		input: `${pkgPath}/index.ts`,
-		external: [...Object.keys(peerDependencies), 'scheduler'],
+		input: `${pkgPath}/${module}`,
 		output: [
 			{
 				file: `${pkgDistPath}/index.js`,
-				name: 'index.js',
+				name: 'ReactNoopRenderer',
 				format: 'umd'
 			}
 		],
+		external: [...Object.keys(peerDependencies), 'scheduler'],
 		plugins: [
-			...basePlugins,
+			...getBaseRollupPlugins({
+				typescript: {
+					exclude: ['./packages/react-dom/**/*'],
+					tsconfigOverride: {
+						compilerOptions: {
+							paths: {
+								hostConfig: [`./${name}/src/hostConfig.ts`]
+							}
+						}
+					}
+				}
+			}),
+			// webpack resolve alias
 			alias({
 				entries: {
 					hostConfig: `${pkgPath}/src/hostConfig.ts`
@@ -46,7 +48,9 @@ export default [
 					name,
 					description,
 					version,
-					peerDependencies: { react: version },
+					peerDependencies: {
+						react: version
+					},
 					main: 'index.js'
 				})
 			})

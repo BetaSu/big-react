@@ -135,20 +135,6 @@ describe('ReactElement', () => {
 		expect(element.props).toEqual({ foo: '56' });
 	});
 
-	// it('preserves the owner on the element', () => {
-	// 	let element;
-
-	// 	function Wrapper() {
-	// 		element = React.createElement(ComponentFC);
-	// 		return element;
-	// 	}
-
-	// 	const instance = ReactTestUtils.renderIntoDocument(
-	// 		React.createElement(Wrapper)
-	// 	);
-	// 	expect(element._owner.stateNode).toBe(instance);
-	// });
-
 	it('merges an additional argument onto the children prop', () => {
 		const a = 1;
 		const element = React.createElement(
@@ -232,6 +218,7 @@ describe('ReactElement', () => {
 		function Test() {
 			return <div />;
 		}
+
 		const test = ReactTestUtils.renderIntoDocument(<Test value={+undefined} />);
 		expect(test.props.value).toBeNaN();
 	});
@@ -240,10 +227,14 @@ describe('ReactElement', () => {
 	// // classic JS without JSX.
 	it('identifies elements, but not JSON, if Symbols are supported', () => {
 		// Rudimentary polyfill
+		// @eslint-
 		// Once all jest engines support Symbols natively we can swap this to test
 		// WITH native Symbols by default.
+		/*eslint-disable */
 		const REACT_ELEMENT_TYPE = function () {}; // fake Symbol
+		// eslint-disable-line no-use-before-define
 		const OTHER_SYMBOL = function () {}; // another fake Symbol
+		/*eslint-enable */
 		global.Symbol = function (name) {
 			return OTHER_SYMBOL;
 		};

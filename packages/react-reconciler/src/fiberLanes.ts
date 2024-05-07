@@ -1,93 +1,117 @@
+import ReactCurrentBatchConfig from 'react/src/currentBatchConfig';
 import {
-	unstable_NormalPriority as NormalPriority,
-	unstable_ImmediatePriority as ImmediatePriority,
-	unstable_IdlePriority as IdlePriority,
-	unstable_LowPriority as LowPriority,
-	unstable_UserBlockingPriority as UserBlockingPriority,
-	unstable_getCurrentPriorityLevel as getCurrentSchedulerPriorityLevel
+	unstable_getCurrentPriorityLevel,
+	unstable_IdlePriority,
+	unstable_ImmediatePriority,
+	unstable_NormalPriority,
+	unstable_UserBlockingPriority
 } from 'scheduler';
 import { FiberRootNode } from './fiber';
 
 export type Lane = number;
 export type Lanes = number;
 
-export const NoLane = /*               */ 0b0000000000000000000000000000000;
-export const NoLanes = /*              */ 0b0000000000000000000000000000000;
-export const SyncLane = /*             */ 0b0000000000000000000000000000001; // 同步，ex：onClick
-export const InputContinuousLane = /*  */ 0b0000000000000000000000000000010; // 连续触发，ex：onScroll
-export const DefaultLane = /*          */ 0b0000000000000000000000000000100; // 默认，ex：useEffect回调
-export const IdleLane = /*             */ 0b1000000000000000000000000000000; // 空闲
+export const SyncLane = 0b00001;
+export const NoLane = 0b00000;
+export const NoLanes = 0b00000;
+export const InputContinuousLane = 0b00010;
+export const DefaultLane = 0b00100;
+export const TransitionLane = 0b01000;
+export const IdleLane = 0b10000;
 
-export function mergeLanes(laneA: Lane, laneB: Lane): Lane {
+export function mergeLanes(laneA: Lane, laneB: Lane): Lanes {
 	return laneA | laneB;
 }
 
-// 获取update应有的优先级，根据update触发场景
 export function requestUpdateLane() {
-	// TODO render阶段触发更新
-	// TODO Transition
+	const isTransition = ReactCurrentBatchConfig.transition !== null;
+	if (isTransition) {
+		return TransitionLane;
+	}
 
-	// 从当前上下文中获取优先级信息
-	const currentSchedulerPriorityLevel = getCurrentSchedulerPriorityLevel();
-	const updateLane = schedulerPriorityToLane(currentSchedulerPriorityLevel);
-	console.warn('updateLane!', updateLane);
-	return updateLane;
+	// 从上下文环境中获取Scheduler优先级
+	const currentSchedulerPriority = unstable_getCurrentPriorityLevel();
+	const lane = schedulerPriorityToLane(currentSchedulerPriority);
+	return lane;
 }
 
 export function getHighestPriorityLane(lanes: Lanes): Lane {
 	return lanes & -lanes;
 }
 
-export function markRootFinished(root: FiberRootNode, lanes: Lanes) {
-	root.pendingLanes &= ~lanes;
-}
-
-export function isSubsetOfLanes(set: Lanes, subset: Lanes | Lane) {
+export function isSubsetOfLanes(set: Lanes, subset: Lane) {
 	return (set & subset) === subset;
 }
 
-// 当前没有做特殊处理，但是保留了lanes的灵活性
-export function getNextLanes(root: FiberRootNode): Lanes {
-	const pendingLanes = root.pendingLanes;
-	if (pendingLanes === NoLanes) {
-		return NoLanes;
-	}
-	const nextLanes = getHighestPriorityLane(pendingLanes);
+export function markRootFinished(root: FiberRootNode, lane: Lane) {
+	root.pendingLanes &= ~lane;
 
-	if (nextLanes === NoLanes) {
-		return NoLanes;
-	}
-	// TODO render阶段更新
-
-	return nextLanes;
+	root.suspendedLanes = NoLanes;
+	root.pingedLanes = NoLanes;
 }
 
-// lanes向Scheduler优先级转换
 export function lanesToSchedulerPriority(lanes: Lanes) {
 	const lane = getHighestPriorityLane(lanes);
+
 	if (lane === SyncLane) {
-		return ImmediatePriority;
+		return unstable_ImmediatePriority;
 	}
 	if (lane === InputContinuousLane) {
-		return UserBlockingPriority;
+		return unstable_UserBlockingPriority;
 	}
 	if (lane === DefaultLane) {
-		return NormalPriority;
+		return unstable_NormalPriority;
 	}
-	// 剩下的做空闲处理
-	return IdlePriority;
+	return unstable_IdlePriority;
 }
 
-// Scheduler优先级向lanes转换
 export function schedulerPriorityToLane(schedulerPriority: number): Lane {
-	if (schedulerPriority === ImmediatePriority) {
+	if (schedulerPriority === unstable_ImmediatePriority) {
 		return SyncLane;
 	}
-	if (schedulerPriority === UserBlockingPriority) {
+	if (schedulerPriority === unstable_UserBlockingPriority) {
 		return InputContinuousLane;
 	}
-	if (schedulerPriority === NormalPriority) {
+	if (schedulerPriority === unstable_NormalPriority) {
 		return DefaultLane;
 	}
 	return NoLane;
+}
+
+export function markRootPinged(root: FiberRootNode, pingedLane: Lane) {
+	root.pingedLanes |= root.suspendedLanes & pingedLane;
+}
+
+export function markRootSuspended(root: FiberRootNode, suspendedLane: Lane) {
+	root.suspendedLanes |= suspendedLane;
+	root.pingedLanes &= ~suspendedLane;
+}
+
+export function getNextLane(root: FiberRootNode): Lane {
+	const pendingLanes = root.pendingLanes;
+
+	if (pendingLanes === NoLanes) {
+		return NoLane;
+	}
+	let nextLane = NoLane;
+
+	// 排除掉挂起的lane
+	const suspendedLanes = pendingLanes & ~root.suspendedLanes;
+	if (suspendedLanes !== NoLanes) {
+		nextLane = getHighestPriorityLane(suspendedLanes);
+	} else {
+		const pingedLanes = pendingLanes & root.pingedLanes;
+		if (pingedLanes !== NoLanes) {
+			nextLane = getHighestPriorityLane(pingedLanes);
+		}
+	}
+	return nextLane;
+}
+
+export function includeSomeLanes(set: Lanes, subset: Lane | Lanes): boolean {
+	return (set & subset) !== NoLanes;
+}
+
+export function removeLanes(set: Lanes, subet: Lanes | Lane): Lanes {
+	return set & ~subet;
 }
