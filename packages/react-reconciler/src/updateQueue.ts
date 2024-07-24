@@ -138,7 +138,7 @@ export const processUpdateQueue = <State>(
 				if (pending.hasEagerState) {
 					newState = pending.eagerState;
 				} else {
-					newState = basicStateReducer(baseState, action);
+					newState = basicStateReducer(newState, action);
 				}
 			}
 			pending = pending.next as Update<any>;
