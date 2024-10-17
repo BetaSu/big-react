@@ -188,8 +188,9 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 			case REACT_MEMO_TYPE:
 				fiberTag = MemoComponent;
 				break;
-      case REACT_LAZY_TYPE:
-        fiberTag = LazyComponent
+			case REACT_LAZY_TYPE:
+				fiberTag = LazyComponent;
+				break;
 			default:
 				console.warn('未定义的type类型', element);
 				break;

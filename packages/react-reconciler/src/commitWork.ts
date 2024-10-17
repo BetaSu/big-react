@@ -99,7 +99,7 @@ const commitMutationEffectsOnFiber = (
 
 	if ((flags & Ref) !== NoFlags && tag === HostComponent) {
 		if (current !== null) {
-			safelyDetachRef(finishedWork);
+			safelyDetachRef(current);
 		}
 	}
 	if ((flags & Visibility) !== NoFlags && tag === OffscreenComponent) {
