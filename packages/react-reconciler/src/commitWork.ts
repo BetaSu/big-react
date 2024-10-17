@@ -72,6 +72,7 @@ const commitMutationEffectsOnFiber = (
 	root: FiberRootNode
 ) => {
 	const { flags, tag } = finishedWork;
+	const current = finishedWork.alternate;
 
 	if ((flags & Placement) !== NoFlags) {
 		commitPlacement(finishedWork);
@@ -95,8 +96,11 @@ const commitMutationEffectsOnFiber = (
 		commitPassiveEffect(finishedWork, root, 'update');
 		finishedWork.flags &= ~PassiveEffect;
 	}
+
 	if ((flags & Ref) !== NoFlags && tag === HostComponent) {
-		safelyDetachRef(finishedWork);
+		if (current !== null) {
+			safelyDetachRef(finishedWork);
+		}
 	}
 	if ((flags & Visibility) !== NoFlags && tag === OffscreenComponent) {
 		const isHidden = finishedWork.pendingProps.mode === 'hidden';
