@@ -347,8 +347,8 @@ export function cloneChildFibers(wip: FiberNode) {
 	while (currentChild.sibling !== null) {
 		currentChild = currentChild.sibling;
 		newChild = newChild.sibling = createWorkInProgress(
-			newChild,
-			newChild.pendingProps
+			currentChild,
+			currentChild.pendingProps
 		);
 		newChild.return = wip;
 	}
