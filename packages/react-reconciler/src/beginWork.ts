@@ -140,8 +140,9 @@ function updateMemoComponent(wip: FiberNode, renderLane: Lane) {
 
 		// state context
 		if (!checkScheduledUpdateOrContext(current, renderLane)) {
-			// 浅比较props
-			if (shallowEqual(prevProps, nextProps) && current.ref === wip.ref) {
+			const compare =
+				wip.type.compare !== null ? wip.type.compare : shallowEqual;
+			if (compare(prevProps, nextProps) && current.ref === wip.ref) {
 				didReceiveUpdate = false;
 				wip.pendingProps = prevProps;
 
