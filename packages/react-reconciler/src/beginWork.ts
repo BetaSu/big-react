@@ -134,6 +134,8 @@ function updateMemoComponent(wip: FiberNode, renderLane: Lane) {
 	const current = wip.alternate;
 	const nextProps = wip.pendingProps;
 	const Component = wip.type.type;
+	// compare 比较函数
+	const compare = wip.type.compare === null ? shallowEqual : wip.type.compare;
 
 	if (current !== null) {
 		const prevProps = current.memoizedProps;
@@ -141,7 +143,7 @@ function updateMemoComponent(wip: FiberNode, renderLane: Lane) {
 		// state context
 		if (!checkScheduledUpdateOrContext(current, renderLane)) {
 			// 浅比较props
-			if (shallowEqual(prevProps, nextProps) && current.ref === wip.ref) {
+			if (compare(prevProps, nextProps) && current.ref === wip.ref) {
 				didReceiveUpdate = false;
 				wip.pendingProps = prevProps;
 
